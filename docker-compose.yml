@@ -1,7 +1,12 @@
 version: "3.8"
 services:
   image:
-    build: .
+    build:
+      context: .
+      args:
+        WEBMIN_ROOT_HOSTNAME: ${WEBMIN_ROOT_HOSTNAME}
+        WEBMIN_ROOT_PASSWORD: ${WEBMIN_ROOT_PASSWORD}
+        WEBMIN_ROOT_PORT: ${WEBMIN_ROOT_PORT_PREFIX}0
     restart: always
     ports:
       - 22:22
