@@ -24,7 +24,7 @@ RUN chmod +x install.sh && echo ${WEBMIN_ROOT_HOSTNAME} > /etc/hostname \
 
 # EPEL
 RUN dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-$(< /etc/redhat-release tr -dc '0-9.'|cut -d \. -f1).noarch.rpm && \
-    dnf-config-manager --enable epel && \
+    dnf config-manager --enable epel && \
     dnf clean all && dnf update -y
 
 # Nodejs & C++
