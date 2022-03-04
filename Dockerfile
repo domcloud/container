@@ -52,39 +52,29 @@ RUN dnf install -y php81-php php81-php-bcmath php81-php-cli php81-php-common php
 RUN curl --fail -sSLo /etc/yum.repos.d/passenger.repo https://oss-binaries.phusionpassenger.com/yum/definitions/el-passenger.repo
 RUN dnf install -y nginx-mod-http-passenger || { dnf config-manager --enable cr && dnf install -y nginx-mod-http-passenger ; }
 
+# SystemD (again)
 RUN wget https://raw.githubusercontent.com/gdraheim/docker-systemctl-replacement/v1.5.4505/files/docker/systemctl3.py \
-    && chmod +x systemctl3.py && cp -f systemctl3.py /usr/bin/systemctl && rm -f systemctl3.py && head `which systemctl`
-
+    && chmod +x systemctl3.py && cp -f systemctl3.py /usr/bin/systemctl && rm -f systemctl3.py
 
 # Firewall
-RUN systemctl stop firewalld && \
-    systemctl disable firewalld && \
+RUN systemctl disable firewalld && \
     systemctl mask --now firewalld
 
 RUN dnf install -y iptables-services && \
-    systemctl start iptables && \
-    systemctl start ip6tables && \
     systemctl enable iptables && \
     systemctl enable ip6tables
 
 # Postgresql
 RUN dnf install -y postgresql-server postgresql-contrib && \
     postgresql-setup initdb && \
-    systemctl enable postgresql && \
-    systemctl start postgresql
+    systemctl enable postgresql
 
 # Disable stuff from webmin
-RUN systemctl stop clamav && \
-    systemctl disable clamav && \
-    systemctl stop dovecot && \
+RUN systemctl disable clamav && \
     systemctl disable dovecot && \
-    systemctl stop fail2ban && \
     systemctl disable fail2ban && \
-    systemctl stop postfix && \
     systemctl disable postfix && \
-    systemctl stop httpd && \
     systemctl disable httpd && \
-    systemctl stop httpd && \
     systemctl disable httpd
 
 RUN dnf install -y composer go rustc cargo rake
@@ -102,8 +92,10 @@ RUN git config --global pull.rebase false
 
 # SSH
 RUN dnf install -y openssh-server && \
+    systemctl enable sshd && \
     sed -i "s@#Port 22@Port 2122@" /etc/ssh/sshd_config
 
 EXPOSE 80 443 2122 3306 5432 53/udp 53/tcp
 EXPOSE ${WEBMIN_ROOT_PORT_PREFIX}0 ${WEBMIN_ROOT_PORT_PREFIX}1 ${WEBMIN_ROOT_PORT_PREFIX}2 ${WEBMIN_ROOT_PORT_PREFIX}3 ${WEBMIN_ROOT_PORT_PREFIX}4 ${WEBMIN_ROOT_PORT_PREFIX}5 ${WEBMIN_ROOT_PORT_PREFIX}6 {WEBMIN_ROOT_PORT_PREFIX}7 {WEBMIN_ROOT_PORT_PREFIX}8 {WEBMIN_ROOT_PORT_PREFIX}9
+
 ENTRYPOINT ["/usr/bin/systemctl","default","--init"]
