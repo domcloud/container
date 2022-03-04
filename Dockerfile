@@ -16,34 +16,32 @@ RUN wget https://raw.githubusercontent.com/gdraheim/docker-systemctl-replacement
     && chmod +x systemctl3.py && cp -f systemctl3.py /usr/bin/systemctl && rm -f systemctl3.py
 
 # Virtualmin
-RUN wget http://software.virtualmin.com/gpl/scripts/install.sh && chmod +x install.sh
-RUN echo ${WEBMIN_ROOT_HOSTNAME} > /etc/hostname \
+COPY install.sh
+RUN chmod +x install.sh && echo ${WEBMIN_ROOT_HOSTNAME} > /etc/hostname \
     && ./install.sh --minimal --force --bundle LEMP \
     && rm install.sh
 
 # EPEL
-RUN dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-$(< /etc/redhat-release tr -dc '0-9.'|cut -d \. -f1).noarch.rpm
-RUN dnf-config-manager --enable epel \
-    && dnf clean all && dnf update -y
+RUN dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-$(< /etc/redhat-release tr -dc '0-9.'|cut -d \. -f1).noarch.rpm && \
+    dnf-config-manager --enable epel && \
+    dnf clean all && dnf update -y
 
 # Nodejs & C++
-RUN dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-$(< /etc/redhat-release tr -dc '0-9.'|cut -d \. -f1).noarch.rpm
-RUN curl --fail -sSL -o setup-nodejs https://rpm.nodesource.com/setup_14.x
-RUN bash setup-nodejs
-RUN dnf install -y nodejs
+RUN curl --fail -sSL -o setup-nodejs https://rpm.nodesource.com/setup_14.x && \
+    bash setup-nodejs && \
+    dnf install -y nodejs
 
 # Python
-RUN dnf -y install python36 python36-pip
-RUN dnf -y install python38 python38-pip
+RUN dnf -y install python36 python38 python39
 
 # Ruby
-RUN curl -sSL https://rvm.io/mpapis.asc | gpg --import -
-RUN curl -sSL https://rvm.io/pkuczynski.asc | gpg --import -
-RUN curl -sSL https://get.rvm.io | bash -s stable
+RUN curl -sSL https://rvm.io/mpapis.asc | gpg --import - && \
+    curl -sSL https://rvm.io/pkuczynski.asc | gpg --import - && \
+    curl -sSL https://get.rvm.io | bash -s stable
 # relogin from now
-RUN usermod -a -G rvm `whoami`
-RUN rvm install ruby
-RUN rvm --default use ruby
+RUN usermod -a -G rvm `whoami` && \
+    rvm install ruby && \
+    rvm --default use ruby
 
 # PHP
 RUN dnf install -y https://rpms.remirepo.net/enterprise/remi-release-8.rpm
@@ -55,58 +53,57 @@ RUN dnf install -y php81-php php81-php-bcmath php81-php-cli php81-php-common php
 
 # Passenger Nginx
 RUN curl --fail -sSLo /etc/dnf.repos.d/passenger.repo https://oss-binaries.phusionpassenger.com/dnf/definitions/el-passenger.repo
-RUN dnf install -y nginx-mod-http-passenger || dnf-config-manager --enable cr && dnf install -y nginx-mod-http-passenger
+RUN dnf install -y nginx-mod-http-passenger || \
+    dnf-config-manager --enable cr && dnf install -y nginx-mod-http-passenger
 RUN systemctl restart nginx
 
 # Firewall
-RUN systemctl stop firewalld
-RUN systemctl disable firewalld
-RUN systemctl mask --now firewalld
+RUN systemctl stop firewalld && \
+    systemctl disable firewalld && \
+    systemctl mask --now firewalld
 
-RUN dnf install -y iptables-services
-RUN systemctl start iptables
-RUN systemctl start ip6tables
-RUN systemctl enable iptables
-RUN systemctl enable ip6tables
+RUN dnf install -y iptables-services &&
+    systemctl start iptables && \
+    systemctl start ip6tables && \
+    systemctl enable iptables && \
+    systemctl enable ip6tables
 
 # Postgresql
-RUN dnf install -y postgresql-server postgresql-contrib
-RUN postgresql-setup initdb
-RUN systemctl enable postgresql
-RUN systemctl start postgresql
+RUN dnf install -y postgresql-server postgresql-contrib && \
+    postgresql-setup initdb && \
+    systemctl enable postgresql && \
+    systemctl start postgresql
 
 # Disable stuff from webmin
-RUN systemctl stop clamav
-RUN systemctl disable clamav
-RUN systemctl stop dovecot
-RUN systemctl disable dovecot
-RUN systemctl stop fail2ban
-RUN systemctl disable fail2ban
-RUN systemctl stop postfix
-RUN systemctl disable postfix
-RUN systemctl stop httpd
-RUN systemctl disable httpd
-RUN systemctl stop httpd
-RUN systemctl disable httpd
+RUN systemctl stop clamav && \
+    systemctl disable clamav && \
+    systemctl stop dovecot && \
+    systemctl disable dovecot && \
+    systemctl stop fail2ban && \
+    systemctl disable fail2ban && \
+    systemctl stop postfix && \
+    systemctl disable postfix && \
+    systemctl stop httpd && \
+    systemctl disable httpd && \
+    systemctl stop httpd && \
+    systemctl disable httpd
 
 RUN dnf install -y composer go rustc cargo rake
 RUN npm install -g yarn
 
 # set root password
-WORKDIR /usr/libexec/webmin
-RUN ./changepass.pl /etc/webmin root ${WEBMIN_ROOT_PASSWORD}
-WORKDIR /root
+RUN /usr/libexec/webmin/changepass.pl /etc/webmin root ${WEBMIN_ROOT_PASSWORD}
 
 # Temporary fix for nginx
-RUN yum downgrade wbm-virtualmin-nginx-2.21 -y
-RUN yum downgrade wbm-virtualmin-nginx-ssl-1.15 -y
+RUN yum downgrade wbm-virtualmin-nginx-2.21 -y && \
+    yum downgrade wbm-virtualmin-nginx-ssl-1.15 -y
 
 # Git good default config
 RUN git config --global pull.rebase false
 
 # SSH
-RUN dnf install -y openssh-server
-RUN sed -i "s@#Port 22@Port 2122@" /etc/ssh/sshd_config
+RUN dnf install -y openssh-server && \
+    sed -i "s@#Port 22@Port 2122@" /etc/ssh/sshd_config
 
 EXPOSE 80 443 2122 3306 5432 53/udp 53/tcp
 EXPOSE ${WEBMIN_ROOT_PORT_PREFIX}0 ${WEBMIN_ROOT_PORT_PREFIX}1 ${WEBMIN_ROOT_PORT_PREFIX}2 ${WEBMIN_ROOT_PORT_PREFIX}3 ${WEBMIN_ROOT_PORT_PREFIX}4 ${WEBMIN_ROOT_PORT_PREFIX}5 ${WEBMIN_ROOT_PORT_PREFIX}6 {WEBMIN_ROOT_PORT_PREFIX}7 {WEBMIN_ROOT_PORT_PREFIX}8 {WEBMIN_ROOT_PORT_PREFIX}9
