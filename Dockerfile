@@ -6,23 +6,25 @@ ARG WEBMIN_ROOT_PORT_PREFIX
 WORKDIR /root
 
 # GNU tools
-RUN dnf install -y curl git nano vim wget net-tools openssl whois zip unzip tar
-RUN dnf install -y which gcc gcc-c++ gnupg2 gpg make cmake
+RUN dnf install -y curl git nano vim wget \
+    iproute net-tools dnf-utils openssl whois \
+    which gcc gcc-c++ gnupg2 gpg make cmake \
+    zip unzip tar
 
 # SystemD replacement
-RUN wget https://raw.githubusercontent.com/gdraheim/docker-systemctl-replacement/v1.5.4505/files/docker/systemctl3.py
-RUN chmod +x systemctl3.py && cp -f systemctl3.py /usr/bin/systemctl && rm -f systemctl3.py
+RUN wget https://raw.githubusercontent.com/gdraheim/docker-systemctl-replacement/v1.5.4505/files/docker/systemctl3.py \
+    && chmod +x systemctl3.py && cp -f systemctl3.py /usr/bin/systemctl && rm -f systemctl3.py
 
 # Virtualmin
 RUN wget http://software.virtualmin.com/gpl/scripts/install.sh && chmod +x install.sh
-RUN ./install.sh --minimal --force --bundle LEMP --hostname ${WEBMIN_ROOT_HOSTNAME}
-RUN rm install.sh
+RUN echo ${WEBMIN_ROOT_HOSTNAME} > /etc/hostname
+    && ./install.sh --minimal --force --bundle LEMP \
+    && rm install.sh
 
 # EPEL
-RUN dnf install -y dnf-utils
 RUN dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-$(< /etc/redhat-release tr -dc '0-9.'|cut -d \. -f1).noarch.rpm
-RUN dnf-config-manager --enable epel
-RUN dnf clean all && dnf update -y
+RUN dnf-config-manager --enable epel \
+    && dnf clean all && dnf update -y
 
 # Nodejs & C++
 RUN dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-$(< /etc/redhat-release tr -dc '0-9.'|cut -d \. -f1).noarch.rpm
@@ -45,8 +47,7 @@ RUN rvm --default use ruby
 
 # PHP
 RUN dnf install -y https://rpms.remirepo.net/enterprise/remi-release-8.rpm
-RUN dnf module reset -y php
-RUN dnf module enable php:remi-7.4
+RUN dnf module reset -y php && dnf module enable php:remi-7.4
 RUN dnf install -y php php-bcmath php-cli php-common php-devel php-fpm php-gd php-intl php-json php-mbstring php-mysqlnd php-opcache php-pdo php-pear php-pecl-igbinary php-pecl-memcached php-pecl-msgpack php-pecl-yaml php-pecl-zip php-pgsql php-process php-xml php-xmlrpc
 RUN dnf install -y php56-php php56-php-bcmath php56-php-cli php56-php-common php56-php-devel php56-php-fpm php56-php-gd php56-php-intl php56-php-json php56-php-mbstring php56-php-mysqlnd php56-php-opcache php56-php-pdo php56-php-pear php56-php-pecl-igbinary php56-php-pecl-memcached php56-php-pecl-msgpack php56-php-pecl-yaml php56-php-pecl-zip php56-php-pgsql php56-php-process php56-php-xml php56-php-xmlrpc
 RUN dnf install -y php80-php php80-php-bcmath php80-php-cli php80-php-common php80-php-devel php80-php-fpm php80-php-gd php80-php-intl php80-php-json php80-php-mbstring php80-php-mysqlnd php80-php-opcache php80-php-pdo php80-php-pear php80-php-pecl-igbinary php80-php-pecl-memcached php80-php-pecl-msgpack php80-php-pecl-yaml php80-php-pecl-zip php80-php-pgsql php80-php-process php80-php-xml php80-php-xmlrpc
