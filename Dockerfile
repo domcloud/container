@@ -1,5 +1,8 @@
 FROM rockylinux:latest
 MAINTAINER Wildan M <willnode@wellosoft.net>
+ARG WEBMIN_ROOT_HOSTNAME
+ARG WEBMIN_ROOT_PASSWORD
+ARG WEBMIN_ROOT_PORT
 WORKDIR /root
 
 # GNU tools
