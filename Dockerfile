@@ -17,8 +17,9 @@ RUN wget https://raw.githubusercontent.com/gdraheim/docker-systemctl-replacement
 
 # Virtualmin
 COPY install.sh .
+COPY slib.sh .
 RUN chmod +x install.sh && echo ${WEBMIN_ROOT_HOSTNAME} > /etc/hostname \
-    && ./install.sh --minimal --force --bundle LEMP \
+    && TERM=xterm COLUMNS=120 ./install.sh --minimal --force --bundle LEMP \
     && rm install.sh
 
 # EPEL
