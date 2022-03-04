@@ -51,7 +51,10 @@ RUN dnf install -y php81-php php81-php-bcmath php81-php-cli php81-php-common php
 # Passenger Nginx
 RUN curl --fail -sSLo /etc/yum.repos.d/passenger.repo https://oss-binaries.phusionpassenger.com/yum/definitions/el-passenger.repo
 RUN dnf install -y nginx-mod-http-passenger || { dnf config-manager --enable cr && dnf install -y nginx-mod-http-passenger ; }
-RUN systemctl restart nginx && /usr/bin/passenger-config validate-install
+
+RUN wget https://raw.githubusercontent.com/gdraheim/docker-systemctl-replacement/v1.5.4505/files/docker/systemctl3.py \
+    && chmod +x systemctl3.py && cp -f systemctl3.py /usr/bin/systemctl && rm -f systemctl3.py && head `which systemctl`
+
 
 # Firewall
 RUN systemctl stop firewalld && \
