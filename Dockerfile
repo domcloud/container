@@ -30,25 +30,19 @@ RUN dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-$(<
 # Nodejs & C++
 RUN curl --fail -sSL -o setup-nodejs https://rpm.nodesource.com/setup_14.x && \
     bash setup-nodejs && \
-    dnf install -y nodejs
+    dnf install -y nodejs && \
+    sed -i "/failovermethod=priority//" /etc/yum.repos.d/nodesource-el8.repo
 
 # Python
 RUN dnf -y install python36 python38 python39
+RUN alternatives --set python /usr/bin/python3.6 1
 
 # Ruby
 RUN dnf -y install ruby
-# RUN curl -sSL https://rvm.io/mpapis.asc | gpg --import - && \
-#     curl -sSL https://rvm.io/pkuczynski.asc | gpg --import - && \
-#     curl -sSL https://get.rvm.io | bash -s stable
-# # relogin from now
-# RUN source /etc/profile.d/rvm.sh && \
-#     usermod -a -G rvm `whoami` && \
-#     rvm install ruby && \
-#     rvm --default use ruby
 
 # PHP
 RUN dnf install -y https://rpms.remirepo.net/enterprise/remi-release-8.rpm
-RUN dnf module reset -y php && dnf module enable php:remi-7.4
+RUN dnf module reset -y php && dnf module enable -y php:remi-7.4
 RUN dnf install -y php php-bcmath php-cli php-common php-devel php-fpm php-gd php-intl php-json php-mbstring php-mysqlnd php-opcache php-pdo php-pear php-pecl-igbinary php-pecl-memcached php-pecl-msgpack php-pecl-yaml php-pecl-zip php-pgsql php-process php-xml php-xmlrpc
 RUN dnf install -y php56-php php56-php-bcmath php56-php-cli php56-php-common php56-php-devel php56-php-fpm php56-php-gd php56-php-intl php56-php-json php56-php-mbstring php56-php-mysqlnd php56-php-opcache php56-php-pdo php56-php-pear php56-php-pecl-igbinary php56-php-pecl-memcached php56-php-pecl-msgpack php56-php-pecl-yaml php56-php-pecl-zip php56-php-pgsql php56-php-process php56-php-xml php56-php-xmlrpc
 RUN dnf install -y php80-php php80-php-bcmath php80-php-cli php80-php-common php80-php-devel php80-php-fpm php80-php-gd php80-php-intl php80-php-json php80-php-mbstring php80-php-mysqlnd php80-php-opcache php80-php-pdo php80-php-pear php80-php-pecl-igbinary php80-php-pecl-memcached php80-php-pecl-msgpack php80-php-pecl-yaml php80-php-pecl-zip php80-php-pgsql php80-php-process php80-php-xml php80-php-xmlrpc
