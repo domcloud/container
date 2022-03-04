@@ -16,7 +16,7 @@ RUN wget https://raw.githubusercontent.com/gdraheim/docker-systemctl-replacement
     && chmod +x systemctl3.py && cp -f systemctl3.py /usr/bin/systemctl && rm -f systemctl3.py
 
 # Virtualmin
-COPY install.sh
+COPY install.sh .
 RUN chmod +x install.sh && echo ${WEBMIN_ROOT_HOSTNAME} > /etc/hostname \
     && ./install.sh --minimal --force --bundle LEMP \
     && rm install.sh
@@ -62,7 +62,7 @@ RUN systemctl stop firewalld && \
     systemctl disable firewalld && \
     systemctl mask --now firewalld
 
-RUN dnf install -y iptables-services &&
+RUN dnf install -y iptables-services && \
     systemctl start iptables && \
     systemctl start ip6tables && \
     systemctl enable iptables && \
