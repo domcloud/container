@@ -31,11 +31,11 @@ RUN dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-$(<
 RUN curl --fail -sSL -o setup-nodejs https://rpm.nodesource.com/setup_14.x && \
     bash setup-nodejs && \
     dnf install -y nodejs && \
-    sed -i "/failovermethod=priority//" /etc/yum.repos.d/nodesource-el8.repo
+    sed -i "s/failovermethod=priority//g" /etc/yum.repos.d/nodesource-el8.repo
 
 # Python
 RUN dnf -y install python36 python38 python39
-RUN alternatives --set python /usr/bin/python3.6 1
+RUN alternatives --install /usr/local/bin/python python /usr/bin/python3.9 1
 
 # Ruby
 RUN dnf -y install ruby
