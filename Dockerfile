@@ -6,7 +6,7 @@ ARG WEBMIN_ROOT_PORT_PREFIX
 WORKDIR /root
 
 # GNU tools
-RUN dnf install -y curl git nano vim wget \
+RUN dnf install -y curl git nano vim wget procps \
     iproute net-tools dnf-utils openssl whois \
     which gcc gcc-c++ gnupg2 gpg make cmake \
     zip unzip tar
