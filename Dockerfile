@@ -50,7 +50,7 @@ RUN dnf install -y php81-php php81-php-bcmath php81-php-cli php81-php-common php
 
 # Passenger Nginx
 RUN curl --fail -sSLo /etc/yum.repos.d/passenger.repo https://oss-binaries.phusionpassenger.com/yum/definitions/el-passenger.repo
-RUN sudo dnf install -y nginx-mod-http-passenger || { sudo dnf config-manager --enable cr && sudo dnf install -y nginx-mod-http-passenger ; }
+RUN dnf install -y nginx-mod-http-passenger || { dnf config-manager --enable cr && dnf install -y nginx-mod-http-passenger ; }
 RUN systemctl restart nginx && /usr/bin/passenger-config validate-install
 
 # Firewall
