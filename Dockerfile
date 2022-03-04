@@ -17,7 +17,7 @@ RUN wget https://raw.githubusercontent.com/gdraheim/docker-systemctl-replacement
 
 # Virtualmin
 RUN wget http://software.virtualmin.com/gpl/scripts/install.sh && chmod +x install.sh
-RUN echo ${WEBMIN_ROOT_HOSTNAME} > /etc/hostname
+RUN echo ${WEBMIN_ROOT_HOSTNAME} > /etc/hostname \
     && ./install.sh --minimal --force --bundle LEMP \
     && rm install.sh
 
