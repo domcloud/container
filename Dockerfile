@@ -40,7 +40,7 @@ RUN curl -sSL https://rvm.io/mpapis.asc | gpg --import - && \
     curl -sSL https://rvm.io/pkuczynski.asc | gpg --import - && \
     curl -sSL https://get.rvm.io | bash -s stable
 # relogin from now
-RUN source /etc/profile.d/rvm.sh &&
+RUN source /etc/profile.d/rvm.sh && \
     usermod -a -G rvm `whoami` && \
     rvm install ruby && \
     rvm --default use ruby
