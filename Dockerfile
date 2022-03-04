@@ -2,11 +2,11 @@ FROM rockylinux:latest
 MAINTAINER Wildan M <willnode@wellosoft.net>
 ARG WEBMIN_ROOT_HOSTNAME
 ARG WEBMIN_ROOT_PASSWORD
-ARG WEBMIN_ROOT_PORT
+ARG WEBMIN_ROOT_PORT_PREFIX
 WORKDIR /root
 
 # GNU tools
-RUN dnf install -y curl git nano vim wget openssl whois zip unzip tar
+RUN dnf install -y curl git nano vim wget net-tools openssl whois zip unzip tar
 RUN dnf install -y which gcc gcc-c++ gnupg2 gpg make cmake
 
 # SystemD replacement
@@ -14,8 +14,8 @@ RUN wget https://raw.githubusercontent.com/gdraheim/docker-systemctl-replacement
 RUN chmod +x systemctl3.py && cp -f systemctl3.py /usr/bin/systemctl && rm -f systemctl3.py
 
 # Virtualmin
-RUN wget http://software.virtualmin.com/gpl/scripts/install.sh
-RUN /bin/sh install.sh --bundle LEMP --hostname ${WEBMIN_ROOT_HOSTNAME} --minimal --force
+RUN wget http://software.virtualmin.com/gpl/scripts/install.sh && chmod +x install.sh
+RUN ./install.sh --minimal --force --bundle LEMP --hostname ${WEBMIN_ROOT_HOSTNAME}
 RUN rm install.sh
 
 # EPEL
@@ -103,7 +103,10 @@ RUN yum downgrade wbm-virtualmin-nginx-ssl-1.15 -y
 # Git good default config
 RUN git config --global pull.rebase false
 
-# # etc
-# RUN alternatives --config python
+# SSH
+RUN dnf install -y openssh-server
+RUN sed -i "s@#Port 22@Port 2122@" /etc/ssh/sshd_config
 
+EXPOSE 80 443 2122 3306 5432 53/udp 53/tcp
+EXPOSE ${WEBMIN_ROOT_PORT_PREFIX}0 ${WEBMIN_ROOT_PORT_PREFIX}1 ${WEBMIN_ROOT_PORT_PREFIX}2 ${WEBMIN_ROOT_PORT_PREFIX}3 ${WEBMIN_ROOT_PORT_PREFIX}4 ${WEBMIN_ROOT_PORT_PREFIX}5 ${WEBMIN_ROOT_PORT_PREFIX}6 {WEBMIN_ROOT_PORT_PREFIX}7 {WEBMIN_ROOT_PORT_PREFIX}8 {WEBMIN_ROOT_PORT_PREFIX}9
 ENTRYPOINT ["/usr/bin/systemctl","default","--init"]
