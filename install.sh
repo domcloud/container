@@ -18,8 +18,8 @@
 # License and version
 SERIAL=GPL
 KEY=GPL
-VER=7.0.0-beta5
-vm_version=7
+VER=6.x.x
+vm_version=6
 upgrade_virtualmin_host=software.virtualmin.com
 
 # Currently supported systems:
@@ -301,7 +301,7 @@ fi
 # fi
 chmod +x slib.sh
 # shellcheck disable=SC1091
-. ./slib.sh
+. /root/slib.sh
 
 # Check the serial number and key
 serial_ok "$SERIAL" "$KEY"
