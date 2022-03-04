@@ -36,14 +36,15 @@ RUN curl --fail -sSL -o setup-nodejs https://rpm.nodesource.com/setup_14.x && \
 RUN dnf -y install python36 python38 python39
 
 # Ruby
-RUN curl -sSL https://rvm.io/mpapis.asc | gpg --import - && \
-    curl -sSL https://rvm.io/pkuczynski.asc | gpg --import - && \
-    curl -sSL https://get.rvm.io | bash -s stable
-# relogin from now
-RUN source /etc/profile.d/rvm.sh && \
-    usermod -a -G rvm `whoami` && \
-    rvm install ruby && \
-    rvm --default use ruby
+RUN dnf -y install ruby
+# RUN curl -sSL https://rvm.io/mpapis.asc | gpg --import - && \
+#     curl -sSL https://rvm.io/pkuczynski.asc | gpg --import - && \
+#     curl -sSL https://get.rvm.io | bash -s stable
+# # relogin from now
+# RUN source /etc/profile.d/rvm.sh && \
+#     usermod -a -G rvm `whoami` && \
+#     rvm install ruby && \
+#     rvm --default use ruby
 
 # PHP
 RUN dnf install -y https://rpms.remirepo.net/enterprise/remi-release-8.rpm
