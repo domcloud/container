@@ -49,10 +49,9 @@ RUN dnf install -y php80-php php80-php-bcmath php80-php-cli php80-php-common php
 RUN dnf install -y php81-php php81-php-bcmath php81-php-cli php81-php-common php81-php-devel php81-php-fpm php81-php-gd php81-php-intl php81-php-json php81-php-mbstring php81-php-mysqlnd php81-php-opcache php81-php-pdo php81-php-pear php81-php-pecl-igbinary php81-php-pecl-memcached php81-php-pecl-msgpack php81-php-pecl-yaml php81-php-pecl-zip php81-php-pgsql php81-php-process php81-php-xml php81-php-xmlrpc
 
 # Passenger Nginx
-RUN curl --fail -sSLo /etc/dnf.repos.d/passenger.repo https://oss-binaries.phusionpassenger.com/dnf/definitions/el-passenger.repo
-RUN dnf install -y nginx-mod-http-passenger || \
-    dnf-config-manager --enable cr && dnf install -y nginx-mod-http-passenger
-RUN systemctl restart nginx
+RUN curl --fail -sSLo /etc/yum.repos.d/passenger.repo https://oss-binaries.phusionpassenger.com/yum/definitions/el-passenger.repo
+RUN sudo dnf install -y nginx-mod-http-passenger || { sudo dnf config-manager --enable cr && sudo dnf install -y nginx-mod-http-passenger ; }
+RUN systemctl restart nginx && /usr/bin/passenger-config validate-install
 
 # Firewall
 RUN systemctl stop firewalld && \
