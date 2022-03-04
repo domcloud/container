@@ -35,7 +35,7 @@ RUN curl --fail -sSL -o setup-nodejs https://rpm.nodesource.com/setup_14.x && \
 
 # Python
 RUN dnf -y install python36 python38 python39
-RUN alternatives --install /usr/local/bin/python python /usr/bin/python3.9 1
+RUN alternatives --install /usr/bin/unversioned-python python /usr/bin/python3.9 1
 
 # Ruby
 RUN dnf -y install ruby
