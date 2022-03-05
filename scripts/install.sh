@@ -18,7 +18,7 @@
 # License and version
 SERIAL=GPL
 KEY=GPL
-VER=6.x.x
+VER=7.0.0-beta5
 vm_version=6
 upgrade_virtualmin_host=software.virtualmin.com
 
@@ -41,7 +41,7 @@ NORMAL="$(tput sgr0)"
 
 # Set defaults
 bundle='LAMP' # Other option is LEMP
-mode='full' # Other option is minimal
+mode='full'   # Other option is minimal
 
 usage() {
   # shellcheck disable=SC2046
@@ -299,7 +299,7 @@ fi
 #   echo "${RED}Error:${NORMAL} Failed to download utility function library. Cannot continue. Check your network connection and DNS settings."
 #   exit 1
 # fi
-chmod +x /root/slib.sh
+# chmod +x slib.sh
 # shellcheck disable=SC1091
 . /root/slib.sh
 
@@ -595,7 +595,7 @@ log_debug "Install mode: $mode"
 log_debug "Product: Virtualmin $PRODUCT"
 log_debug "install.sh version: $VER"
 
-# [No need to] Check for a fully qualified hostname
+# Check for a fully qualified hostname
 # log_debug "Checking for fully qualified hostname..."
 # name="$(hostname -f)"
 # if [ -n "$forcehostname" ]; then
@@ -1011,12 +1011,12 @@ if [ -n "$QUOTA_FAILED" ]; then
 fi
 echo
 if [ $errors -eq "0" ]; then
-  hostname=$(cat /etc/hostname)
+  hostname=$(hostname -f)
   detect_ip
   log_success "Installation Complete!"
   log_success "If there were no errors above, Virtualmin should be ready"
   log_success "to configure at https://${hostname}:10000 (or https://${address}:10000)."
-  log_success "You'll receive a security warning in your browser on your first visit."
+  log_success "You may receive a security warning in your browser on your first visit."
 else
   log_warning "The following errors occurred during installation:"
   echo
