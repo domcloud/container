@@ -316,7 +316,7 @@ run_ok () {
   # Unicode checkmark and x mark for run_ok function
   CHECK='\u2714'
   BALLOT_X='\u2718'
-  spinner
+  spinner &
   spinpid=$!
   allpids="$allpids $spinpid"
   echo "Spin pid is: $spinpid" >> ${RUN_LOG}
@@ -325,14 +325,14 @@ run_ok () {
   touch ${SPINNER_DONEFILE}
   env sleep .2 # It's possible to have a race for stdout and spinner clobbering the next bit
   # Just in case the spinner survived somehow, kill it.
-  pidcheck=$(ps --no-headers ${spinpid})
-  if [ ! -z "$pidcheck" ]; then
-    echo "Made it here...why?" >> ${RUN_LOG}
-    kill $spinpid 2>/dev/null
-    rm -rf ${SPINNER_DONEFILE} 2>/dev/null 2>&1
-    tput rc
-    tput cnorm
-  fi
+  # pidcheck=$(ps --no-headers ${spinpid})
+  # if [ ! -z "$pidcheck" ]; then
+  #   echo "Made it here...why?" >> ${RUN_LOG}
+  #   kill $spinpid 2>/dev/null
+  #   rm -rf ${SPINNER_DONEFILE} 2>/dev/null 2>&1
+  #   tput rc
+  #   tput cnorm
+  # fi
   # Log what we were supposed to be running
   printf "${msg}: " >> ${RUN_LOG}
   if shell_has_unicode; then
