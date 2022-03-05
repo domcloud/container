@@ -68,12 +68,11 @@ ARG WEBMIN_ROOT_HOSTNAME
 RUN ssh-keygen -A && \
     npm install -g yarn pnpm && \
     mysql_install_db --skip-test-db && \
-    postgresql-setup --initdb --unit postgresql && \
+    # postgresql-setup --initdb --unit postgresql && \
     sed -i "s@#Port 22@Port 2122@" /etc/ssh/sshd_config && \
     git config --global pull.rebase false && \
     alternatives --install /usr/bin/unversioned-python python /usr/bin/python3.9 1 && \
     cp -f systemctl3.py /usr/bin/systemctl
-
 
 # bugfix https://github.com/virtualmin/Virtualmin-Config/commit/e8f4498d4cdc3618efee2120b80ccbc723e034e2
 COPY ./scripts/Virtualmin-Config.pm /usr/share/perl5/vendor_perl/Virtualmin/Config.pm
