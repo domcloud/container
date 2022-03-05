@@ -74,7 +74,7 @@ RUN ssh-keygen -A && \
     cp -f systemctl3.py /usr/bin/systemctl
 
 # resolv.conf can't be overriden inside docker
-COPY ./scripts/Net.pm ./scripts/ProFTPd.pm .
+COPY ./scripts/Net.pm ./scripts/ProFTPd.pm ./
 RUN cp {Net.pm,ProFTPd.pm,SASL.pm} /usr/share/perl5/Virtualmin/Config/Plugin/ && \
     virtualmin config-system -b MiniLEMP
 
