@@ -73,8 +73,9 @@ RUN ssh-keygen -A && \
     sed -i "s@port=10000@port=${WEBMIN_ROOT_PORT_PREFIX}0@" /etc/webmin/miniserv.conf
 
 # resolv.conf can't be overriden inside docker
-COPY ./scripts/setup/ /usr/share/perl5/Virtualmin/Config/Plugin/
-RUN virtualmin config-system -b MiniLEMP -i PostgreSQL
+COPY ./scripts/setup/ /root/setup/
+RUN cp -a ./setup/* usr/share/perl5/Virtualmin/Config/Plugin/ && \
+    virtualmin config-system -b MiniLEMP -i PostgreSQL
 
 # Firewall
 RUN systemctl disable firewalld && \
