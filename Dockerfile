@@ -47,7 +47,8 @@ RUN apt-get install -y composer php-pear php5.6 php5.6-cgi php5.6-cli php5.6-fpm
 
 # Virtualmin
 COPY ./scripts/install.sh ./scripts/slib.sh /root/
-RUN ./install.sh --minimal --force --verbose --bundle LEMP
+RUN TERM=xterm-256color COLUMNS=120 ./install.sh \
+    --minimal --force --verbose --bundle LEMP
 
 # Nodejs & C++
 RUN curl --fail -sSL -o setup-nodejs https://deb.nodesource.com/setup_16.x && \
