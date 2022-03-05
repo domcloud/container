@@ -58,9 +58,8 @@ RUN curl --fail -sSL -o setup-nodejs https://deb.nodesource.com/setup_14.x && \
 RUN apt-get install -y dirmngr gnupg && \
     apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 561F9B9CAC40B2F7 && \
     apt-get install -y apt-transport-https ca-certificates && \
-    echo deb https://oss-binaries.phusionpassenger.com/apt/passenger bionic main > /etc/apt/sources.list.d/passenger.list && \
-    apt-get update && \
-    apt-get install -y libnginx-mod-http-passenger
+    echo deb https://oss-binaries.phusionpassenger.com/apt/passenger focal main > /etc/apt/sources.list.d/passenger.list && \
+    apt-get update && apt-get install -y libnginx-mod-http-passenger
 
 ARG WEBMIN_ROOT_PORT_PREFIX
 ARG WEBMIN_ROOT_HOSTNAME
