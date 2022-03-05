@@ -299,7 +299,7 @@ fi
 #   echo "${RED}Error:${NORMAL} Failed to download utility function library. Cannot continue. Check your network connection and DNS settings."
 #   exit 1
 # fi
-chmod +x slib.sh
+chmod +x /root/slib.sh
 # shellcheck disable=SC1091
 . /root/slib.sh
 

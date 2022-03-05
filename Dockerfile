@@ -70,12 +70,10 @@ RUN dnf install -y postgresql-server postgresql-contrib && \
     systemctl enable postgresql
 
 # Disable stuff from webmin
-RUN systemctl disable clamav && \
-    systemctl disable dovecot && \
-    systemctl disable fail2ban && \
-    systemctl disable postfix && \
-    systemctl disable httpd && \
-    systemctl disable httpd
+RUN systemctl disable httpd && \
+    systemctl enable nginx && \
+    systemctl enable webmin && \
+    systemctl enable php-fpm
 
 RUN dnf install -y composer go rustc cargo rake
 RUN npm install -g yarn
@@ -84,8 +82,8 @@ RUN npm install -g yarn
 RUN /usr/libexec/webmin/changepass.pl /etc/webmin root ${WEBMIN_ROOT_PASSWORD}
 
 # Temporary fix for nginx
-RUN yum downgrade wbm-virtualmin-nginx-2.21 -y && \
-    yum downgrade wbm-virtualmin-nginx-ssl-1.15 -y
+# RUN yum downgrade wbm-virtualmin-nginx-2.21 -y && \
+#     yum downgrade wbm-virtualmin-nginx-ssl-1.15 -y
 
 # Git good default config
 RUN git config --global pull.rebase false
@@ -95,7 +93,10 @@ RUN dnf install -y openssh-server && \
     systemctl enable sshd && \
     sed -i "s@#Port 22@Port 2122@" /etc/ssh/sshd_config
 
-EXPOSE 80 443 2122 3306 5432 53/udp 53/tcp
-EXPOSE ${WEBMIN_ROOT_PORT_PREFIX}0 ${WEBMIN_ROOT_PORT_PREFIX}1 ${WEBMIN_ROOT_PORT_PREFIX}2 ${WEBMIN_ROOT_PORT_PREFIX}3 ${WEBMIN_ROOT_PORT_PREFIX}4 ${WEBMIN_ROOT_PORT_PREFIX}5 ${WEBMIN_ROOT_PORT_PREFIX}6 {WEBMIN_ROOT_PORT_PREFIX}7 {WEBMIN_ROOT_PORT_PREFIX}8 {WEBMIN_ROOT_PORT_PREFIX}9
+COPY save.sh start.sh .
 
-ENTRYPOINT ["/usr/bin/systemctl","default","--init"]
+RUN chmod +x start.sh && \
+    chmod +x save.sh && \
+    ./save.sh
+
+ENTRYPOINT /root/start.sh
