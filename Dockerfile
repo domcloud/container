@@ -49,6 +49,8 @@ RUN curl --fail -sSLo /etc/yum.repos.d/passenger.repo https://oss-binaries.phusi
 RUN dnf install -y nginx-mod-http-passenger || { dnf config-manager --enable cr && dnf install -y nginx-mod-http-passenger ; }
 
 ARG WEBMIN_ROOT_HOSTNAME
+# affected by yum update, need recopy? (and forever like that?)
+RUN cp -f systemctl3.py /usr/bin/systemctl
 
 # Misc
 RUN postgresql-setup initdb && \
