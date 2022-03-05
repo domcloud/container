@@ -14,7 +14,6 @@ System Requirements for this container:
 
 ```
 cp .env.example .env
-chmod -R +x scripts/
 docker-compose up
 ```
 
