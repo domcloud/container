@@ -36,8 +36,8 @@ RUN dnf install -y composer php php-bcmath php-cli php-common php-devel php-fpm 
 COPY ./scripts/install.sh ./scripts/slib.sh ./scripts/systemctl3.py  /root/
 RUN chmod +x /root/*
 
-# SystemD replacement
-RUN dnf install -y e2fsprogs && cp -f systemctl3.py /usr/bin/systemctl && chattr +i /usr/bin/systemctl
+# SystemD replacement (e2fsprogs)
+RUN cp -f systemctl3.py /usr/bin/systemctl && chmod -w /usr/bin/systemctl
 
 # Virtualmin
 RUN TERM=xterm-256color COLUMNS=120 ./install.sh --minimal --force --verbose --bundle LEMP
