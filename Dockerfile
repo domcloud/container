@@ -5,10 +5,6 @@ ARG WEBMIN_ROOT_PASSWORD
 ARG WEBMIN_ROOT_PORT_PREFIX
 WORKDIR /root
 
-# Copy scripts
-COPY ./scripts /root
-RUN chmod +x /root/*
-
 # GNU tools
 RUN dnf install -y curl git nano vim wget procps \
     iproute net-tools dnf-utils openssl whois \
@@ -18,12 +14,16 @@ RUN dnf install -y curl git nano vim wget procps \
     postgresql-server postgresql-contrib \
     python36 python38 python39
 
+# Copy scripts
+COPY ./scripts /root
+RUN chmod +x /root/*
+
 # SystemD replacement
 RUN cp -f systemctl3.py /usr/bin/systemctl
 
 # Virtualmin
 RUN echo ${WEBMIN_ROOT_HOSTNAME} > /etc/hostname \
-    && TERM=xterm COLUMNS=120 ./install.sh --minimal --force --bundle LEMP
+    && TERM=xterm-256color COLUMNS=120 ./install.sh --minimal --force --verbose --bundle LEMP
 
 # EPEL
 RUN dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-$(< /etc/redhat-release tr -dc '0-9.'|cut -d \. -f1).noarch.rpm && \
