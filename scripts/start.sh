@@ -11,7 +11,7 @@ zunpack /etc/ssh
 zunpack /etc/webmin
 zunpack /var/lib/mysql
 zunpack /home
-zunpack /var/lib/psql/data
+zunpack /var/lib/pgsql/data
 zunpack /var/named
 
 /usr/bin/systemctl default --init

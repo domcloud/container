@@ -14,5 +14,5 @@ save /etc/ssh
 save /etc/webmin
 save /var/lib/mysql
 save /home
-save /var/lib/psql/data
+save /var/lib/pgsql/data
 save /var/named
