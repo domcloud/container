@@ -10,8 +10,10 @@ save () {
 }
 
 save /etc/nginx
+save /etc/php
 save /etc/ssh
+save /etc/postgresql
+save /etc/mysql
 save /etc/webmin
 save /var/lib/mysql
-save /var/lib/postgresql/data
-save /etc/bind/zones
+save /var/lib/postgresql

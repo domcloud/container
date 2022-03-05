@@ -23,8 +23,11 @@ services:
       - ./mount/etc/nginx:/etc/nginx
       - ./mount/etc/ssh:/etc/ssh
       - ./mount/etc/webmin:/etc/webmin
+      - ./mount/etc/mysql:/etc/mysql
+      - ./mount/etc/postgresql:/etc/postgresql
+      - ./mount/etc/php:/etc/php
       - ./mount/data/mysql:/var/lib/mysql
       - ./mount/data/home:/home
-      - ./mount/data/pgsql:/var/lib/postgresql/data
-      - ./mount/data/zones:/etc/bind/zones
+      - ./mount/data/postgresql:/var/lib/postgresql
+      - ./mount/data/bind:/etc/bind
     stop_grace_period: 0s

@@ -13,7 +13,10 @@ System Requirements for this container:
 ## Quickstart
 
 ```
+cp .env.example .env
 docker-compose up
 ```
 
 The first build might take around 30 minutes on cloud servers.
+
+All website data are exported to volumes under `./mount`.
