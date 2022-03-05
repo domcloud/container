@@ -1,8 +1,6 @@
 FROM rockylinux:latest
 MAINTAINER Wildan M <willnode@wellosoft.net>
-ARG WEBMIN_ROOT_HOSTNAME
-ARG WEBMIN_ROOT_PASSWORD
-ARG WEBMIN_ROOT_PORT_PREFIX
+
 WORKDIR /root
 
 # GNU tools
@@ -13,6 +11,8 @@ RUN dnf install -y curl git nano vim wget procps \
     iptables-services openssh-server mariadb \
     postgresql-server postgresql-contrib \
     python36 python38 python39
+
+ARG WEBMIN_ROOT_PORT_PREFIX
 
 # Copy scripts
 COPY ./scripts /root
@@ -48,6 +48,8 @@ RUN dnf install -y composer php php-bcmath php-cli php-common php-devel php-fpm 
 RUN curl --fail -sSLo /etc/yum.repos.d/passenger.repo https://oss-binaries.phusionpassenger.com/yum/definitions/el-passenger.repo
 RUN dnf install -y nginx-mod-http-passenger || { dnf config-manager --enable cr && dnf install -y nginx-mod-http-passenger ; }
 
+ARG WEBMIN_ROOT_HOSTNAME
+
 # Misc
 RUN postgresql-setup initdb && \
     npm install -g yarn && \
@@ -73,6 +75,7 @@ RUN systemctl disable firewalld && \
 #     yum downgrade wbm-virtualmin-nginx-ssl-1.15 -y
 
 # set root password
+ARG WEBMIN_ROOT_PASSWORD
 RUN /usr/libexec/webmin/changepass.pl /etc/webmin root ${WEBMIN_ROOT_PASSWORD}
 
 # save mount artifacts
