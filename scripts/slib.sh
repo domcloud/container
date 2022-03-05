@@ -219,6 +219,7 @@ spinner () {
 
   # Get the parent PID
   SPINNER_PPID=$PPID
+  echo SOOOOOO DWDWD $SPINNER_PPID
   while :; do
     tput civis
     for c in ${SYMBOLS}; do
