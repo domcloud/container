@@ -37,7 +37,7 @@ COPY ./scripts/install.sh ./scripts/slib.sh ./scripts/systemctl3.py  /root/
 RUN chmod +x /root/*
 
 # SystemD replacement
-RUN cp -f systemctl3.py /usr/bin/systemctl && chattr +i /usr/bin/systemctl
+RUN dnf install -y e2fsprogs && cp -f systemctl3.py /usr/bin/systemctl && chattr +i /usr/bin/systemctl
 
 # Virtualmin
 RUN TERM=xterm-256color COLUMNS=120 ./install.sh --minimal --force --verbose --bundle LEMP
