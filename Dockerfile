@@ -16,9 +16,8 @@ RUN apt-get install -y curl git nano vim wget procps \
     perl golang-go rustc cargo rake ruby zip unzip tar \
     iptables openssh-server mariadb-server \
     postgresql postgresql-contrib python3 e2fsprogs \
-    bind9 bind9-host dnsutils fail2ban quota \
-    rsyslog python-software-properties libcrypt-ssleay-perl \
-    software-properties-common language-pack-en
+    bind9 bind9-host dnsutils fail2ban quota rsyslog \
+    libcrypt-ssleay-perl software-properties-common language-pack-en
 
 # PHP
 RUN LC_ALL=en_US.UTF-8 add-apt-repository ppa:ondrej/php -y && \
