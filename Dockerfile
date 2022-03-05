@@ -12,12 +12,19 @@ RUN rm  /etc/apt/apt.conf.d/docker-gzip-indexes \
 # GNU tools
 RUN apt-get install -y curl git nano vim wget procps \
     iproute2 net-tools openssl whois screen \
-    gcc g++ gnupg2 gpg make cmake apt-utils \
+    gcc g++ dirmngr gnupg gpg make cmake apt-utils \
     perl golang-go rustc cargo rake ruby zip unzip tar \
-    iptables openssh-server mariadb-server \
-    postgresql postgresql-contrib python3 e2fsprogs \
-    bind9 bind9-host dnsutils fail2ban quota rsyslog \
+    python3 e2fsprogs dnsutils quota linux-image-extra-virtual rsyslog \
     libcrypt-ssleay-perl software-properties-common language-pack-en
+
+# SystemD replacement
+COPY ./scripts/systemctl3.py /root/
+RUN cp -f systemctl3.py /usr/bin/systemctl
+
+# Services
+RUN apt-get install -y postgresql postgresql-contrib \
+    openssh-server mariadb-server mariadb-client \
+    bind9 bind9-host fail2ban nginx
 
 # PHP
 RUN LC_ALL=en_US.UTF-8 add-apt-repository ppa:ondrej/php -y && \
@@ -38,25 +45,17 @@ RUN apt-get install -y composer php-pear php5.6 php5.6-cgi php5.6-cli php5.6-fpm
     php8.1-xml php8.1-zip php8.1-bcmath php8.1-soap php8.1-gettext \
     php8.1-intl php8.1-readline php8.1-msgpack php8.1-igbinary php8.1-ldap
 
-
-# Copy scripts
-COPY ./scripts/install.sh ./scripts/slib.sh ./scripts/systemctl3.py  /root/
-RUN chmod +x /root/*
-
-# SystemD replacement
-RUN cp -f systemctl3.py /usr/bin/systemctl
-
 # Virtualmin
-RUN TERM=xterm-256color COLUMNS=120 ./install.sh --minimal --force --verbose --bundle LEMP
+COPY ./scripts/install.sh ./scripts/slib.sh /root/
+RUN ./install.sh --minimal --force --verbose --bundle LEMP
 
 # Nodejs & C++
-RUN curl --fail -sSL -o setup-nodejs https://deb.nodesource.com/setup_14.x && \
+RUN curl --fail -sSL -o setup-nodejs https://deb.nodesource.com/setup_16.x && \
     bash setup-nodejs && \
     apt-get install -y nodejs
 
 # Passenger Nginx
-RUN apt-get install -y dirmngr gnupg && \
-    apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 561F9B9CAC40B2F7 && \
+RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 561F9B9CAC40B2F7 && \
     apt-get install -y apt-transport-https ca-certificates && \
     echo deb https://oss-binaries.phusionpassenger.com/apt/passenger focal main > /etc/apt/sources.list.d/passenger.list && \
     apt-get update && apt-get install -y libnginx-mod-http-passenger
@@ -67,11 +66,10 @@ ARG WEBMIN_ROOT_HOSTNAME
 # Misc
 RUN ssh-keygen -A && \
     npm install -g yarn pnpm && \
-    mysql_install_db --skip-test-db && \
-    # postgresql-setup --initdb --unit postgresql && \
     sed -i "s@#Port 22@Port 2122@" /etc/ssh/sshd_config && \
     git config --global pull.rebase false && \
-    cp -f systemctl3.py /usr/bin/systemctl
+    cp -f systemctl3.py /usr/bin/systemctl && \
+    sed -i "s@port=10000@port=${WEBMIN_ROOT_PORT_PREFIX}0@" /etc/webmin/miniserv.conf
 
 # resolv.conf can't be overriden inside docker
 COPY ./scripts/Net.pm ./scripts/ProFTPd.pm ./scripts/SASL.pm ./
@@ -81,15 +79,18 @@ RUN cp -t /usr/share/perl5/Virtualmin/Config/Plugin/ Net.pm ProFTPd.pm SASL.pm  
 # Firewall
 RUN systemctl disable firewalld && \
     systemctl mask --now firewalld && \
-#    systemctl disable httpd && \
-#    systemctl enable iptables && \
-#    systemctl enable ip6tables && \
+    systemctl disable clamav-freshclam && \
+    systemctl disable proftpd && \
+    systemctl disable saslauthd && \
+    systemctl disable dovecot && \
+    systemctl enable mysql && \
     systemctl enable postgresql && \
-#    systemctl enable mariadb && \
     systemctl enable nginx && \
     systemctl enable webmin && \
-#    systemctl enable php-fpm && \
-    systemctl enable sshd
+    systemctl enable sshd && \
+    systemctl enable php5.6-fpm && \
+    systemctl enable php7.4-fpm && \
+    systemctl enable php8.1-fpm && \
 
 # Temporary fix for nginx
 # RUN yum downgrade wbm-virtualmin-nginx-2.21 -y && \
