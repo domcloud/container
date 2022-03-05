@@ -15,7 +15,7 @@ RUN dnf install -y curl git nano vim wget procps \
 ARG WEBMIN_ROOT_PORT_PREFIX
 
 # Copy scripts
-COPY ./scripts/install.sh ./scripts/slib.sh  /root/
+COPY ./scripts/install.sh ./scripts/slib.sh ./scripts/systemctl3.py  /root/
 RUN chmod +x /root/*
 
 # SystemD replacement
@@ -82,6 +82,6 @@ RUN /usr/libexec/webmin/changepass.pl /etc/webmin root ${WEBMIN_ROOT_PASSWORD}
 
 # save mount artifacts
 COPY ./scripts/save.sh ./scripts/start.sh  /root/
-RUN ./save.sh
+RUN chmod +x /root/* && ./save.sh
 
 ENTRYPOINT /root/start.sh
