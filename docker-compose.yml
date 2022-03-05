@@ -25,6 +25,6 @@ services:
       - ./mount/etc/webmin:/etc/webmin
       - ./mount/data/mysql:/var/lib/mysql
       - ./mount/data/home:/home
-      - ./mount/data/pgsql:/var/lib/pgsql/data
-      - ./mount/data/named:/var/named
+      - ./mount/data/pgsql:/var/lib/postgresql/data
+      - ./mount/data/zones:/etc/bind/zones
     stop_grace_period: 0s

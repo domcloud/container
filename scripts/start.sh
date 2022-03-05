@@ -10,7 +10,7 @@ zunpack /etc/nginx
 zunpack /etc/ssh
 zunpack /etc/webmin
 zunpack /var/lib/mysql
-zunpack /var/lib/pgsql/data
-zunpack /var/named
+zunpack /var/lib/postgresql/data
+zunpack /etc/bind/zones
 
 /usr/bin/systemctl default --init

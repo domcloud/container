@@ -13,5 +13,5 @@ save /etc/nginx
 save /etc/ssh
 save /etc/webmin
 save /var/lib/mysql
-save /var/lib/pgsql/data
-save /var/named
+save /var/lib/postgresql/data
+save /etc/bind/zones

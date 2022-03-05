@@ -74,21 +74,21 @@ RUN ssh-keygen -A && \
     cp -f systemctl3.py /usr/bin/systemctl
 
 # resolv.conf can't be overriden inside docker
-COPY ./scripts/Net.pm ./scripts/ProFTPd.pm ./
-RUN cp {Net.pm,ProFTPd.pm,SASL.pm} /usr/share/perl5/Virtualmin/Config/Plugin/ && \
+COPY ./scripts/Net.pm ./scripts/ProFTPd.pm ./scripts/SASL.pm ./
+RUN cp -t /usr/share/perl5/Virtualmin/Config/Plugin/ Net.pm ProFTPd.pm SASL.pm  && \
     virtualmin config-system -b MiniLEMP
 
 # Firewall
 RUN systemctl disable firewalld && \
     systemctl mask --now firewalld && \
-    systemctl disable httpd && \
-    systemctl enable iptables && \
-    systemctl enable ip6tables && \
+#    systemctl disable httpd && \
+#    systemctl enable iptables && \
+#    systemctl enable ip6tables && \
     systemctl enable postgresql && \
-    systemctl enable mariadb && \
+#    systemctl enable mariadb && \
     systemctl enable nginx && \
     systemctl enable webmin && \
-    systemctl enable php-fpm && \
+#    systemctl enable php-fpm && \
     systemctl enable sshd
 
 # Temporary fix for nginx
@@ -97,7 +97,7 @@ RUN systemctl disable firewalld && \
 
 # set root password
 ARG WEBMIN_ROOT_PASSWORD
-RUN /usr/libexec/webmin/changepass.pl /etc/webmin root ${WEBMIN_ROOT_PASSWORD}
+RUN /usr/share/webmin/changepass.pl /etc/webmin root ${WEBMIN_ROOT_PASSWORD}
 
 # save mount artifacts
 COPY ./scripts/save.sh ./scripts/start.sh  /root/
