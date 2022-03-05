@@ -90,7 +90,7 @@ RUN systemctl disable firewalld && \
     systemctl enable sshd && \
     systemctl enable php5.6-fpm && \
     systemctl enable php7.4-fpm && \
-    systemctl enable php8.1-fpm && \
+    systemctl enable php8.1-fpm
 
 # Temporary fix for nginx
 # RUN yum downgrade wbm-virtualmin-nginx-2.21 -y && \
