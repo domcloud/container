@@ -20,7 +20,7 @@ if [ ! -d /home/index ] ; then
     printf "Installing index controller"
     virtualmin create-domain --user index --domain `hostname -f` --pass \
     `echo $RANDOM | md5sum | head -c 20` --unix --dir --webmin \
-    --virtualmin-nginx-ssl --virtualmin-nginx \
+    --virtualmin-nginx-ssl --virtualmin-nginx
     if [ $? -eq 0 ]; then
         cd /home/index/public_html
         rm -rf *
