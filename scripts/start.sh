@@ -15,7 +15,7 @@ zunpack /etc/webmin
 zunpack /var/lib/mysql
 zunpack /var/lib/postgresql
 
-if [ -z "$(ls -A /home)" ] ; then
+if [ ! -d /home/index ] ; then
     # init default domain
     printf "Installing index controller"
     virtualmin create-domain --user index --domain `hostname -f` --password \

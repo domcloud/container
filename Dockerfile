@@ -84,6 +84,8 @@ RUN systemctl disable firewalld && \
     systemctl disable proftpd && \
     systemctl disable saslauthd && \
     systemctl disable dovecot && \
+    systemctl disable dbus && \
+    systemctl enable fail2ban && \
     systemctl enable mysql && \
     systemctl enable postgresql && \
     systemctl enable nginx && \
