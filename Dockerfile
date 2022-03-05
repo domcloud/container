@@ -13,7 +13,7 @@ RUN chmod +x /root/*
 RUN dnf install -y curl git nano vim wget procps \
     iproute net-tools dnf-utils openssl whois \
     which gcc gcc-c++ gnupg2 gpg make cmake \
-    go rustc cargo rake ruby zip unzip tar \
+    perl go rustc cargo rake ruby zip unzip tar \
     iptables-services openssh-server mariadb \
     postgresql-server postgresql-contrib \
     python36 python38 python39
