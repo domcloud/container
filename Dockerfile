@@ -2,12 +2,13 @@ FROM ubuntu:latest
 MAINTAINER Wildan M <willnode@wellosoft.net>
 
 WORKDIR /root
+ARG DEBIAN_FRONTEND=noninteractive
 
 # GNU tools
 RUN apt-get update && apt-get upgrade
 RUN apt-get install -y curl git nano vim wget procps \
     iproute2 net-tools openssl whois \
-    which gcc g++ gnupg2 gpg make cmake \
+    gcc g++ gnupg2 gpg make cmake \
     perl golang-go rustc cargo rake ruby zip unzip tar \
     iptables openssh-server mariadb-server \
     postgresql postgresql-contrib python3 e2fsprogs
