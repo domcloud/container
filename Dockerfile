@@ -74,8 +74,8 @@ RUN ssh-keygen -A && \
     cp -f systemctl3.py /usr/bin/systemctl
 
 # bugfix https://github.com/virtualmin/Virtualmin-Config/commit/e8f4498d4cdc3618efee2120b80ccbc723e034e2
-COPY ./scripts/Virtualmin-Config.pm /usr/share/perl5/Virtualmin/Config.pm
-RUN virtualmin-config-system -b MiniLEMP -x Net
+COPY ./scripts/Config.pm /usr/share/perl5/Virtualmin/
+RUN virtualmin config-system -b MiniLEMP -x Net
 
 
 # Firewall
