@@ -952,10 +952,10 @@ fi
 
 # Reap any clingy processes (like spinner forks)
 # get the parent pids (as those are the problem)
-# allpids="$(ps -o pid= --ppid $$) $allpids"
-# for pid in $allpids; do
-#   kill "$pid" 1>/dev/null 2>&1
-# done
+allpids="$(ps -o pid= --ppid $$) $allpids"
+for pid in $allpids; do
+  kill "$pid" 1>/dev/null 2>&1
+done
 
 # Final step is configuration. Wait here for a moment, hopefully letting any
 # apt processes disappear before we start, as they're huge and memory is a
