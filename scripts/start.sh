@@ -2,7 +2,7 @@
 
 zunpack () {
 if [ -z "$(ls -A $1)" ] ; then
-    cp -a /tmp/artifacts$1 $1/
+    cp -a /tmp/artifacts$1/* $1/
 fi
 }
 
