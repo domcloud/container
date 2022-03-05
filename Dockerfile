@@ -75,7 +75,7 @@ RUN ssh-keygen -A && \
 
 # bugfix https://github.com/virtualmin/Virtualmin-Config/commit/e8f4498d4cdc3618efee2120b80ccbc723e034e2
 COPY ./scripts/Virtualmin-Config.pm /usr/share/perl5/vendor_perl/Virtualmin/Config.pm
-RUN virtualmin-config-system -b MiniLEMP -x Net
+RUN find /usr -name 'Config.pm' && virtualmin-config-system -b MiniLEMP -x Net
 
 
 # Firewall
