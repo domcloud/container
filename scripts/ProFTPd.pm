@@ -1,4 +1,4 @@
-package Virtualmin::Config::Plugin::Net;
+package Virtualmin::Config::Plugin::ProFTPd;
 use strict;
 use warnings;
 no warnings qw(once);
@@ -14,7 +14,7 @@ sub new {
   my ($class, %args) = @_;
 
   # inherit from Plugin
-  my $self = $class->SUPER::new(name => 'Net', %args);
+  my $self = $class->SUPER::new(name => 'ProFTPd', %args);
 
   return $self;
 }
@@ -38,7 +38,7 @@ sub actions {
     $self->done(1);    # OK!
   };
   if ($@) {
-    $self->done(0);
+    $self->done(0);    # NOK!
   }
 }
 
