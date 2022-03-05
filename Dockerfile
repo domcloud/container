@@ -40,7 +40,7 @@ RUN chmod +x /root/*
 RUN cp -f systemctl3.py /usr/bin/systemctl && chmod -w /usr/bin/systemctl
 
 # Virtualmin
-RUN TERM=xterm-256color COLUMNS=120 ./install.sh --minimal --force --verbose --bundle LEMP
+RUN rm -f /var/lib/rpm/.rpm.lock && TERM=xterm-256color COLUMNS=120 ./install.sh --minimal --force --verbose --bundle LEMP
 
 # Passenger Nginx
 RUN curl --fail -sSLo /etc/yum.repos.d/passenger.repo https://oss-binaries.phusionpassenger.com/yum/definitions/el-passenger.repo
