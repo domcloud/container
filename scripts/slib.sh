@@ -218,7 +218,7 @@ spinner () {
   eval SYMBOLS=\$${SPINNER_SYMBOLS}
 
   # Get the parent PID
-  SPINNER_PPID=$(ps -p "$$" -o ppid=)
+  SPINNER_PPID=$PPID
   while :; do
     tput civis
     for c in ${SYMBOLS}; do
@@ -325,14 +325,14 @@ run_ok () {
   touch ${SPINNER_DONEFILE}
   env sleep .2 # It's possible to have a race for stdout and spinner clobbering the next bit
   # Just in case the spinner survived somehow, kill it.
-  # pidcheck=$(ps --no-headers ${spinpid})
-  # if [ ! -z "$pidcheck" ]; then
-  #   echo "Made it here...why?" >> ${RUN_LOG}
-  #   kill $spinpid 2>/dev/null
-  #   rm -rf ${SPINNER_DONEFILE} 2>/dev/null 2>&1
-  #   tput rc
-  #   tput cnorm
-  # fi
+  pidcheck=$(ps --no-headers ${spinpid})
+  if [ ! -z "$pidcheck" ]; then
+    echo "Made it here...why?" >> ${RUN_LOG}
+    kill $spinpid 2>/dev/null
+    rm -rf ${SPINNER_DONEFILE} 2>/dev/null 2>&1
+    tput rc
+    tput cnorm
+  fi
   # Log what we were supposed to be running
   printf "${msg}: " >> ${RUN_LOG}
   if shell_has_unicode; then
