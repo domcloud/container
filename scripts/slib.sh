@@ -320,7 +320,7 @@ run_ok () {
   spinpid=$!
   allpids="$allpids $spinpid"
   echo "Spin pid is: $spinpid" >> ${RUN_LOG}
-  eval "${cmd}"
+  eval "${cmd}" 1>> ${RUN_LOG} 2>&1
   local res=$?
   touch ${SPINNER_DONEFILE}
   env sleep .2 # It's possible to have a race for stdout and spinner clobbering the next bit
