@@ -24,8 +24,9 @@ RUN curl --fail -sSL -o setup-nodejs https://rpm.nodesource.com/setup_14.x && \
     sed -i "s/failovermethod=priority//g" /etc/yum.repos.d/nodesource-el8.repo
 
 # PHP
-RUN dnf config-manager --set-enabled PowerTools && \
-    dnf install -y https://rpms.remirepo.net/enterprise/remi-release-8.rpm && \
+RUN dnf install -y https://rpms.remirepo.net/enterprise/remi-release-8.rpm && \
+    dnf install -y dnf-plugins-core && dnf upgrade && \
+    dnf config-manager --set-enabled PowerTools && \
     dnf module reset -y php && dnf module enable -y php:remi-7.4
 RUN dnf install -y composer php php-bcmath php-cli php-common php-devel php-fpm php-gd php-intl php-json php-mbstring php-mysqlnd php-opcache php-pdo php-pear php-pecl-igbinary php-pecl-memcached php-pecl-msgpack php-pecl-yaml php-pecl-zip php-pgsql php-process php-xml php-xmlrpc \
     php56-php php56-php-bcmath php56-php-cli php56-php-common php56-php-devel php56-php-fpm php56-php-gd php56-php-intl php56-php-json php56-php-mbstring php56-php-mysqlnd php56-php-opcache php56-php-pdo php56-php-pear php56-php-pecl-igbinary php56-php-pecl-memcached php56-php-pecl-msgpack php56-php-pecl-yaml php56-php-pecl-zip php56-php-pgsql php56-php-process php56-php-xml php56-php-xmlrpc \
