@@ -6,7 +6,7 @@
 
 save () {
   mkdir -p /tmp/artifacts$1
-  cp -a $1 /tmp/artifacts$1/
+  cp -a $1/* /tmp/artifacts$1/
 }
 
 save /etc/nginx
