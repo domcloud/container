@@ -74,7 +74,7 @@ RUN ssh-keygen -A && \
 
 # resolv.conf can't be overriden inside docker
 COPY ./scripts/setup/ /root/setup/
-RUN cp -a ./setup/* usr/share/perl5/Virtualmin/Config/Plugin/ && \
+RUN cp -a ./setup/* /usr/share/perl5/Virtualmin/Config/Plugin/ && \
     virtualmin config-system -b MiniLEMP -i PostgreSQL
 
 # Firewall
@@ -88,7 +88,7 @@ RUN systemctl disable firewalld && \
     systemctl enable postgresql && \
     systemctl enable nginx && \
     systemctl enable webmin && \
-    systemctl enable sshd && \
+    systemctl enable ssh && \
     systemctl enable php5.6-fpm && \
     systemctl enable php7.4-fpm && \
     systemctl enable php8.1-fpm
