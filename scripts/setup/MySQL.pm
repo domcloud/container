@@ -33,16 +33,6 @@ sub actions {
 
   $self->spin();
   eval {
-    foreign_require("init", "init-lib.pl");
-    if ($gconfig{'os_type'} eq "freebsd" || init::action_status("mysql")) {
-      init::enable_at_boot("mysql");
-    }
-    elsif (init::action_status("mariadb")) {
-      init::enable_at_boot("mariadb");
-    }
-    else {
-      init::enable_at_boot("mysqld");
-    }
     foreign_require("mysql", "mysql-lib.pl");
     my $conf = mysql::get_mysql_config();
     my ($sect) = grep { $_->{'name'} eq 'mysqld' } @$conf;
