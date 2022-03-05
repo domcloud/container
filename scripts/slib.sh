@@ -218,8 +218,7 @@ spinner () {
   eval SYMBOLS=\$${SPINNER_SYMBOLS}
 
   # Get the parent PID
-  SPINNER_PPID=$PPID
-  echo SOOOOOO DWDWD $SPINNER_PPID
+  # SPINNER_PPID=$PPID
   while :; do
     tput civis
     for c in ${SYMBOLS}; do
@@ -246,16 +245,16 @@ spinner () {
       # always available, but seems to not break things, when not.
       env sleep .2
       # Check to be sure parent is still going; handles sighup/kill
-      if [ ! -z "$SPINNER_PPID" ]; then
-        # This is ridiculous. ps prepends a space in the ppid call, which breaks
-        # this ps with a "garbage option" error.
-        # XXX Potential gotcha if ps produces weird output.
-        # shellcheck disable=SC2086
-        SPINNER_PARENTUP=$(ps --no-headers $SPINNER_PPID)
-        if [ -z "$SPINNER_PARENTUP" ]; then
-          break 2
-        fi
-      fi
+      # if [ ! -z "$SPINNER_PPID" ]; then
+      #   # This is ridiculous. ps prepends a space in the ppid call, which breaks
+      #   # this ps with a "garbage option" error.
+      #   # XXX Potential gotcha if ps produces weird output.
+      #   # shellcheck disable=SC2086
+      #   SPINNER_PARENTUP=$(ps --no-headers $SPINNER_PPID)
+      #   if [ -z "$SPINNER_PARENTUP" ]; then
+      #     break 2
+      #   fi
+      # fi
     done
   done
   tput rc
