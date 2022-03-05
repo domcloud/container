@@ -53,8 +53,8 @@ ARG WEBMIN_ROOT_HOSTNAME
 RUN cp -f systemctl3.py /usr/bin/systemctl
 
 # Misc
-RUN postgresql-setup initdb && \
-    npm install -g yarn && \
+RUN npm install -g yarn pnpm && \
+    postgresql-setup --initdb --unit postgresql && \
     sed -i "s@#Port 22@Port 2122@" /etc/ssh/sshd_config && \
     git config --global pull.rebase false && \
     alternatives --install /usr/bin/unversioned-python python /usr/bin/python3.9 1
