@@ -6,13 +6,12 @@ if [ -z "$(ls -A $1)" ] ; then
 fi
 }
 
-zunpack /usr/local/conf
+zunpack /etc/nginx
 zunpack /etc/ssh
 zunpack /etc/webmin
-zunpack /etc/sysconfig
 zunpack /var/lib/mysql
 zunpack /home
-zunpack /var/lib/postgresql/data
+zunpack /var/lib/psql/data
 zunpack /var/named
 
 /usr/bin/systemctl default --init

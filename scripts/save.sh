@@ -9,11 +9,10 @@ save () {
   cp -a $1 /tmp/artifacts$1/
 }
 
-save /usr/local/conf
+save /etc/nginx
 save /etc/ssh
 save /etc/webmin
-save /etc/sysconfig
 save /var/lib/mysql
 save /home
-save /var/lib/postgresql/data
+save /var/lib/psql/data
 save /var/named
