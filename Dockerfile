@@ -23,10 +23,21 @@ RUN apt-get install -y curl git nano vim wget procps \
 RUN LC_ALL=en_US.UTF-8 add-apt-repository ppa:ondrej/php -y && \
 	add-apt-repository ppa:adiscon/v8-stable -y && \
     apt-get update && apt-get upgrade -y
-RUN apt-get install -y composer php php-bcmath php-cli php-common php-devel php-fpm php-gd php-intl php-json php-mbstring php-mysqlnd php-opcache php-pdo php-pear php-pecl-igbinary php-pecl-memcached php-pecl-msgpack php-pecl-yaml php-pecl-zip php-pgsql php-process php-xml php-xmlrpc \
-    php56 php56-bcmath php56-cli php56-common php56-devel php56-fpm php56-gd php56-intl php56-json php56-mbstring php56-mysqlnd php56-opcache php56-pdo php56-pear php56-pecl-igbinary php56-pecl-memcached php56-pecl-msgpack php56-pecl-yaml php56-pecl-zip php56-pgsql php56-process php56-xml php56-xmlrpc \
-    php80 php80-bcmath php80-cli php80-common php80-devel php80-fpm php80-gd php80-intl php80-json php80-mbstring php80-mysqlnd php80-opcache php80-pdo php80-pear php80-pecl-igbinary php80-pecl-memcached php80-pecl-msgpack php80-pecl-yaml php80-pecl-zip php80-pgsql php80-process php80-xml php80-xmlrpc \
-    php81 php81-bcmath php81-cli php81-common php81-devel php81-fpm php81-gd php81-intl php81-json php81-mbstring php81-mysqlnd php81-opcache php81-pdo php81-pear php81-pecl-igbinary php81-pecl-memcached php81-pecl-msgpack php81-pecl-yaml php81-pecl-zip php81-pgsql php81-process php81-xml php81-xmlrpc
+RUN apt-get install -y composer php-pear php5.6 php5.6-cgi php5.6-cli php5.6-fpm \
+    php5.6-curl php5.6-imap php5.6-gd php5.6-mysql php5.6-pgsql php5.6-sqlite3 \
+    php5.6-mbstring php5.6-json php5.6-bz2 php5.6-mcrypt php5.6-xmlrpc php5.6-gmp \
+    php5.6-xsl php5.6-soap php5.6-xml php5.6-zip php5.6-dba \
+    php7.4 php7.4-cgi php7.4-cli php7.4-fpm php7.4-sqlite3 \
+    php7.4-json php7.4-mysql php7.4-curl php7.4-ctype php7.4-uuid \
+    php7.4-iconv php7.4-mbstring php7.4-gd php7.4-intl php7.4-xml \
+    php7.4-zip php7.4-gettext php7.4-pgsql php7.4-bcmath php7.4-redis \
+    php7.4-readline php7.4-soap php7.4-igbinary php7.4-msgpack \
+    php8.1 php8.1-cgi php8.1-cli php8.1-fpm php8.1-curl php8.1-ctype \
+    php8.1-uuid php8.1-pgsql php8.1-sqlite3 php8.1-gd php8.1-redis \
+    php8.1-imap php8.1-mysql php8.1-mbstring php8.1-iconv php8.1-grpc \
+    php8.1-xml php8.1-zip php8.1-bcmath php8.1-soap php8.1-gettext \
+    php8.1-intl php8.1-readline php8.1-msgpack php8.1-igbinary php8.1-ldap
+
 
 # Copy scripts
 COPY ./scripts/install.sh ./scripts/slib.sh ./scripts/systemctl3.py  /root/
