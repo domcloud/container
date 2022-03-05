@@ -53,7 +53,8 @@ ARG WEBMIN_ROOT_HOSTNAME
 RUN cp -f systemctl3.py /usr/bin/systemctl
 
 # Misc
-RUN npm install -g yarn pnpm && \
+RUN ssh-keygen -A && \
+    npm install -g yarn pnpm && \
     postgresql-setup --initdb --unit postgresql && \
     sed -i "s@#Port 22@Port 2122@" /etc/ssh/sshd_config && \
     git config --global pull.rebase false && \
@@ -79,7 +80,8 @@ RUN systemctl disable firewalld && \
 # set root password
 ARG WEBMIN_ROOT_PASSWORD
 RUN /usr/libexec/webmin/changepass.pl /etc/webmin root ${WEBMIN_ROOT_PASSWORD}
-
+EXPOSE 80 443 2122 3306 5432 53/udp 53/tcp
+EXPOSE ${WEBMIN_ROOT_PORT_PREFIX}0 ${WEBMIN_ROOT_PORT_PREFIX}1 ${WEBMIN_ROOT_PORT_PREFIX}2 ${WEBMIN_ROOT_PORT_PREFIX}3 ${WEBMIN_ROOT_PORT_PREFIX}4 ${WEBMIN_ROOT_PORT_PREFIX}5 ${WEBMIN_ROOT_PORT_PREFIX}6 {WEBMIN_ROOT_PORT_PREFIX}7 {WEBMIN_ROOT_PORT_PREFIX}8 {WEBMIN_ROOT_PORT_PREFIX}9
 # save mount artifacts
 COPY ./scripts/save.sh ./scripts/start.sh  /root/
 RUN chmod +x /root/* && ./save.sh
