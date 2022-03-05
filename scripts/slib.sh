@@ -316,11 +316,11 @@ run_ok () {
   # Unicode checkmark and x mark for run_ok function
   CHECK='\u2714'
   BALLOT_X='\u2718'
-  spinner &
+  spinner
   spinpid=$!
   allpids="$allpids $spinpid"
   echo "Spin pid is: $spinpid" >> ${RUN_LOG}
-  eval "${cmd}" 1>> ${RUN_LOG} 2>&1
+  eval "${cmd}"
   local res=$?
   touch ${SPINNER_DONEFILE}
   env sleep .2 # It's possible to have a race for stdout and spinner clobbering the next bit
