@@ -10,6 +10,7 @@ services:
     restart: always
     privileged: true
     hostname: ${WEBMIN_ROOT_HOSTNAME}
+    network_mode: host # Linux only!
     dns:
     - 127.0.0.1
     - 1.1.1.1
