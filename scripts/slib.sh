@@ -319,25 +319,25 @@ run_ok () {
   spinner &
   spinpid=$!
   allpids="$allpids $spinpid"
-  echo "Spin pid is: $spinpid"
-  eval "${cmd}"
+  echo "Spin pid is: $spinpid" >> ${RUN_LOG}
+  eval "${cmd}" 1>> ${RUN_LOG} 2>&1
   local res=$?
   touch ${SPINNER_DONEFILE}
   env sleep .2 # It's possible to have a race for stdout and spinner clobbering the next bit
   # Just in case the spinner survived somehow, kill it.
   pidcheck=$(ps --no-headers ${spinpid})
   if [ ! -z "$pidcheck" ]; then
-    echo "Made it here...why?"
+    echo "Made it here...why?" >> ${RUN_LOG}
     kill $spinpid 2>/dev/null
     rm -rf ${SPINNER_DONEFILE} 2>/dev/null 2>&1
     tput rc
     tput cnorm
   fi
   # Log what we were supposed to be running
-  printf "${msg}: "
+  printf "${msg}: " >> ${RUN_LOG}
   if shell_has_unicode; then
     if [ $res -eq 0 ]; then
-      printf "Success.\\n"
+      printf "Success.\\n" >> ${RUN_LOG}
       env printf "${GREENBG}[  ${CHECK}  ]${NORMAL}\\n"
       return 0
     else
@@ -354,14 +354,13 @@ run_ok () {
     fi
   else
     if [ $res -eq 0 ]; then
-      printf "Success.\\n"
+      printf "Success.\\n" >> ${RUN_LOG}
       env printf "${GREENBG}[ OK! ]${NORMAL}\\n"
       return 0
     else
-      printf "Failed with error: ${res}\\n"
+      printf "Failed with error: ${res}\\n" >> ${RUN_LOG}
       echo
       env printf "${REDBG}[ERROR]${NORMAL}\\n"
-      cat ${RUN_LOG}
       if [ "$RUN_ERRORS_FATAL" ]; then
         log_fatal "Something went wrong with the previous command. Exiting."
         exit 1

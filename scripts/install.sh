@@ -962,17 +962,17 @@ done
 # problem. XXX This is hacky. I'm not sure what's really causing random fails.
 sleep 1
 echo
-log_debug "Phase 3 of 3: Configuration"
-printf "${GREEN}▣▣${YELLOW}▣${NORMAL} Phase ${YELLOW}3${NORMAL} of ${GREEN}3${NORMAL}: Configuration\\n"
-if [ "$mode" = "minimal" ]; then
-  bundle="Mini${bundle}"
-fi
-virtualmin-config-system --bundle "$bundle"
-if [ "$?" != "0" ]; then
-  errorlist="${errorlist}  ${YELLOW}◉${NORMAL} Postinstall configuration returned an error.\\n"
-  errors=$((errors + 1))
-fi
-config_system_pid=$!
+# log_debug "Phase 3 of 3: Configuration"
+# printf "${GREEN}▣▣${YELLOW}▣${NORMAL} Phase ${YELLOW}3${NORMAL} of ${GREEN}3${NORMAL}: Configuration\\n"
+# if [ "$mode" = "minimal" ]; then
+#   bundle="Mini${bundle}"
+# fi
+# virtualmin-config-system --bundle "$bundle"
+# if [ "$?" != "0" ]; then
+#   errorlist="${errorlist}  ${YELLOW}◉${NORMAL} Postinstall configuration returned an error.\\n"
+#   errors=$((errors + 1))
+# fi
+# config_system_pid=$!
 
 # Functions that are used in the OS specific modifications section
 disable_selinux() {
@@ -992,7 +992,7 @@ case "$os_type" in
 esac
 
 # kill the virtualmin config-system command, if it's still running
-kill "$config_system_pid" 1>/dev/null 2>&1
+# kill "$config_system_pid" 1>/dev/null 2>&1
 # Make sure the cursor is back (if spinners misbehaved)
 tput cnorm
 

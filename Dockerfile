@@ -12,19 +12,6 @@ RUN dnf install -y curl git nano vim wget procps \
     postgresql-server postgresql-contrib \
     python36 python38 python39
 
-ARG WEBMIN_ROOT_PORT_PREFIX
-
-# Copy scripts
-COPY ./scripts/install.sh ./scripts/slib.sh ./scripts/systemctl3.py  /root/
-RUN chmod +x /root/*
-
-# SystemD replacement
-RUN cp -f systemctl3.py /usr/bin/systemctl
-
-# Virtualmin
-RUN echo ${WEBMIN_ROOT_HOSTNAME} > /etc/hostname \
-    && TERM=xterm-256color COLUMNS=120 ./install.sh --minimal --force --verbose --bundle LEMP
-
 # EPEL
 RUN dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-$(< /etc/redhat-release tr -dc '0-9.'|cut -d \. -f1).noarch.rpm && \
     dnf config-manager --enable epel && \
@@ -44,21 +31,35 @@ RUN dnf install -y composer php php-bcmath php-cli php-common php-devel php-fpm 
     php80-php php80-php-bcmath php80-php-cli php80-php-common php80-php-devel php80-php-fpm php80-php-gd php80-php-intl php80-php-json php80-php-mbstring php80-php-mysqlnd php80-php-opcache php80-php-pdo php80-php-pear php80-php-pecl-igbinary php80-php-pecl-memcached php80-php-pecl-msgpack php80-php-pecl-yaml php80-php-pecl-zip php80-php-pgsql php80-php-process php80-php-xml php80-php-xmlrpc \
     php81-php php81-php-bcmath php81-php-cli php81-php-common php81-php-devel php81-php-fpm php81-php-gd php81-php-intl php81-php-json php81-php-mbstring php81-php-mysqlnd php81-php-opcache php81-php-pdo php81-php-pear php81-php-pecl-igbinary php81-php-pecl-memcached php81-php-pecl-msgpack php81-php-pecl-yaml php81-php-pecl-zip php81-php-pgsql php81-php-process php81-php-xml php81-php-xmlrpc
 
+# Copy scripts
+COPY ./scripts/install.sh ./scripts/slib.sh ./scripts/systemctl3.py  /root/
+RUN chmod +x /root/*
+
+# SystemD replacement
+RUN cp -f systemctl3.py /usr/bin/systemctl && chattr +i /usr/bin/systemctl
+
+# Virtualmin
+RUN TERM=xterm-256color COLUMNS=120 ./install.sh --minimal --force --verbose --bundle LEMP
+
 # Passenger Nginx
 RUN curl --fail -sSLo /etc/yum.repos.d/passenger.repo https://oss-binaries.phusionpassenger.com/yum/definitions/el-passenger.repo
 RUN dnf install -y nginx-mod-http-passenger || { dnf config-manager --enable cr && dnf install -y nginx-mod-http-passenger ; }
 
+ARG WEBMIN_ROOT_PORT_PREFIX
 ARG WEBMIN_ROOT_HOSTNAME
-# affected by yum update, need recopy? (and forever like that?)
-RUN cp -f systemctl3.py /usr/bin/systemctl
 
 # Misc
 RUN ssh-keygen -A && \
     npm install -g yarn pnpm && \
+    mysql_install_db --skip-test-db && \
     postgresql-setup --initdb --unit postgresql && \
     sed -i "s@#Port 22@Port 2122@" /etc/ssh/sshd_config && \
     git config --global pull.rebase false && \
     alternatives --install /usr/bin/unversioned-python python /usr/bin/python3.9 1
+
+# bugfix https://github.com/virtualmin/Virtualmin-Config/commit/e8f4498d4cdc3618efee2120b80ccbc723e034e2
+COPY ./scripts/Virtualmin-Config.pm /usr/share/perl5/vendor_perl/Virtualmin/Config.pm
+RUN virtualmin-config-system -b MiniLEMP -x Net
 
 # Firewall
 RUN systemctl disable firewalld && \
@@ -80,8 +81,7 @@ RUN systemctl disable firewalld && \
 # set root password
 ARG WEBMIN_ROOT_PASSWORD
 RUN /usr/libexec/webmin/changepass.pl /etc/webmin root ${WEBMIN_ROOT_PASSWORD}
-EXPOSE 80 443 2122 3306 5432 53/udp 53/tcp
-EXPOSE ${WEBMIN_ROOT_PORT_PREFIX}0 ${WEBMIN_ROOT_PORT_PREFIX}1 ${WEBMIN_ROOT_PORT_PREFIX}2 ${WEBMIN_ROOT_PORT_PREFIX}3 ${WEBMIN_ROOT_PORT_PREFIX}4 ${WEBMIN_ROOT_PORT_PREFIX}5 ${WEBMIN_ROOT_PORT_PREFIX}6 ${WEBMIN_ROOT_PORT_PREFIX}7 ${WEBMIN_ROOT_PORT_PREFIX}8 ${WEBMIN_ROOT_PORT_PREFIX}9
+
 # save mount artifacts
 COPY ./scripts/save.sh ./scripts/start.sh  /root/
 RUN chmod +x /root/* && ./save.sh

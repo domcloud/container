@@ -10,7 +10,6 @@ zunpack /etc/nginx
 zunpack /etc/ssh
 zunpack /etc/webmin
 zunpack /var/lib/mysql
-zunpack /home
 zunpack /var/lib/pgsql/data
 zunpack /var/named
 
