@@ -73,10 +73,9 @@ RUN ssh-keygen -A && \
     git config --global pull.rebase false && \
     cp -f systemctl3.py /usr/bin/systemctl
 
-# bugfix https://github.com/virtualmin/Virtualmin-Config/commit/e8f4498d4cdc3618efee2120b80ccbc723e034e2
-COPY ./scripts/Config.pm /usr/share/perl5/Virtualmin/
-RUN virtualmin config-system -b MiniLEMP -x Net
-
+# resolv.conf can't be overriden inside docker
+COPY ./scripts/Net.pm /usr/share/perl5/Virtualmin/Config/Plugin/
+RUN virtualmin config-system -b MiniLEMP
 
 # Firewall
 RUN systemctl disable firewalld && \
