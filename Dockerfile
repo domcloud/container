@@ -70,7 +70,8 @@ RUN ssh-keygen -A && \
     sed -i "s@#Port 22@Port 2122@" /etc/ssh/sshd_config && \
     git config --global pull.rebase false && \
     cp -f systemctl3.py /usr/bin/systemctl && \
-    sed -i "s@port=10000@port=${WEBMIN_ROOT_PORT_PREFIX}0@" /etc/webmin/miniserv.conf
+    sed -i "s@port=10000@port=${WEBMIN_ROOT_PORT_PREFIX}0@" /etc/webmin/miniserv.conf && \
+    curl -sS https://getcomposer.org/installer | sudo php -- --install-dir=/usr/local/bin --filename=composer
 
 # resolv.conf can't be overriden inside docker
 COPY ./scripts/setup/ /root/setup/

@@ -20,14 +20,8 @@ services:
       - .env
     platform: linux/amd64
     volumes:
-      - ./mount/etc/nginx:/etc/nginx
-      - ./mount/etc/ssh:/etc/ssh
-      - ./mount/etc/webmin:/etc/webmin
-      - ./mount/etc/mysql:/etc/mysql
-      - ./mount/etc/postgresql:/etc/postgresql
-      - ./mount/etc/php:/etc/php
+      - ./mount/etc:/etc
       - ./mount/data/mysql:/var/lib/mysql
       - ./mount/data/home:/home
       - ./mount/data/postgresql:/var/lib/postgresql
-      - ./mount/data/bind:/etc/bind
     stop_grace_period: 0s
