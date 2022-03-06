@@ -15,6 +15,11 @@ zunpack /etc/webmin
 zunpack /var/lib/mysql
 zunpack /var/lib/postgresql
 
+/usr/bin/systemctl default --init &
+mainpid=$!
+
+sleep 15 # wait for all services ON
+
 if [ ! -d /home/index ] ; then
     # init default domain
     printf "Installing index controller"
@@ -34,4 +39,4 @@ if [ ! -d /home/index ] ; then
     fi
 fi
 
-/usr/bin/systemctl default --init
+wait $mainpid

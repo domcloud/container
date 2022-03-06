@@ -104,6 +104,7 @@ RUN /usr/share/webmin/changepass.pl /etc/webmin root ${WEBMIN_ROOT_PASSWORD}
 
 # save mount artifacts
 COPY ./scripts/save.sh ./scripts/start.sh  /root/
+COPY ./templates/ /tmp/artifacts/templates/
 RUN chmod +x *.sh && ./save.sh
 
 ENTRYPOINT /root/start.sh
