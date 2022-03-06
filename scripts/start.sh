@@ -18,7 +18,7 @@ zunpack /var/lib/postgresql
 /usr/bin/systemctl default --init &
 mainpid=$!
 
-sleep 15 # wait for all services ON
+sleep 20 # wait for all services ON
 
 if [ ! -d /home/index ] ; then
     # init default domain

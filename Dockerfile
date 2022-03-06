@@ -66,7 +66,7 @@ ARG WEBMIN_ROOT_HOSTNAME
 
 # Misc
 RUN ssh-keygen -A && \
-    npm install -g yarn pnpm && \
+    npm install -g npm@latest yarn pnpm && \
     sed -i "s@#Port 22@Port 2122@" /etc/ssh/sshd_config && \
     git config --global pull.rebase false && \
     cp -f systemctl3.py /usr/bin/systemctl && \
@@ -78,7 +78,7 @@ COPY ./scripts/setup/ /root/setup/
 RUN cp -a ./setup/* /usr/share/perl5/Virtualmin/Config/Plugin/ && \
     virtualmin config-system -b MiniLEMP -i PostgreSQL
 
-# Firewall
+# System daemons
 RUN systemctl disable firewalld && \
     systemctl mask --now firewalld && \
     systemctl disable clamav-freshclam && \
@@ -95,16 +95,12 @@ RUN systemctl disable firewalld && \
     systemctl enable php7.4-fpm && \
     systemctl enable php8.1-fpm
 
-# Temporary fix for nginx
-# RUN yum downgrade wbm-virtualmin-nginx-2.21 -y && \
-#     yum downgrade wbm-virtualmin-nginx-ssl-1.15 -y
-
 # set root password
 ARG WEBMIN_ROOT_PASSWORD
 RUN /usr/share/webmin/changepass.pl /etc/webmin root ${WEBMIN_ROOT_PASSWORD}
 
 # save mount artifacts
-COPY ./scripts/save.sh ./scripts/start.sh  /root/
+COPY ./scripts/save.sh ./scripts/start.sh /root/
 COPY ./templates/ /tmp/artifacts/templates/
 RUN chmod +x *.sh && ./save.sh
 
