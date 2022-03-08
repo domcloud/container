@@ -11,10 +11,13 @@ services:
     privileged: true
     hostname: ${WEBMIN_ROOT_HOSTNAME}
     container_name: ${WEBMIN_ROOT_HOSTNAME}
-    network_mode: ${NET_MODE:-bridge}
+    network_mode: bridge
     ports:
+    - ${IP_MODE:-0.0.0.0}:53:53/tcp
+    - ${IP_MODE:-0.0.0.0}:53:53/udp
     - ${IP_MODE:-0.0.0.0}:80:80
-    - ${IP_MODE:-0.0.0.0}:443:443
+    - ${IP_MODE:-0.0.0.0}:443:443/tcp
+    - ${IP_MODE:-0.0.0.0}:443:443/udp
     - ${IP_MODE:-0.0.0.0}:2212:2212
     - ${IP_MODE:-0.0.0.0}:3306:3306
     - ${IP_MODE:-0.0.0.0}:5432:5432
@@ -37,7 +40,7 @@ services:
     platform: linux/${ARCH_MODE:-amd64}
     volumes:
       - ./mount/etc:/etc
-      - ./mount/data/mysql:/var/lib/mysql
       - ./mount/data/home:/home
+      - ./mount/data/mysql:/var/lib/mysql
       - ./mount/data/postgresql:/var/lib/postgresql
     stop_grace_period: 0s

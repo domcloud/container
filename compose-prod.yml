@@ -1,0 +1,28 @@
+version: "3.8"
+services:
+  domcloud:
+    build:
+      context: .
+      args:
+        WEBMIN_ROOT_HOSTNAME: ${WEBMIN_ROOT_HOSTNAME}
+        WEBMIN_ROOT_PASSWORD: ${WEBMIN_ROOT_PASSWORD}
+        WEBMIN_ROOT_PORT_PREFIX: ${WEBMIN_ROOT_PORT_PREFIX}
+    restart: always
+    privileged: true
+    hostname: ${WEBMIN_ROOT_HOSTNAME}
+    container_name: ${WEBMIN_ROOT_HOSTNAME}
+    network_mode: host
+    enable_ipv6: true
+    dns:
+    - 127.0.0.1
+    - 1.1.1.1
+    - 1.0.0.1
+    env_file:
+      - .env
+    platform: linux/amd64
+    volumes:
+      - ./mount/etc:/etc
+      - ./mount/data/home:/home
+      - ./mount/data/mysql:/var/lib/mysql
+      - ./mount/data/postgresql:/var/lib/postgresql
+    stop_grace_period: 0s
