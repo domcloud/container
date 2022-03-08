@@ -28,7 +28,7 @@ RUN apt-get install -y postgresql postgresql-contrib \
     openssh-server mariadb-server mariadb-client \
     bind9 bind9-host fail2ban nginx
 
-# PHP & Composer
+# PHP
 RUN apt-get install -y php-pear php5.6 php5.6-cgi php5.6-cli php5.6-fpm \
     php5.6-curl php5.6-imap php5.6-gd php5.6-mysql php5.6-pgsql php5.6-sqlite3 \
     php5.6-mbstring php5.6-json php5.6-bz2 php5.6-mcrypt php5.6-xmlrpc php5.6-gmp \
@@ -43,9 +43,7 @@ RUN apt-get install -y php-pear php5.6 php5.6-cgi php5.6-cli php5.6-fpm \
     php8.1-imap php8.1-mysql php8.1-mbstring php8.1-iconv php8.1-grpc \
     php8.1-xml php8.1-zip php8.1-bcmath php8.1-soap php8.1-gettext \
     php8.1-intl php8.1-readline php8.1-msgpack php8.1-igbinary php8.1-ldap && \
-    update-alternatives --set php /usr/bin/php8.1 && \
-    curl -sS https://getcomposer.org/installer -o /tmp/composer-setup.php && \
-    php /tmp/composer-setup.php --install-dir=/usr/local/bin --filename=composer
+    update-alternatives --set php /usr/bin/php8.1
 
 # Virtualmin
 COPY ./scripts/install.sh ./scripts/slib.sh /root/
@@ -63,17 +61,13 @@ RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 561F9B9CAC
     echo deb https://oss-binaries.phusionpassenger.com/apt/passenger focal main > /etc/apt/sources.list.d/passenger.list && \
     apt-get update && apt-get install -y libnginx-mod-http-passenger
 
-ARG WEBMIN_ROOT_PORT_PREFIX
-ARG WEBMIN_ROOT_HOSTNAME
-
 # Misc
 RUN ssh-keygen -A && \
     npm install -g npm@latest yarn pnpm && \
     sed -i "s@#Port 22@Port 2122@" /etc/ssh/sshd_config && \
     git config --global pull.rebase false && \
     cp -f systemctl3.py /usr/bin/systemctl && \
-    sed -i "s@port=10000@port=${WEBMIN_ROOT_PORT_PREFIX}0@" /etc/webmin/miniserv.conf && \
-    curl -sS https://getcomposer.org/installer | sudo php -- --install-dir=/usr/local/bin --filename=composer
+    curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
 # resolv.conf can't be overriden inside docker
 COPY ./scripts/setup/ /root/setup/
@@ -97,9 +91,11 @@ RUN systemctl disable firewalld && \
     systemctl enable php7.4-fpm && \
     systemctl enable php8.1-fpm
 
-# set root password
+# set webmin port & root password
 ARG WEBMIN_ROOT_PASSWORD
-RUN /usr/share/webmin/changepass.pl /etc/webmin root ${WEBMIN_ROOT_PASSWORD}
+ARG WEBMIN_ROOT_PORT_PREFIX
+RUN sed -i "s@port=10000@port=${WEBMIN_ROOT_PORT_PREFIX}0@" /etc/webmin/miniserv.conf && \
+    /usr/share/webmin/changepass.pl /etc/webmin root ${WEBMIN_ROOT_PASSWORD}
 
 # save mount artifacts
 COPY ./scripts/save.sh ./scripts/start.sh /root/
