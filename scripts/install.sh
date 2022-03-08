@@ -247,8 +247,8 @@ if [ "$mode" = 'full' ]; then
     ubudeps="postfix virtualmin-lamp-stack"
   elif [ "$bundle" = 'LEMP' ]; then
     rhgroup="'Virtualmin LEMP Stack'"
-    debdeps="postfix php*-fpm virtualmin-lemp-stack"
-    ubudeps="postfix php*-fpm virtualmin-lemp-stack"
+    debdeps="postfix virtualmin-lemp-stack"
+    ubudeps="postfix virtualmin-lemp-stack"
   fi
 elif [ "$mode" = 'minimal' ]; then
   if [ "$bundle" = 'LAMP' ]; then
@@ -257,8 +257,8 @@ elif [ "$mode" = 'minimal' ]; then
     ubudeps="postfix virtualmin-lamp-stack-minimal"
   elif [ "$bundle" = 'LEMP' ]; then
     rhgroup="'Virtualmin LEMP Stack Minimal'"
-    debdeps="postfix php*-fpm virtualmin-lemp-stack-minimal"
-    ubudeps="postfix php*-fpm virtualmin-lemp-stack-minimal"
+    debdeps="postfix virtualmin-lemp-stack-minimal"
+    ubudeps="postfix virtualmin-lemp-stack-minimal"
   fi
 fi
 
