@@ -37,7 +37,7 @@ services:
     - 1.0.0.1
     env_file:
       - .env
-    platform: linux/${ARCH_MODE:-amd64}
+    platform: linux/amd64 # ARM64 is not supported yet due to phusion
     volumes:
       - ./mount/etc:/etc
       - ./mount/data/home:/home

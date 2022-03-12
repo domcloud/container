@@ -6,6 +6,7 @@ ARG DEBIAN_FRONTEND=noninteractive
 
 RUN sed -i 's#exit 101#exit 0#' /usr/sbin/policy-rc.d
 RUN rm /etc/apt/apt.conf.d/docker-gzip-indexes && \
+    apt-get update -y && apt-get install software-properties-common -y && \
     add-apt-repository ppa:longsleep/golang-backports -y && \
     LC_ALL=en_US.UTF-8 add-apt-repository ppa:ondrej/php -y && \
     add-apt-repository ppa:adiscon/v8-stable -y && \
@@ -17,7 +18,7 @@ RUN apt-get install -y curl git mercurial nano vim wget procps \
     gcc g++ dirmngr gnupg gpg make cmake apt-utils libtool \
     perl golang-go rustc cargo rake ruby zip unzip tar sqlite3 \
     python3 e2fsprogs dnsutils quota linux-image-extra-virtual rsyslog \
-    libcrypt-ssleay-perl software-properties-common language-pack-en
+    libcrypt-ssleay-perl language-pack-en
 
 # SystemD replacement
 COPY ./scripts/systemctl3.py /root/
