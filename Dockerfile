@@ -27,7 +27,7 @@ RUN cp -f systemctl3.py /usr/bin/systemctl
 # Services
 RUN apt-get install -y postgresql postgresql-contrib \
     openssh-server mariadb-server mariadb-client \
-    bind9 bind9-host fail2ban nginx
+    bind9 bind9-host nginx
 
 # PHP
 RUN apt-get install -y php-pear php5.6 php5.6-cgi php5.6-cli php5.6-fpm \
@@ -82,7 +82,6 @@ RUN systemctl disable firewalld && \
     systemctl disable proftpd && \
     systemctl disable saslauthd && \
     systemctl disable dovecot && \
-    systemctl enable fail2ban && \
     systemctl enable mysql && \
     systemctl enable postgresql && \
     systemctl enable nginx && \

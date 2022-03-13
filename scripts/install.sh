@@ -238,7 +238,7 @@ sclgroup="'Software Collections PHP 7.2 Environment'"
 
 # This has to be installed before anything else, so it can be disabled during
 # install, and turned back on after. This is ridiculous.
-debpredeps="fail2ban"
+debpredeps=""
 
 if [ "$mode" = 'full' ]; then
   if [ "$bundle" = 'LAMP' ]; then
