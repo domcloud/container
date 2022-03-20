@@ -39,12 +39,25 @@ RUN apt-get install -y postgresql postgresql-contrib \
     openssh-server mariadb-server mariadb-client \
     bind9 bind9-host nginx php8.1-fpm
 
+# Virtualmin
+COPY ./scripts/install.sh ./scripts/slib.sh /root/
+RUN chmod +x *.sh && TERM=xterm-256color COLUMNS=100 ./install.sh --force --setup
+RUN apt-get install -y virtualmin-base virtualmin-core webmin virtualmin-config \
+     webmin-virtual-server webmin-virtualmin-init webmin-virtualmin-slavedns \
+     nginx-extras webmin-virtualmin-nginx webmin-virtualmin-nginx-ssl \
+     ntpdate p7zip xz-utils etckeeper certbot fcgiwrap
+
 # Make sure all services installed
-RUN systemctl enable mariadb && \
+RUN systemctl disable grub-common && \
+    systemctl mask grub-common && \
+    systemctl disable firewalld && \
+    systemctl mask firewalld && \
+    systemctl enable mariadb && \
     systemctl enable postgresql && \
     systemctl enable nginx && \
     systemctl enable ssh && \
-    systemctl enable php8.1-fpm
+    systemctl enable php8.1-fpm && \
+    systemctl enable webmin
 
 # PHP extensions
 RUN apt-get install -y php8.1-curl php8.1-ctype php8.1-uuid php8.1-pgsql \
@@ -52,11 +65,6 @@ RUN apt-get install -y php8.1-curl php8.1-ctype php8.1-uuid php8.1-pgsql \
     php8.1-mysql php8.1-mbstring php8.1-iconv php8.1-grpc \
     php8.1-xml php8.1-zip php8.1-bcmath php8.1-soap php8.1-gettext \
     php8.1-intl php8.1-readline php8.1-msgpack php8.1-igbinary
-
-# Virtualmin
-COPY ./scripts/install.sh ./scripts/slib.sh /root/
-RUN chmod +x *.sh && TERM=xterm-256color COLUMNS=100 ./install.sh \
-    --minimal --force --verbose --bundle LEMP
 
 # Passenger Nginx
 RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 561F9B9CAC40B2F7 && \
@@ -75,18 +83,6 @@ RUN apt-get autoremove -y && ssh-keygen -A && \
 COPY ./scripts/setup/ /root/setup/
 RUN cp -a ./setup/* /usr/share/perl5/Virtualmin/Config/Plugin/ && \
     virtualmin config-system -b MiniLEMP -i PostgreSQL
-
-# System daemons
-RUN systemctl mask --now firewalld && \
-    systemctl disable clamav-freshclam && \
-    systemctl mask clamav-freshclam && \
-    systemctl disable proftpd && \
-    systemctl disable saslauthd && \
-    systemctl disable dovecot && \
-    systemctl mask dovecot && \
-    systemctl disable grub-common && \
-    systemctl mask grub-common && \
-    systemctl enable webmin
 
 # set webmin port & root password
 ARG WEBMIN_ROOT_PASSWORD
