@@ -95,6 +95,7 @@ RUN sed -i "s@port=10000@port=${WEBMIN_ROOT_PORT_PREFIX}0@" /etc/webmin/miniserv
 # save mount artifacts
 COPY ./scripts/save.sh ./scripts/start.sh /root/
 COPY ./templates/ /tmp/artifacts/templates/
+RUN cp -f /tmp/artifacts/templates/nginx.conf /etc/nginx/nginx.conf
 RUN chmod +x *.sh && ./save.sh
 
 ENTRYPOINT /root/start.sh
