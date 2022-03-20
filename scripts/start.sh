@@ -30,7 +30,7 @@ if [ ! -d /home/index ] ; then
         rm -rf *
         git clone https://github.com/domcloud/bridge .
         /bin/bash tools-init.sh
-        echo 'index ALL = (root) NOPASSWD: `echo $PWD`/sudoutil.js' | EDITOR='tee' visudo /etc/sudoers.d/index
+        echo 'index ALL = (root) NOPASSWD: /home/index/public_html/sudoutil.js' | EDITOR='tee' visudo /etc/sudoers.d/index
         chmod -R 0750 .
         cd ~
     else
