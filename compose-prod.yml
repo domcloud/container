@@ -4,7 +4,6 @@ services:
     build:
       context: .
       args:
-        WEBMIN_ROOT_HOSTNAME: ${WEBMIN_ROOT_HOSTNAME}
         WEBMIN_ROOT_PASSWORD: ${WEBMIN_ROOT_PASSWORD}
         WEBMIN_ROOT_PORT_PREFIX: ${WEBMIN_ROOT_PORT_PREFIX}
     restart: always

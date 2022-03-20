@@ -15,10 +15,6 @@ zunpack /var/lib/postgresql
 /usr/bin/systemctl default --init &
 mainpid=$!
 
-echo DEBUG Start
-echo Systemctl is $mainpid
-ls /usr/share/webmin/virtual-server/create-domain.pl
-
 sleep 20 # wait for all services ON
 
 if [ ! -d /home/index ] ; then

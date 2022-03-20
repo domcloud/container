@@ -56,7 +56,6 @@ RUN apt-get install -y postgresql postgresql-contrib \
 RUN systemctl enable mariadb && \
     systemctl enable postgresql && \
     systemctl enable nginx && \
-    systemctl enable webmin && \
     systemctl enable ssh && \
     systemctl enable php5.6-fpm && \
     systemctl enable php7.4-fpm && \
@@ -90,7 +89,9 @@ RUN systemctl mask --now firewalld && \
     systemctl disable clamav-freshclam && \
     systemctl disable proftpd && \
     systemctl disable saslauthd && \
-    systemctl disable dovecot
+    systemctl disable dovecot && \
+    systemctl disable grub-common && \
+    systemctl enable webmin
 
 # set webmin port & root password
 ARG WEBMIN_ROOT_PASSWORD
