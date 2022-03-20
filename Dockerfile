@@ -57,9 +57,7 @@ RUN apt-get install -y postgresql postgresql-contrib \
     bind9 bind9-host
 
 # Make sure all services installed
-RUN systemctl disable firewalld && \
-    systemctl mask firewalld && \
-    systemctl enable mariadb && \
+RUN systemctl enable mariadb && \
     systemctl enable postgresql && \
     systemctl enable nginx && \
     systemctl enable ssh && \
