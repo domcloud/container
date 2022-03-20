@@ -7,27 +7,20 @@ ARG DEBIAN_FRONTEND=noninteractive
 # Repositories
 RUN sed -i 's#exit 101#exit 0#' /usr/sbin/policy-rc.d
 RUN rm /etc/apt/apt.conf.d/docker-gzip-indexes && \
-    apt-get update -y && apt-get install software-properties-common \
-    apt-transport-https ca-certificates apt-utils perl wget curl -y && \
+    apt-get update && apt-get install software-properties-common \
+    apt-transport-https ca-certificates perl wget curl -y && \
     add-apt-repository ppa:longsleep/golang-backports -y && \
     LC_ALL=en_US.UTF-8 add-apt-repository ppa:ondrej/php -y && \
     add-apt-repository ppa:adiscon/v8-stable -y && \
-    apt-get update -y && apt-get upgrade -y
+    apt-get clean && apt-get update
 
 # Virtualmin Repos
 COPY ./scripts/install.sh ./scripts/slib.sh /root/
 RUN chmod +x *.sh && TERM=xterm-256color COLUMNS=100 ./install.sh --force --setup
 
 # Webmin
-RUN apt-get install -y virtualmin-config \
-     webmin-virtual-server webmin-virtualmin-init webmin-virtualmin-slavedns \
-     webmin-virtualmin-nginx webmin-virtualmin-nginx-ssl
-
-RUN exit 1
-
-# SystemD replacement
-COPY ./scripts/systemctl3.py /root/
-RUN cp -f systemctl3.py /usr/bin/systemctl
+RUN apt-get install -y virtualmin-core && \
+    apt-get install -y virtualmin-lemp-stack-minimal --no-install-recommends
 
 # Terminal tools
 RUN apt-get install -y git mercurial nano vim procps ntpdate \
@@ -47,11 +40,14 @@ RUN curl --fail -sSL -o setup-nodejs https://deb.nodesource.com/setup_16.x && \
     bash setup-nodejs && \
     apt-get install -y nodejs
 
+# SystemD replacement
+COPY ./scripts/systemctl3.py /root/
+RUN cp -f systemctl3.py /usr/bin/systemctl
+
 # Services
 RUN apt-get install -y postgresql postgresql-contrib \
     openssh-server mariadb-server mariadb-client \
-    bind9 bind9-host php8.1-fpm webmin nginx nginx-extras
-
+    bind9 bind9-host php8.1-fpm webmin nginx-common
 
 # Make sure all services installed
 RUN systemctl disable grub-common && \
