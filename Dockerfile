@@ -50,7 +50,7 @@ RUN cp -f systemctl3.py /usr/bin/systemctl
 # Services
 RUN apt-get install -y postgresql postgresql-contrib \
     openssh-server mariadb-server mariadb-client \
-    bind9 bind9-host php8.1-fpm webmin nginx-common
+    bind9 bind9-host php8.1-fpm
 
 # Make sure all services installed
 RUN systemctl disable grub-common && \
