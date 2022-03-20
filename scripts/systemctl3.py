@@ -6463,6 +6463,8 @@ if __name__ == "__main__":
     if callable(command_func) and not found:
         found = True
         result = command_func()
+    if command_func in ['unset-environment', 'set-environment']:
+        sys.exit(0) # FORK: skip (avoid problem with some systemd daemons)
     if not found:
         logg.error("Unknown operation %s.", command)
         sys.exit(1)

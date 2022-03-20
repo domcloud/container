@@ -6,7 +6,8 @@ ARG DEBIAN_FRONTEND=noninteractive
 
 RUN sed -i 's#exit 101#exit 0#' /usr/sbin/policy-rc.d
 RUN rm /etc/apt/apt.conf.d/docker-gzip-indexes && \
-    apt-get update -y && apt-get install software-properties-common -y && \
+    apt-get update -y && apt-get install software-properties-common \
+    apt-transport-https ca-certificates -y && \
     add-apt-repository ppa:longsleep/golang-backports -y && \
     LC_ALL=en_US.UTF-8 add-apt-repository ppa:ondrej/php -y && \
     add-apt-repository ppa:adiscon/v8-stable -y && \
@@ -51,6 +52,16 @@ RUN apt-get install -y postgresql postgresql-contrib \
     openssh-server mariadb-server mariadb-client \
     bind9 bind9-host nginx  php5.6-fpm php7.4-fpm php8.1-fpm
 
+# Make sure all services installed
+RUN systemctl enable mariadb && \
+    systemctl enable postgresql && \
+    systemctl enable nginx && \
+    systemctl enable webmin && \
+    systemctl enable ssh && \
+    systemctl enable php5.6-fpm && \
+    systemctl enable php7.4-fpm && \
+    systemctl enable php8.1-fpm
+
 # Virtualmin
 COPY ./scripts/install.sh ./scripts/slib.sh /root/
 RUN chmod +x *.sh && TERM=xterm-256color COLUMNS=120 ./install.sh \
@@ -58,7 +69,6 @@ RUN chmod +x *.sh && TERM=xterm-256color COLUMNS=120 ./install.sh \
 
 # Passenger Nginx
 RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 561F9B9CAC40B2F7 && \
-    apt-get install -y apt-transport-https ca-certificates && \
     echo deb https://oss-binaries.phusionpassenger.com/apt/passenger focal main > /etc/apt/sources.list.d/passenger.list && \
     apt-get update && apt-get install -y libnginx-mod-http-passenger
 
@@ -80,15 +90,7 @@ RUN systemctl mask --now firewalld && \
     systemctl disable clamav-freshclam && \
     systemctl disable proftpd && \
     systemctl disable saslauthd && \
-    systemctl disable dovecot && \
-    systemctl enable mysql && \
-    systemctl enable postgresql && \
-    systemctl enable nginx && \
-    systemctl enable webmin && \
-    systemctl enable ssh && \
-    systemctl enable php5.6-fpm && \
-    systemctl enable php7.4-fpm && \
-    systemctl enable php8.1-fpm
+    systemctl disable dovecot
 
 # set webmin port & root password
 ARG WEBMIN_ROOT_PASSWORD

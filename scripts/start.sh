@@ -1,8 +1,10 @@
 #!/bin/bash
 
 zunpack () {
-if [ -z "$(ls -A $1)" ] ; then
-    cp -a /tmp/artifacts$1/* $1/
+if [ ! -f $1/.mounted ] ; then
+    echo copying artifacts to mount $1
+    cp -a /tmp/artifacts$1/. $1/
+    touch $1/.mounted
 fi
 }
 
