@@ -79,10 +79,15 @@ RUN cp -a ./setup/* /usr/share/perl5/Virtualmin/Config/Plugin/ && \
 # System daemons
 RUN systemctl mask --now firewalld && \
     systemctl disable clamav-freshclam && \
+    systemctl mask clamav-freshclam && \
     systemctl disable proftpd && \
+    systemctl mask proftpd && \
     systemctl disable saslauthd && \
+    systemctl mask saslauthd && \
     systemctl disable dovecot && \
+    systemctl mask dovecot && \
     systemctl disable grub-common && \
+    systemctl mask grub-common && \
     systemctl enable webmin
 
 # set webmin port & root password
