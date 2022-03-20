@@ -62,7 +62,7 @@ RUN systemctl enable mariadb && \
     systemctl enable nginx && \
     systemctl enable ssh && \
     systemctl enable php8.1-fpm && \
-    systemctl enable bind9 && \
+    systemctl enable named && \
     systemctl enable webmin
 
 # Passenger Nginx
