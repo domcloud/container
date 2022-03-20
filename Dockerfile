@@ -54,7 +54,7 @@ RUN cp -f systemctl3.py /usr/bin/systemctl
 # Services
 RUN apt-get install -y postgresql postgresql-contrib \
     openssh-server mariadb-server mariadb-client \
-    bind9 bind9-host
+    bind9 bind9-host proftpd
 
 # Make sure all services installed
 RUN systemctl enable mariadb && \
@@ -75,7 +75,10 @@ RUN ssh-keygen -A && \
     npm install -g npm@latest yarn pnpm && \
     sed -i "s@#Port 22@Port 2122@" /etc/ssh/sshd_config && \
     git config --global pull.rebase false && \
-    curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+    curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer && \
+    groupadd -r mysql && useradd -r -g mysql mysql && \
+    mkdir /var/lib/mysql && chown -R mysql:mysql /var/lib/mysql
+
 
 # resolv.conf can't be overriden inside docker
 COPY ./scripts/setup/ /root/setup/
