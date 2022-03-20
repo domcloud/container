@@ -57,15 +57,14 @@ RUN apt-get install -y postgresql postgresql-contrib \
     bind9 bind9-host
 
 # Make sure all services installed
-RUN systemctl disable grub-common && \
-    systemctl mask grub-common && \
-    systemctl disable firewalld && \
+RUN systemctl disable firewalld && \
     systemctl mask firewalld && \
     systemctl enable mariadb && \
     systemctl enable postgresql && \
     systemctl enable nginx && \
     systemctl enable ssh && \
     systemctl enable php8.1-fpm && \
+    systemctl enable bind9 && \
     systemctl enable webmin
 
 # Passenger Nginx
