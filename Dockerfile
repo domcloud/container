@@ -29,14 +29,19 @@ RUN apt-get install -y webmin && \
 RUN apt-get install -y git mercurial nano vim procps ntpdate \
     iproute2 net-tools openssl whois screen autoconf automake \
     gcc g++ dirmngr gnupg gpg make cmake apt-utils libtool \
-    perl-modules golang-go rustc cargo rake ruby zip unzip tar sqlite3 \
-    python3 e2fsprogs dnsutils quota sudo linux-image-extra-virtual \
-    rsyslog libcrypt-ssleay-perl language-pack-en libjson-pp-perl \
-    liblog-log4perl-perl p7zip xz-utils etckeeper certbot fcgiwrap
+    golang-go rustc cargo rake ruby zip unzip tar sqlite3 \
+    python3 e2fsprogs dnsutils quota sudo rsyslog language-pack-en
 
 # PHP
-RUN apt-get install -y php-pear php8.1 php8.1-common php8.1-cli php8.1-cgi && \
+RUN apt-get install -y php-pear php8.1 php8.1-common php8.1-cli php8.1-cgi php8.1-fpm && \
     update-alternatives --set php /usr/bin/php8.1
+
+# PHP extensions
+RUN apt-get install -y php8.1-curl php8.1-ctype php8.1-uuid php8.1-pgsql \
+    php8.1-sqlite3 php8.1-gd php8.1-redis php8.1-ldap \
+    php8.1-mysql php8.1-mbstring php8.1-iconv php8.1-grpc \
+    php8.1-xml php8.1-zip php8.1-bcmath php8.1-soap php8.1-gettext \
+    php8.1-intl php8.1-readline php8.1-msgpack php8.1-igbinary
 
 # Nodejs
 RUN curl --fail -sSL -o setup-nodejs https://deb.nodesource.com/setup_16.x && \
@@ -50,7 +55,7 @@ RUN cp -f systemctl3.py /usr/bin/systemctl
 # Services
 RUN apt-get install -y postgresql postgresql-contrib \
     openssh-server mariadb-server mariadb-client \
-    bind9 bind9-host php8.1-fpm
+    bind9 bind9-host
 
 # Make sure all services installed
 RUN systemctl disable grub-common && \
@@ -63,13 +68,6 @@ RUN systemctl disable grub-common && \
     systemctl enable ssh && \
     systemctl enable php8.1-fpm && \
     systemctl enable webmin
-
-# PHP extensions
-RUN apt-get install -y php8.1-curl php8.1-ctype php8.1-uuid php8.1-pgsql \
-    php8.1-sqlite3 php8.1-gd php8.1-redis php8.1-ldap \
-    php8.1-mysql php8.1-mbstring php8.1-iconv php8.1-grpc \
-    php8.1-xml php8.1-zip php8.1-bcmath php8.1-soap php8.1-gettext \
-    php8.1-intl php8.1-readline php8.1-msgpack php8.1-igbinary
 
 # Passenger Nginx
 RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 561F9B9CAC40B2F7 && \
