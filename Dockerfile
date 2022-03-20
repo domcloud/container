@@ -20,6 +20,28 @@ RUN apt-get install -y curl git mercurial nano vim wget procps \
     python3 e2fsprogs dnsutils quota linux-image-extra-virtual rsyslog \
     libcrypt-ssleay-perl language-pack-en
 
+# PHP
+RUN apt-get install -y php-pear php5.6 php5.6-cgi php5.6-cli \
+    php5.6-curl php5.6-imap php5.6-gd php5.6-mysql php5.6-pgsql php5.6-sqlite3 \
+    php5.6-mbstring php5.6-json php5.6-bz2 php5.6-mcrypt php5.6-xmlrpc php5.6-gmp \
+    php5.6-xsl php5.6-soap php5.6-xml php5.6-zip php5.6-dba \
+    php7.4 php7.4-cgi php7.4-cli php7.4-sqlite3 \
+    php7.4-json php7.4-mysql php7.4-curl php7.4-ctype php7.4-uuid \
+    php7.4-iconv php7.4-mbstring php7.4-gd php7.4-intl php7.4-xml \
+    php7.4-zip php7.4-gettext php7.4-pgsql php7.4-bcmath php7.4-redis \
+    php7.4-readline php7.4-soap php7.4-igbinary php7.4-msgpack \
+    php8.1 php8.1-cgi php8.1-cli php8.1-curl php8.1-ctype \
+    php8.1-uuid php8.1-pgsql php8.1-sqlite3 php8.1-gd php8.1-redis \
+    php8.1-imap php8.1-mysql php8.1-mbstring php8.1-iconv php8.1-grpc \
+    php8.1-xml php8.1-zip php8.1-bcmath php8.1-soap php8.1-gettext \
+    php8.1-intl php8.1-readline php8.1-msgpack php8.1-igbinary php8.1-ldap && \
+    update-alternatives --set php /usr/bin/php8.1
+
+# Nodejs
+RUN curl --fail -sSL -o setup-nodejs https://deb.nodesource.com/setup_16.x && \
+    bash setup-nodejs && \
+    apt-get install -y nodejs
+
 # SystemD replacement
 COPY ./scripts/systemctl3.py /root/
 RUN cp -f systemctl3.py /usr/bin/systemctl
@@ -27,34 +49,12 @@ RUN cp -f systemctl3.py /usr/bin/systemctl
 # Services
 RUN apt-get install -y postgresql postgresql-contrib \
     openssh-server mariadb-server mariadb-client \
-    bind9 bind9-host nginx
-
-# PHP
-RUN apt-get install -y php-pear php5.6 php5.6-cgi php5.6-cli php5.6-fpm \
-    php5.6-curl php5.6-imap php5.6-gd php5.6-mysql php5.6-pgsql php5.6-sqlite3 \
-    php5.6-mbstring php5.6-json php5.6-bz2 php5.6-mcrypt php5.6-xmlrpc php5.6-gmp \
-    php5.6-xsl php5.6-soap php5.6-xml php5.6-zip php5.6-dba \
-    php7.4 php7.4-cgi php7.4-cli php7.4-fpm php7.4-sqlite3 \
-    php7.4-json php7.4-mysql php7.4-curl php7.4-ctype php7.4-uuid \
-    php7.4-iconv php7.4-mbstring php7.4-gd php7.4-intl php7.4-xml \
-    php7.4-zip php7.4-gettext php7.4-pgsql php7.4-bcmath php7.4-redis \
-    php7.4-readline php7.4-soap php7.4-igbinary php7.4-msgpack \
-    php8.1 php8.1-cgi php8.1-cli php8.1-fpm php8.1-curl php8.1-ctype \
-    php8.1-uuid php8.1-pgsql php8.1-sqlite3 php8.1-gd php8.1-redis \
-    php8.1-imap php8.1-mysql php8.1-mbstring php8.1-iconv php8.1-grpc \
-    php8.1-xml php8.1-zip php8.1-bcmath php8.1-soap php8.1-gettext \
-    php8.1-intl php8.1-readline php8.1-msgpack php8.1-igbinary php8.1-ldap && \
-    update-alternatives --set php /usr/bin/php8.1
+    bind9 bind9-host nginx  php5.6-fpm php7.4-fpm php8.1-fpm
 
 # Virtualmin
 COPY ./scripts/install.sh ./scripts/slib.sh /root/
 RUN chmod +x *.sh && TERM=xterm-256color COLUMNS=120 ./install.sh \
     --minimal --force --verbose --bundle LEMP
-
-# Nodejs & C++
-RUN curl --fail -sSL -o setup-nodejs https://deb.nodesource.com/setup_16.x && \
-    bash setup-nodejs && \
-    apt-get install -y nodejs
 
 # Passenger Nginx
 RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 561F9B9CAC40B2F7 && \
@@ -76,8 +76,7 @@ RUN cp -a ./setup/* /usr/share/perl5/Virtualmin/Config/Plugin/ && \
     virtualmin config-system -b MiniLEMP -i PostgreSQL
 
 # System daemons
-RUN systemctl disable firewalld && \
-    systemctl mask --now firewalld && \
+RUN systemctl mask --now firewalld && \
     systemctl disable clamav-freshclam && \
     systemctl disable proftpd && \
     systemctl disable saslauthd && \
