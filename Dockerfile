@@ -75,7 +75,6 @@ RUN apt-get autoremove -y && ssh-keygen -A && \
     npm install -g npm@latest yarn pnpm && \
     sed -i "s@#Port 22@Port 2122@" /etc/ssh/sshd_config && \
     git config --global pull.rebase false && \
-    cp -f systemctl3.py /usr/bin/systemctl && \
     curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
 # resolv.conf can't be overriden inside docker
