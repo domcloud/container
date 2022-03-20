@@ -19,8 +19,11 @@ COPY ./scripts/install.sh ./scripts/slib.sh /root/
 RUN chmod +x *.sh && TERM=xterm-256color COLUMNS=100 ./install.sh --force --setup
 
 # Webmin
-RUN apt-get install -y virtualmin-core && \
-    apt-get install -y virtualmin-lemp-stack-minimal --no-install-recommends
+RUN apt-get install -y webmin && \
+    apt-get install -y nginx-common && \
+    sed -i 's/listen \[::\]:80 default_server;/#listen \[::\]:80 default_server;/' /etc/nginx/sites-available/default && \
+    apt-get install -y virtualmin-lemp-stack-minimal --no-install-recommends && \
+    apt-get install -y virtualmin-core
 
 # Terminal tools
 RUN apt-get install -y git mercurial nano vim procps ntpdate \
