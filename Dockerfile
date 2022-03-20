@@ -71,7 +71,7 @@ RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 561F9B9CAC
     apt-get update && apt-get install -y libnginx-mod-http-passenger
 
 # Misc
-RUN apt-get autoremove -y && ssh-keygen -A && \
+RUN ssh-keygen -A && \
     npm install -g npm@latest yarn pnpm && \
     sed -i "s@#Port 22@Port 2122@" /etc/ssh/sshd_config && \
     git config --global pull.rebase false && \
