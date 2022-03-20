@@ -1,4 +1,4 @@
-FROM ubuntu:latest
+FROM ubuntu:focal
 MAINTAINER Wildan M <willnode@wellosoft.net>
 
 WORKDIR /root
