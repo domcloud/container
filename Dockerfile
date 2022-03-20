@@ -7,7 +7,7 @@ ARG DEBIAN_FRONTEND=noninteractive
 RUN sed -i 's#exit 101#exit 0#' /usr/sbin/policy-rc.d
 RUN rm /etc/apt/apt.conf.d/docker-gzip-indexes && \
     apt-get update -y && apt-get install software-properties-common \
-    apt-transport-https ca-certificates -y && \
+    apt-transport-https ca-certificates apt-utils -y && \
     add-apt-repository ppa:longsleep/golang-backports -y && \
     LC_ALL=en_US.UTF-8 add-apt-repository ppa:ondrej/php -y && \
     add-apt-repository ppa:adiscon/v8-stable -y && \
@@ -18,24 +18,11 @@ RUN apt-get install -y curl git mercurial nano vim wget procps \
     iproute2 net-tools openssl whois screen autoconf automake \
     gcc g++ dirmngr gnupg gpg make cmake apt-utils libtool \
     perl golang-go rustc cargo rake ruby zip unzip tar sqlite3 \
-    python3 e2fsprogs dnsutils quota linux-image-extra-virtual rsyslog \
-    libcrypt-ssleay-perl language-pack-en
+    python3 e2fsprogs dnsutils quota sudo linux-image-extra-virtual \
+    rsyslog libcrypt-ssleay-perl language-pack-en
 
 # PHP
-RUN apt-get install -y php-pear php5.6 php5.6-cgi php5.6-cli \
-    php5.6-curl php5.6-imap php5.6-gd php5.6-mysql php5.6-pgsql php5.6-sqlite3 \
-    php5.6-mbstring php5.6-json php5.6-bz2 php5.6-mcrypt php5.6-xmlrpc php5.6-gmp \
-    php5.6-xsl php5.6-soap php5.6-xml php5.6-zip php5.6-dba \
-    php7.4 php7.4-cgi php7.4-cli php7.4-sqlite3 \
-    php7.4-json php7.4-mysql php7.4-curl php7.4-ctype php7.4-uuid \
-    php7.4-iconv php7.4-mbstring php7.4-gd php7.4-intl php7.4-xml \
-    php7.4-zip php7.4-gettext php7.4-pgsql php7.4-bcmath php7.4-redis \
-    php7.4-readline php7.4-soap php7.4-igbinary php7.4-msgpack \
-    php8.1 php8.1-cgi php8.1-cli php8.1-curl php8.1-ctype \
-    php8.1-uuid php8.1-pgsql php8.1-sqlite3 php8.1-gd php8.1-redis \
-    php8.1-imap php8.1-mysql php8.1-mbstring php8.1-iconv php8.1-grpc \
-    php8.1-xml php8.1-zip php8.1-bcmath php8.1-soap php8.1-gettext \
-    php8.1-intl php8.1-readline php8.1-msgpack php8.1-igbinary php8.1-ldap && \
+RUN apt-get install -y php-pear php8.1 php8.1-common php8.1-cli php8.1-cgi && \
     update-alternatives --set php /usr/bin/php8.1
 
 # Nodejs
@@ -50,20 +37,25 @@ RUN cp -f systemctl3.py /usr/bin/systemctl
 # Services
 RUN apt-get install -y postgresql postgresql-contrib \
     openssh-server mariadb-server mariadb-client \
-    bind9 bind9-host nginx  php5.6-fpm php7.4-fpm php8.1-fpm
+    bind9 bind9-host nginx php8.1-fpm
 
 # Make sure all services installed
 RUN systemctl enable mariadb && \
     systemctl enable postgresql && \
     systemctl enable nginx && \
     systemctl enable ssh && \
-    systemctl enable php5.6-fpm && \
-    systemctl enable php7.4-fpm && \
     systemctl enable php8.1-fpm
+
+# PHP extensions
+RUN apt-get install -y php8.1-curl php8.1-ctype php8.1-uuid php8.1-pgsql \
+    php8.1-sqlite3 php8.1-gd php8.1-redis php8.1-ldap \
+    php8.1-mysql php8.1-mbstring php8.1-iconv php8.1-grpc \
+    php8.1-xml php8.1-zip php8.1-bcmath php8.1-soap php8.1-gettext \
+    php8.1-intl php8.1-readline php8.1-msgpack php8.1-igbinary
 
 # Virtualmin
 COPY ./scripts/install.sh ./scripts/slib.sh /root/
-RUN chmod +x *.sh && TERM=xterm-256color COLUMNS=120 ./install.sh \
+RUN chmod +x *.sh && TERM=xterm-256color COLUMNS=100 ./install.sh \
     --minimal --force --verbose --bundle LEMP
 
 # Passenger Nginx
@@ -72,7 +64,7 @@ RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 561F9B9CAC
     apt-get update && apt-get install -y libnginx-mod-http-passenger
 
 # Misc
-RUN ssh-keygen -A && \
+RUN apt-get autoremove -y && ssh-keygen -A && \
     npm install -g npm@latest yarn pnpm && \
     sed -i "s@#Port 22@Port 2122@" /etc/ssh/sshd_config && \
     git config --global pull.rebase false && \
