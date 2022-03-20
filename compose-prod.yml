@@ -22,6 +22,7 @@ services:
     volumes:
       - ./mount/etc:/etc
       - ./mount/data/home:/home
+      - ./mount/data/log:/var/log
       - ./mount/data/mysql:/var/lib/mysql
       - ./mount/data/postgresql:/var/lib/postgresql
     stop_grace_period: 0s

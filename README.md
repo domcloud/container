@@ -17,7 +17,7 @@ cp .env.example .env
 docker-compose up
 ```
 
-The first build might take around 30 minutes on cloud servers.
+The first build might take around 30 minutes on cloud servers. The final image build will uccopy close to 3 GB of storage.
 
 All website data are exported to volumes under `./mount`.
 

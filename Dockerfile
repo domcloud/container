@@ -76,7 +76,9 @@ RUN ssh-keygen -A && \
     sed -i "s@#Port 22@Port 2122@" /etc/ssh/sshd_config && \
     git config --global pull.rebase false && \
     curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer && \
-    chown -R mysql:mysql /var/lib/mysql
+    chown -R mysql:mysql /var/lib/mysql && \
+    mkdir -p /run/php && chmod 777 /run/php && \
+    apt-get install -y libdbd-pg-perl
 
 
 # resolv.conf can't be overriden inside docker

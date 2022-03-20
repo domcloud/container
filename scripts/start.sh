@@ -9,6 +9,7 @@ fi
 }
 
 zunpack /etc
+zunpack /var/log
 zunpack /var/lib/mysql
 zunpack /var/lib/postgresql
 

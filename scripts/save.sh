@@ -11,6 +11,7 @@ save () {
 
 # save artifacts
 save /etc
+save /var/log
 save /var/lib/mysql
 save /var/lib/postgresql
 
