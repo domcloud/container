@@ -6,12 +6,7 @@ if [ -z "$(ls -A $1)" ] ; then
 fi
 }
 
-zunpack /etc/nginx
-zunpack /etc/php
-zunpack /etc/postgresql
-zunpack /etc/mysql
-zunpack /etc/ssh
-zunpack /etc/webmin
+zunpack /etc
 zunpack /var/lib/mysql
 zunpack /var/lib/postgresql
 
