@@ -4,22 +4,39 @@ MAINTAINER Wildan M <willnode@wellosoft.net>
 WORKDIR /root
 ARG DEBIAN_FRONTEND=noninteractive
 
+# Repositories
 RUN sed -i 's#exit 101#exit 0#' /usr/sbin/policy-rc.d
 RUN rm /etc/apt/apt.conf.d/docker-gzip-indexes && \
     apt-get update -y && apt-get install software-properties-common \
-    apt-transport-https ca-certificates apt-utils -y && \
+    apt-transport-https ca-certificates apt-utils perl wget curl -y && \
     add-apt-repository ppa:longsleep/golang-backports -y && \
     LC_ALL=en_US.UTF-8 add-apt-repository ppa:ondrej/php -y && \
     add-apt-repository ppa:adiscon/v8-stable -y && \
     apt-get update -y && apt-get upgrade -y
 
+# Virtualmin Repos
+COPY ./scripts/install.sh ./scripts/slib.sh /root/
+RUN chmod +x *.sh && TERM=xterm-256color COLUMNS=100 ./install.sh --force --setup
+
+# Webmin
+RUN apt-get install -y virtualmin-config \
+     webmin-virtual-server webmin-virtualmin-init webmin-virtualmin-slavedns \
+     webmin-virtualmin-nginx webmin-virtualmin-nginx-ssl
+
+RUN exit 1
+
+# SystemD replacement
+COPY ./scripts/systemctl3.py /root/
+RUN cp -f systemctl3.py /usr/bin/systemctl
+
 # Terminal tools
-RUN apt-get install -y curl git mercurial nano vim wget procps \
+RUN apt-get install -y git mercurial nano vim procps ntpdate \
     iproute2 net-tools openssl whois screen autoconf automake \
     gcc g++ dirmngr gnupg gpg make cmake apt-utils libtool \
-    perl golang-go rustc cargo rake ruby zip unzip tar sqlite3 \
+    perl-modules golang-go rustc cargo rake ruby zip unzip tar sqlite3 \
     python3 e2fsprogs dnsutils quota sudo linux-image-extra-virtual \
-    rsyslog libcrypt-ssleay-perl language-pack-en
+    rsyslog libcrypt-ssleay-perl language-pack-en libjson-pp-perl \
+    liblog-log4perl-perl p7zip xz-utils etckeeper certbot fcgiwrap
 
 # PHP
 RUN apt-get install -y php-pear php8.1 php8.1-common php8.1-cli php8.1-cgi && \
@@ -30,22 +47,11 @@ RUN curl --fail -sSL -o setup-nodejs https://deb.nodesource.com/setup_16.x && \
     bash setup-nodejs && \
     apt-get install -y nodejs
 
-# SystemD replacement
-COPY ./scripts/systemctl3.py /root/
-RUN cp -f systemctl3.py /usr/bin/systemctl
-
 # Services
 RUN apt-get install -y postgresql postgresql-contrib \
     openssh-server mariadb-server mariadb-client \
-    bind9 bind9-host nginx php8.1-fpm
+    bind9 bind9-host php8.1-fpm webmin nginx nginx-extras
 
-# Virtualmin
-COPY ./scripts/install.sh ./scripts/slib.sh /root/
-RUN chmod +x *.sh && TERM=xterm-256color COLUMNS=100 ./install.sh --force --setup
-RUN apt-get install -y libjson-pp-perl perl-modules webmin virtualmin-config \
-     webmin-virtual-server webmin-virtualmin-init webmin-virtualmin-slavedns \
-     nginx-extras webmin-virtualmin-nginx webmin-virtualmin-nginx-ssl \
-     ntpdate p7zip xz-utils etckeeper certbot fcgiwrap liblog-log4perl-perl
 
 # Make sure all services installed
 RUN systemctl disable grub-common && \
