@@ -42,10 +42,10 @@ RUN apt-get install -y postgresql postgresql-contrib \
 # Virtualmin
 COPY ./scripts/install.sh ./scripts/slib.sh /root/
 RUN chmod +x *.sh && TERM=xterm-256color COLUMNS=100 ./install.sh --force --setup
-RUN apt-get install -y virtualmin-base virtualmin-core webmin virtualmin-config \
+RUN apt-get install -y libjson-pp-perl perl-modules webmin virtualmin-config \
      webmin-virtual-server webmin-virtualmin-init webmin-virtualmin-slavedns \
      nginx-extras webmin-virtualmin-nginx webmin-virtualmin-nginx-ssl \
-     ntpdate p7zip xz-utils etckeeper certbot fcgiwrap
+     ntpdate p7zip xz-utils etckeeper certbot fcgiwrap liblog-log4perl-perl
 
 # Make sure all services installed
 RUN systemctl disable grub-common && \
