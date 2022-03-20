@@ -45,8 +45,7 @@ RUN apt-get install -y php8.1-curl php8.1-ctype php8.1-uuid php8.1-pgsql \
 
 # Nodejs
 RUN curl --fail -sSL -o setup-nodejs https://deb.nodesource.com/setup_16.x && \
-    bash setup-nodejs && \
-    apt-get install -y nodejs
+    bash setup-nodejs && apt-get install -y nodejs
 
 # SystemD replacement
 COPY ./scripts/systemctl3.py /root/
