@@ -4,11 +4,11 @@ MAINTAINER Wildan M <willnode@wellosoft.net>
 WORKDIR /root
 ARG DEBIAN_FRONTEND=noninteractive
 
-# Repositories
+# Repositories (204 MB apt install)
 RUN sed -i 's#exit 101#exit 0#' /usr/sbin/policy-rc.d
 RUN rm /etc/apt/apt.conf.d/docker-gzip-indexes && \
     apt-get update && apt-get install software-properties-common \
-    apt-transport-https ca-certificates perl wget curl -y && \
+    apt-transport-https ca-certificates perl wget curl -y && \ 
     add-apt-repository ppa:longsleep/golang-backports -y && \
     LC_ALL=en_US.UTF-8 add-apt-repository ppa:ondrej/php -y && \
     add-apt-repository ppa:adiscon/v8-stable -y && \
@@ -18,7 +18,7 @@ RUN rm /etc/apt/apt.conf.d/docker-gzip-indexes && \
 COPY ./scripts/install.sh ./scripts/slib.sh /root/
 RUN chmod +x *.sh && TERM=xterm-256color COLUMNS=100 ./install.sh --force --setup
 
-# Webmin
+# Webmin (304 MB + 60 MB)
 RUN apt-get install -y webmin && \
     apt-get install -y nginx-common && \
     sed -i 's/listen \[::\]:80 default_server;/#listen \[::\]:80 default_server;/' /etc/nginx/sites-available/default && \
@@ -28,9 +28,11 @@ RUN apt-get install -y webmin && \
 # Terminal tools
 RUN apt-get install -y git mercurial nano vim procps ntpdate \
     iproute2 net-tools openssl whois screen autoconf automake \
-    gcc g++ dirmngr gnupg gpg make cmake apt-utils libtool \
-    golang-go rustc cargo rake ruby zip unzip tar sqlite3 \
-    python3 e2fsprogs dnsutils quota sudo rsyslog language-pack-en
+    dirmngr gnupg gpg make libtool zip unzip tar sqlite3 \
+    python3 e2fsprogs dnsutils quota sudo language-pack-en
+
+# Additional compiling language support
+RUN gcc g++ rustc cargo rake ruby golang-go cmake
 
 # PHP
 RUN apt-get install -y php-pear php8.1 php8.1-common php8.1-cli php8.1-cgi php8.1-fpm && \
@@ -38,9 +40,8 @@ RUN apt-get install -y php-pear php8.1 php8.1-common php8.1-cli php8.1-cgi php8.
 
 # PHP extensions
 RUN apt-get install -y php8.1-curl php8.1-ctype php8.1-uuid php8.1-pgsql \
-    php8.1-sqlite3 php8.1-gd php8.1-redis php8.1-ldap \
-    php8.1-mysql php8.1-mbstring php8.1-iconv php8.1-grpc \
-    php8.1-xml php8.1-zip php8.1-bcmath php8.1-soap php8.1-gettext \
+    php8.1-sqlite3 php8.1-gd php8.1-redis php8.1-mysql php8.1-mbstring php8.1-iconv \
+    php8.1-grpc php8.1-xml php8.1-zip php8.1-bcmath php8.1-gettext \
     php8.1-intl php8.1-readline php8.1-msgpack php8.1-igbinary
 
 # Nodejs
