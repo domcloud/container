@@ -20,3 +20,6 @@ save /etc
 save /var/log
 save /var/lib/mysql
 save /var/lib/postgresql
+
+# bugfixes
+touch /tmp/artifacts/etc/rsyncd.conf

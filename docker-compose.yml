@@ -39,7 +39,8 @@ services:
     platform: linux/arm64
     volumes:
       - ./mount/etc:/etc
-      - ./mount/data/home:/home
-      - ./mount/data/mysql:/var/lib/mysql
-      - ./mount/data/postgresql:/var/lib/postgresql
+      - ./mount/home:/home
+      - ./mount/log:/var/log
+      - ./mount/mysql:/var/lib/mysql
+      - ./mount/postgresql:/var/lib/postgresql
     stop_grace_period: 0s
