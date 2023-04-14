@@ -5,63 +5,53 @@ WORKDIR /root
 ARG DEBIAN_FRONTEND=noninteractive
 
 # Repositories (204 MB apt install)
-RUN sed -i 's#exit 101#exit 0#' /usr/sbin/policy-rc.d
-RUN rm /etc/apt/apt.conf.d/docker-gzip-indexes && \
+RUN sed -i 's#exit 101#exit 0#' /usr/sbin/policy-rc.d && \
+    rm /etc/apt/apt.conf.d/docker-gzip-indexes && \
     apt-get update && apt-get install software-properties-common \
     apt-transport-https ca-certificates perl wget curl -y && \ 
-    add-apt-repository ppa:longsleep/golang-backports -y && \
-    LC_ALL=en_US.UTF-8 add-apt-repository ppa:ondrej/php -y && \
-    add-apt-repository ppa:adiscon/v8-stable -y && \
     apt-get clean && apt-get update
 
 # Virtualmin Repos
 COPY ./scripts/install.sh ./scripts/slib.sh /root/
 RUN chmod +x *.sh && TERM=xterm-256color COLUMNS=100 ./install.sh --force --setup
 
-# Webmin (304 MB + 60 MB)
+# Webmin (38.6 MB + 111 MB + 224 MB)
 RUN apt-get install -y webmin && \
     apt-get install -y nginx-common && \
     sed -i 's/listen \[::\]:80 default_server;/#listen \[::\]:80 default_server;/' /etc/nginx/sites-available/default && \
-    apt-get install -y virtualmin-lemp-stack-minimal --no-install-recommends && \
-    apt-get install -y virtualmin-core
+    apt-get install -y virtualmin-lemp-stack-minimal virtualmin-core usermin perl-modules --no-install-recommends
 
-# Terminal tools
+# Terminal tools (442 MB)
 RUN apt-get install -y git mercurial nano vim procps ntpdate \
     iproute2 net-tools openssl whois screen autoconf automake \
     dirmngr gnupg gpg make libtool zip unzip tar sqlite3 \
-    python3 e2fsprogs dnsutils quota sudo language-pack-en gcc g++ cmake nodejs
-
-# PHP
-RUN apt-get install -y php-pear php8.2 php8.2-common php8.2-cli php8.2-cgi php8.2-fpm && \
-    update-alternatives --set php /usr/bin/php8.2
-
-# PHP extensions
-# RUN apt-get install -y php8.2-curl php8.2-ctype php8.2-uuid php8.2-pgsql \
-#     php8.2-sqlite3 php8.2-gd php8.2-redis php8.2-mysql php8.2-mbstring php8.2-iconv \
-#     php8.2-grpc php8.2-xml php8.2-zip php8.2-bcmath php8.2-gettext \
-#     php8.2-intl php8.2-readline php8.2-msgpack php8.2-igbinary
+    python3 e2fsprogs dnsutils sudo nodejs ncdu htop iftop \
+    php-pear php php-common php-cli php-cgi php-fpm \ 
+    build-essential zlib1g-dev libssl-dev libreadline-dev \
+    --no-install-recommends
 
 # SystemD replacement
 COPY ./scripts/systemctl3.py /root/
 RUN cp -f systemctl3.py /usr/bin/systemctl
 
-# Services
+# Services (384 MB)
 RUN apt-get install -y postgresql postgresql-contrib \
     openssh-server mariadb-server mariadb-client \
-    bind9 bind9-host proftpd
+    bind9 bind9-host cron libdbd-pg-perl
 
 # Make sure all services installed
 RUN systemctl enable mariadb && \
     systemctl enable postgresql && \
     systemctl enable nginx && \
+    systemctl enable cron && \
     systemctl enable ssh && \
-    systemctl enable php8.2-fpm && \
+    systemctl enable php8.1-fpm && \
     systemctl enable named && \
     systemctl enable webmin
 
-# Passenger Nginx
+# Passenger Nginx (88.9 MB)
 RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 561F9B9CAC40B2F7 && \
-    echo deb https://oss-binaries.phusionpassenger.com/apt/passenger focal main > /etc/apt/sources.list.d/passenger.list && \
+    echo deb https://oss-binaries.phusionpassenger.com/apt/passenger jammy main > /etc/apt/sources.list.d/passenger.list && \
     apt-get update && apt-get install -y libnginx-mod-http-passenger
 
 # Misc
@@ -70,8 +60,7 @@ RUN ssh-keygen -A && \
     git config --global pull.rebase false && \
     curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer && \
     chown -R mysql:mysql /var/lib/mysql && \
-    mkdir -p /run/php && chmod 777 /run/php && \
-    apt-get install -y libdbd-pg-perl npm cron
+    mkdir -p /run/php && chmod 777 /run/php
 
 
 # resolv.conf can't be overriden inside docker
@@ -91,4 +80,4 @@ COPY ./templates/ /tmp/artifacts/templates/
 RUN cp -f /tmp/artifacts/templates/nginx.conf /etc/nginx/nginx.conf
 RUN chmod +x *.sh && ./save.sh
 
-ENTRYPOINT /root/start.sh
+ENTRYPOINT sh /root/start.sh

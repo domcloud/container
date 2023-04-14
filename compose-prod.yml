@@ -18,11 +18,9 @@ services:
     - 1.0.0.1
     env_file:
       - .env
-    platform: linux/amd64
+    platform: ${PLATFORM:-linux/amd64}
     volumes:
       - ./mount/etc:/etc
-      - ./mount/data/home:/home
-      - ./mount/data/log:/var/log
-      - ./mount/data/mysql:/var/lib/mysql
-      - ./mount/data/postgresql:/var/lib/postgresql
+      - ./mount/home:/home
+      - ./mount/var:/var
     stop_grace_period: 0s

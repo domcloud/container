@@ -9,9 +9,7 @@ fi
 }
 
 zunpack /etc
-zunpack /var/log
-zunpack /var/lib/mysql
-zunpack /var/lib/postgresql
+zunpack /var
 
 /usr/bin/systemctl default --init &
 mainpid=$!
@@ -27,12 +25,19 @@ if [ ! -d /home/index ] ; then
     if [ $? -eq 0 ]; then
         sleep 1
         virtualmin modify-web --domain `hostname -f` --document-dir public_html/public
-        cd /home/index/public_html
-        rm -rf *
-        git clone https://github.com/domcloud/bridge .
-        /bin/bash tools-init.sh
+        su index <<EOSU
+cd /home/index/public_html
+curl -sS https://webi.sh/pathman | sh
+curl -sS https://webi.sh/node | sh
+curl -sS https://webi.sh/python | sh
+source ~/.bashrc
+corepack enable
+rm -rf *
+git clone https://github.com/domcloud/bridge .
+/bin/bash tools-init.sh
+chmod -R 0750 .
+EOSU
         echo 'index ALL = (root) NOPASSWD: /home/index/public_html/sudoutil.js' | EDITOR='tee' visudo /etc/sudoers.d/index
-        chmod -R 0750 .
         cd ~
     else
         echo Installing index controller failed

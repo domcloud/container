@@ -15,11 +15,10 @@ save () {
 # apply templates
 cp -a /tmp/artifacts/templates/nginx.conf /etc/nginx/nginx.conf
 
+# bugfixes
+touch /etc/rsyncd.conf
+rm -rf /usr/share/webmin/virtual-server/help
+
 # save artifacts
 save /etc
-save /var/log
-save /var/lib/mysql
-save /var/lib/postgresql
-
-# bugfixes
-touch /tmp/artifacts/etc/rsyncd.conf
+save /var
