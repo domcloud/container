@@ -1,0 +1,345 @@
+
+# Contents
+wget -O /usr/local/bin/restart https://raw.githubusercontent.com/domcloud/bridge/main/userkill.sh && chmod 755 /usr/local/bin/restart
+mkdir -p /usr/local/share/www && wget -O /usr/local/share/www/deceptive.html https://raw.githubusercontent.com/domcloud/domcloud/master/share/deceptive.html  && chmod 0755 -R /usr/local/share/www
+mkdir -p /etc/skel/public_html
+pushd /etc/skel/public_html
+mkdir .well-known
+touch favicon.ico
+wget https://gist.githubusercontent.com/willnode/0efb7e2d70a2a8005c690d887d0cdb8a/raw/499b82245fd4d430d77f4c1febd4419d869d1109/index.html
+popd
+echo "gem: --no-document" > /etc/gemrc
+cat <<'EOF' > /etc/gitconfig
+[pull]
+        rebase = false
+[init]
+        defaultBranch = main
+EOF
+cat <<'EOF' > /etc/environment
+LC_ALL="en_US.UTF-8"
+LC_CTYPE="en_US.UTF-8"
+LANGUAGE="en_US.UTF-8"
+EOF
+
+# SystemD
+cat <<'EOF' > /etc/security/limits.conf
+root             soft    nofile          65535
+@nginx           hard    as              2048000
+@nginx           hard    nproc           64
+@nginx           hard    priority        5
+EOF
+mkdir -p /etc/systemd/system/{nginx,earlyoom,iptables,ip6tables}.service.d
+cat <<'EOF' > /etc/systemd/system/nginx.service.d/override.conf
+[Service]
+LimitNOFILE=65535
+EOF
+cat <<'EOF' > /etc/systemd/system/earlyoom.service.d/override.conf
+[Service]
+SupplementaryGroups=adm
+EOF
+cat <<'EOF' > /etc/systemd/system/iptables.service.d/override.conf
+[Service]
+ExecStartPre=ipset -! create whitelist hash:ip
+EOF
+cat <<'EOF' > /etc/systemd/system/ip6tables.service.d/override.conf
+[Service]
+ExecStartPre=ipset -! create whitelist-v6 hash:ip family inet6
+EOF
+
+# DB
+cat <<'EOF' > /etc/my.cnf.d/mariadb-server.cnf
+[mysqld]
+datadir=/var/lib/mysql
+socket=/var/lib/mysql/mysql.sock
+log-error=/var/log/mariadb/mariadb.log
+pid-file=/run/mariadb/mariadb.pid
+innodb_file_per_table = 1
+innodb_buffer_pool_size = 128MB
+myisam_sort_buffer_size = 8M
+read_rnd_buffer_size = 512K
+net_buffer_length = 8K
+read_buffer_size = 256K
+sort_buffer_size = 512K
+table_open_cache = 64
+max_allowed_packet = 64M
+key_buffer_size = 16M
+max_connections = 4096
+EOF
+
+cat <<'EOF' > /var/lib/pgsql/16/data/pg_hba.conf
+local   all             all                                     peer
+host    all             all             0.0.0.0/0               md5
+host    all             all             ::/0                    md5
+EOF
+
+cat <<'EOF' | while read -r line; do
+allow_subdoms=0
+auto_letsencrypt=0
+avail_xterm=1
+aws_cmd=aws
+bind_spf=
+bind_sub=yes
+cert_type=sha1
+collect_noall=1
+collect_interval=none
+combined_cert=2
+disable=web,mysql,postgres
+dns_records=@
+dovecot_ssl=0
+hard_quotas=0
+hide_pro_tips=1
+html_perms=0750
+jail_age=
+jailkit_disabled=0
+key_tmpl=/etc/ssl/virtualmin/${ID}/ssl.key
+letsencrypt_retry=0
+letsencrypt_wild=0
+logrotate_shared=yes
+mysql_charset=utf8mb4
+mysql_collate=utf8mb4_unicode_ci
+mysql_db=${PREFIX}_db
+mysql_hosts=%
+mysql_mkdb=0
+mysql_ssl=0
+mysql_suffix=${USER}_
+nolink_certs=2
+passwd_mode=0
+php_fpm=pm = ondemand	pm.max_children = 4	pm.process_idle_timeout = 3600s
+php_log=1
+php_noedit=0
+php_sock=1
+php_suexec=3
+php_vars=
+postfix_ssl=0
+preload_mode=2
+proftpd_ssl=0
+quotas=1
+status=0
+usermin_ssl=0
+virtual_skel=/etc/skel
+webmin_ssl=0
+EOF
+    # Extract the key part (before '=') to use as a pattern for sed
+    key=$(echo "$line" | cut -d'=' -f1)
+    config_file=/etc/webmin/virtual-server/config
+
+    if grep -q "^$key=" "$config_file"; then
+        # If found, replace the line
+        sed -i "s|^$key=.*|$line|" "$config_file"
+    else
+        # If not found, append the line to the end of the file
+        echo "$line" >> "$config_file"
+    fi
+done
+
+cat <<'EOF' > /etc/webmin/virtual-server/plans/0
+ipfollow=
+aliaslimit=
+migrate=0
+capabilities=domain users aliases dbs scripts ssl redirect admins phpver phpmode backup sharedips passwd spf records
+bwlimit=
+aliasdomslimit=
+uquota=
+name=Default Plan
+safeunder=1
+file=/etc/webmin/virtual-server/plans/0
+mailboxlimit=
+nodbname=0
+quota=
+forceunder=1
+featurelimits=
+norename=1
+id=0
+domslimit=
+dbslimit=
+realdomslimit=
+scripts=
+EOF
+
+cat <<'EOF' > /etc/webmin/virtualmin-nginx/config
+php_socket=1
+nginx_cmd=/usr/sbin/nginx
+add_to=/etc/nginx/conf.d
+http2=0
+listen_mode=1
+child_procs=4
+extra_dirs=
+rotate_cmd=nginx -s reload
+apply_cmd=systemctl reload nginx
+stop_cmd=systemctl stop nginx
+start_cmd=systemctl start nginx
+add_link=
+nginx_config=/etc/nginx/nginx.conf
+EOF
+
+
+cat <<'EOF' > /etc/nginx/fastcgi.conf
+fastcgi_param GATEWAY_INTERFACE CGI/1.1;
+fastcgi_param SERVER_SOFTWARE nginx;
+fastcgi_param QUERY_STRING $query_string;
+fastcgi_param REQUEST_METHOD $request_method;
+fastcgi_param CONTENT_TYPE $content_type;
+fastcgi_param CONTENT_LENGTH $content_length;
+fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+fastcgi_param SCRIPT_NAME $fastcgi_script_name;
+fastcgi_param REQUEST_URI $request_uri;
+fastcgi_param DOCUMENT_URI $document_uri;
+fastcgi_param DOCUMENT_ROOT $document_root;
+fastcgi_param SERVER_PROTOCOL $server_protocol;
+fastcgi_param REMOTE_ADDR $remote_addr;
+fastcgi_param REMOTE_PORT $remote_port;
+fastcgi_param SERVER_ADDR $server_addr;
+fastcgi_param SERVER_PORT $server_port;
+fastcgi_param SERVER_NAME $server_name;
+fastcgi_param PATH_INFO $fastcgi_path_info;
+fastcgi_param HTTPS $https;
+fastcgi_split_path_info ^(.+\.php)(/.+)$;
+fastcgi_read_timeout 600s;
+EOF
+
+
+cat <<'EOF' > /etc/nginx/passenger.conf
+# passenger_root /usr/share/ruby/vendor_ruby/phusion_passenger/locations.ini;
+# passenger_ruby /usr/bin/ruby;
+# passenger_instance_registry_dir /var/run/passenger-instreg;
+passenger_python /usr/bin/python3;
+passenger_nodejs /usr/bin/node;
+passenger_friendly_error_pages on;
+passenger_disable_security_update_check on;
+passenger_disable_anonymous_telemetry on;
+passenger_log_file /var/log/nginx/passenger.log;
+passenger_min_instances 0;
+passenger_max_pool_size 32;
+passenger_pool_idle_time 18000;
+passenger_max_instances_per_app 1;
+EOF
+
+cat <<'EOF' > /etc/nginx/finetuning.conf
+server_names_hash_bucket_size 64;
+server_names_hash_max_size 131072;
+limit_req_zone $binary_remote_addr zone=basic_limit:50m rate=2r/s;
+limit_req zone=basic_limit burst=500 nodelay;
+gzip_types text/css application/javascript image/svg+xml;
+gzip_min_length 1024;
+gzip_comp_level 3;
+gzip on;
+sendfile on;
+tcp_nopush on;
+keepalive_timeout 60;
+keepalive_requests 1000;
+directio 16m;
+output_buffers 3 512k;
+client_max_body_size 512m;
+disable_symlinks if_not_owner;
+proxy_http_version 1.1;
+ssl_protocols TLSv1.2 TLSv1.3;
+server_tokens off;
+merge_slashes off;
+msie_padding off;
+ssl_session_cache shared:SSL:1m;
+ssl_session_timeout 1h;
+ssl_session_tickets off;
+ssl_early_data on;
+ssl_buffer_size 4k;
+EOF
+
+cat <<'EOF' > /etc/nginx/nginx.conf
+user nginx;
+worker_processes auto;
+worker_rlimit_nofile 65535;
+error_log /var/log/nginx/error.log;
+pid /run/nginx.pid;
+include /usr/share/nginx/modules/*.conf;
+events {
+    worker_connections 10240;
+}
+http {
+    log_format main '$remote_addr - $remote_user [$time_local] "$request" '
+                    '$status $body_bytes_sent "$http_referer" '
+                    '"$http_user_agent" "$http_x_forwarded_for"';
+    access_log /var/log/nginx/access.log main;
+    include /etc/nginx/mime.types;
+    include /etc/nginx/finetuning.conf;
+    include /etc/nginx/fastcgi.conf;
+    include /etc/nginx/passenger.conf;
+    default_type application/octet-stream;
+    map $sent_http_content_type $expires {
+        default off;
+        text/html epoch;
+        text/css max;
+        application/javascript max;
+        ~image/ max;
+        ~font/ max;
+        ~audio/ max;
+        ~video/ max;
+    }
+    expires $expires;
+    server {
+        server_name _;
+        listen 80;
+        listen [::]:80;
+        return 301 https://$host$request_uri;
+    }
+    include /etc/nginx/conf.d/*.conf;
+}
+EOF
+
+cat <<'EOF' > /etc/sysconfig/iptables
+*filter
+:INPUT ACCEPT [0:0]
+:OUTPUT ACCEPT [0:0]
+:FORWARD ACCEPT [0:0]
+-A INPUT -p icmp -j ACCEPT
+-A INPUT -i lo -j ACCEPT
+-A INPUT -p tcp -m multiport --dports 22,80,443,3306,5432 -j ACCEPT
+-A INPUT -p tcp -m tcp --sport 53 -j ACCEPT
+-A INPUT -p udp -m udp --sport 53 -j ACCEPT
+-A INPUT -p tcp -m tcp --dport 53 -j ACCEPT
+-A INPUT -p udp -m udp --dport 53 -j ACCEPT
+-A INPUT -p tcp --dport 2443:2453 -j ACCEPT
+-A INPUT -p tcp --dport 32000:65535 -j ACCEPT
+-A INPUT -j REJECT --reject-with icmp-host-prohibited
+-A FORWARD -j REJECT --reject-with icmp-host-prohibited
+-A OUTPUT -o lo -j ACCEPT
+-A OUTPUT -m conntrack --ctstate ESTABLISHED -j ACCEPT
+-A OUTPUT -p tcp --dport 22 -j ACCEPT
+-A OUTPUT -p tcp -m tcp --dport 53 -j ACCEPT
+-A OUTPUT -p udp -m udp --dport 53 -j ACCEPT
+-A OUTPUT -p tcp -m tcp --sport 53 -j ACCEPT
+-A OUTPUT -p udp -m udp --sport 53 -j ACCEPT
+-A OUTPUT -p tcp -m tcp --dport 25 -j REJECT
+-A OUTPUT -p tcp -m tcp --sport 25 -j REJECT
+-A OUTPUT -m set -j ACCEPT --match-set whitelist dst
+COMMIT
+EOF
+
+
+cat <<'EOF' > /etc/sysconfig/ip6tables
+*filter
+:INPUT ACCEPT [0:0]
+:OUTPUT ACCEPT [0:0]
+:FORWARD ACCEPT [0:0]
+-A INPUT -p ipv6-icmp -j ACCEPT
+-A INPUT -i lo -j ACCEPT
+-A INPUT -p tcp -m multiport --dports 22,80,443,3306,5432 -j ACCEPT
+-A INPUT -p tcp -m tcp --sport 53 -j ACCEPT
+-A INPUT -p udp -m udp --sport 53 -j ACCEPT
+-A INPUT -p tcp -m tcp --dport 53 -j ACCEPT
+-A INPUT -p udp -m udp --dport 53 -j ACCEPT
+-A INPUT -p udp -m udp --dport 546 -j ACCEPT
+-A INPUT -p tcp --dport 2443:2453 -j ACCEPT
+-A INPUT -p tcp --dport 32000:65535 -j ACCEPT
+-A INPUT -j REJECT --reject-with icmp6-adm-prohibited
+-A FORWARD -j REJECT --reject-with icmp6-adm-prohibited
+-A OUTPUT -o lo -j ACCEPT
+-A OUTPUT -m conntrack --ctstate ESTABLISHED -j ACCEPT
+-A OUTPUT -p tcp --dport 22 -j ACCEPT
+-A OUTPUT -p tcp -m tcp --dport 53 -j ACCEPT
+-A OUTPUT -p udp -m udp --dport 53 -j ACCEPT
+-A OUTPUT -p tcp -m tcp --sport 53 -j ACCEPT
+-A OUTPUT -p udp -m udp --sport 53 -j ACCEPT
+-A OUTPUT -p tcp -m tcp --dport 25 -j REJECT
+-A OUTPUT -p tcp -m tcp --sport 25 -j REJECT
+-A OUTPUT -m set -j ACCEPT --match-set whitelist-v6 dst
+COMMIT
+EOF
