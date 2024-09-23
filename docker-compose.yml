@@ -1,5 +1,5 @@
 services:
-  rocky_linux_qemu:
+  domcloud:
     image: domcloud-container:latest
     container_name: domcloud
     tty: true

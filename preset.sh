@@ -21,6 +21,28 @@ LC_CTYPE="en_US.UTF-8"
 LANGUAGE="en_US.UTF-8"
 EOF
 
+# SSH
+cat <<'EOF' | while read -r line; do
+PasswordAuthentication yes
+PermitRootLogin prohibit-password
+ClientAliveInterval 10
+ClientAliveCountMax 60
+PermitEmptyPasswords no
+EOF
+    # Extract the key part (before ' ') to use as a pattern for sed
+    key=$(echo "$line" | cut -d' ' -f1)
+    config_file=/etc/ssh/sshd_config
+
+    if grep -q "^#?$key " "$config_file"; then
+        # If found, replace the line
+        sed -i "s|^$key .*|$line|" "$config_file"
+    else
+        # If not found, append the line to the end of the file
+        echo "$line" >> "$config_file"
+    fi
+done
+
+
 # SystemD
 cat <<'EOF' > /etc/security/limits.conf
 root             soft    nofile          65535
@@ -66,11 +88,17 @@ key_buffer_size = 16M
 max_connections = 4096
 EOF
 
-cat <<'EOF' > /var/lib/pgsql/16/data/pg_hba.conf
+$PGDATA = /var/lib/pgsql/16/data
+sudo -u postgres /usr/pgsql-16/bin/initdb -D $PGDATA
+sed -i "s/#listen_addresses = .*/listen_addresses = '*'/g" $PGDATA/postgresql.conf
+sed -i "s/max_connections = 100/max_connections = 4096/g" $PGDATA/postgresql.conf
+cat <<'EOF' > $PGDATA/pg_hba.conf
 local   all             all                                     peer
 host    all             all             0.0.0.0/0               md5
 host    all             all             ::/0                    md5
 EOF
+
+sed -i 's/port=10000/port=2443/g' /etc/webmin/miniserv.conf
 
 cat <<'EOF' | while read -r line; do
 allow_subdoms=0
@@ -284,6 +312,69 @@ http {
 }
 EOF
 
+cat <<'EOF' > /etc/logrotate.d/nginx
+/var/log/nginx/*.log /var/log/virtualmin/*_log {
+    create 0640 nginx root
+    daily
+    rotate 10
+    missingok
+    notifempty
+    compress
+    delaycompress
+    sharedscripts
+    postrotate
+	/bin/kill -USR1 `cat /run/nginx.pid 2>/dev/null` 2>/dev/null || true
+    endscript
+}
+EOF
+
+cat <<'EOF' > /etc/fail2ban/filter.d/ratelimit.conf
+[Definition]
+failregex = ^.+ \[error\] .+limiting requests, excess: \d+.\d+ by zone "\w+", client: <HOST>, .+$
+
+ignoreregex =
+EOF
+
+cat <<'EOF' > /etc/fail2ban/filter.d/php.conf
+[Definition]
+failregex = ^<HOST> .* "POST \/+xmlrpc.php .* [24]\d+ \d* ".*"$
+            ^<HOST> .* "POST \/+wp-login.php .* [24]\d+ \d* ".*"$
+            ^<HOST> .* "GET \/index\.php\S+\/index\.php\S+ .* [24]\d+ \d* ".*"$
+
+ignoreregex =
+EOF
+
+
+cat <<'EOF' > /etc/fail2ban/jail.local
+[DEFAULT]
+maxretry = 10
+bantime = 86400 ; 24h
+
+[sshd]
+enabled = true
+port    = ssh
+
+[webmin-auth]
+port    = 2443
+enabled = true
+
+[phpmyadmin-syslog]
+enabled = true
+
+[mysqld-auth]
+enabled = true
+
+[ratelimit]
+enabled = true
+port = http,https
+logpath = /var/log/virtualmin/*error_log
+
+[wordpress-auth]
+enabled = true
+port = http,https
+logpath = /var/log/virtualmin/*access_log
+EOF
+
 cat <<'EOF' > /etc/sysconfig/iptables
 *filter
 :INPUT ACCEPT [0:0]
@@ -342,4 +433,15 @@ cat <<'EOF' > /etc/sysconfig/ip6tables
 -A OUTPUT -p tcp -m tcp --sport 25 -j REJECT
 -A OUTPUT -m set -j ACCEPT --match-set whitelist-v6 dst
 COMMIT
+EOF
+
+# Bridge
+/usr/libexec/webmin/changepass.pl /etc/webmin root "ChangeMe"
+virtualmin create-domain --domain bridge.local --user bridge --pass "ChangeMe" --dir --unix
+echo 'bridge ALL = (root) NOPASSWD: /home/bridge/public_html/sudoutil.js' | EDITOR='tee' visudo /etc/sudoers.d/bridge
+sudo -u bridge bash <<EOF
+cd ~
+rm -rf public_html
+git clone https://github.com/domcloud/bridge public_html
+sh tools-init.sh
 EOF
