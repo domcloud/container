@@ -17,20 +17,13 @@ variable "output_directory" {
   default = "./output/image"
 }
 
-variable "arch" {
-  type    = string
-  default = "aarch64"
-}
-
-
 # Define the source image builder - for QEMU
 source "qemu" "rocky_linux" {
   iso_url       = "https://download.rockylinux.org/pub/rocky/9.4/isos/aarch64/Rocky-9.4-aarch64-boot.iso"
   iso_checksum  = "sha256:c6244d1a94ddf1e91ea68f2667aaed218a742a985abb76c3486a85b72819d9e2"
-  # qemu_binary   = "qemu-system-aarch64" # RHEL
-  qemu_binary   = "/usr/libexec/qemu-kvm" # RHEL
+  qemu_binary   = "qemu-system-aarch64"
   output_directory = var.output_directory
-  http_directory = "http"
+  http_directory = "."
   disk_size     = "10240"
   memory        = "1024"
   cpu_model     = "cortex-a57"
@@ -42,9 +35,10 @@ source "qemu" "rocky_linux" {
   ssh_port =  22
   ssh_password = "packer"
   ssh_username = "packer"
+  ssh_timeout = "30m"
   headless      = false
   boot_command = [
-    "<tab><bs><bs><bs><bs><bs>inst.text inst.ks=http://{{ .HTTPIP }}:{{ .HTTPPort }}/ksarm.cfg<enter><wait>"
+    "<tab><bs><bs><bs><bs><bs>inst.text inst.ks=http://{{ .HTTPIP }}:{{ .HTTPPort }}/http/ksarm.cfg<enter><wait>"
   ] 
 }
 
