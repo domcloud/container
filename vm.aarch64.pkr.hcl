@@ -37,6 +37,7 @@ source "qemu" "rocky_linux" {
   ssh_username = "packer"
   ssh_timeout = "30m"
   headless      = false
+  ssh_wait_timeout = "30m"
   boot_command = [
     "<tab><bs><bs><bs><bs><bs>inst.text inst.ks=http://{{ .HTTPIP }}:{{ .HTTPPort }}/http/ksarm.cfg<enter><wait>"
   ] 

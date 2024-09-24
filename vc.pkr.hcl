@@ -20,6 +20,10 @@ build {
   sources = ["source.docker.rocky_linux"]
 
   provisioner "shell" {
+    script = "vcsysdaemon.sh" 
+  }
+
+  provisioner "shell" {
     script = "install.sh" 
   }
   
