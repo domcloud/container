@@ -1,13 +1,13 @@
 
 # Contents
 wget -O /usr/local/bin/restart https://raw.githubusercontent.com/domcloud/bridge/main/userkill.sh && chmod 755 /usr/local/bin/restart
-mkdir -p /usr/local/share/www && wget -O /usr/local/share/www/deceptive.html https://raw.githubusercontent.com/domcloud/domcloud/master/share/deceptive.html  && chmod 0755 -R /usr/local/share/www
-mkdir -p /etc/skel/public_html
-pushd /etc/skel/public_html
-mkdir .well-known
-touch favicon.ico
-wget https://gist.githubusercontent.com/willnode/0efb7e2d70a2a8005c690d887d0cdb8a/raw/499b82245fd4d430d77f4c1febd4419d869d1109/index.html
-popd
+$WWW = /usr/local/share/www && mkdir -p $WWW
+wget -O $WWW/deceptive.html https://raw.githubusercontent.com/domcloud/domcloud/master/share/deceptive.html  && chmod 0755 -R $WWW
+
+$SKEL = /etc/skel/public_html
+mkdir -p $SKEL/.well-known && touch $SKEL/favicon.ico
+wget -O $SKEL/index.html https://raw.githubusercontent.com/domcloud/domcloud/master/share/index.html
+
 echo "gem: --no-document" > /etc/gemrc
 cat <<'EOF' > /etc/gitconfig
 [pull]

@@ -51,16 +51,16 @@ wget -O pathman.tar.gz https://github.com/therootcompany/pathman/releases/downlo
 tar -xf pathman.tar.gz && mv $PATHMAN /usr/local/bin/pathman && rm -f pathman.tar.gz
 # NVIM + NvChad Support
 git clone https://github.com/neovim/neovim -b release-0.10 --filter=blob:none
-pushd neovim && make CMAKE_BUILD_TYPE=RelWithDebInfo && make install && popd
+cd neovim && make CMAKE_BUILD_TYPE=RelWithDebInfo && make install && cd ..
 dnf -y copr enable atim/lazygit && dnf -y install ripgrep lazygit && rm -rf neovim
 # Neofetch (Forked)
 wget -O /usr/local/bin/neofetch https://github.com/hykilpikonna/hyfetch/raw/1.4.11/neofetch
 chmod +x /usr/local/bin/neofetch
 # Rdfind
 wget https://rdfind.pauldreik.se/rdfind-1.6.0.tar.gz
-tar -xf rdfind-1.6.0.tar.gz ; pushd rdfind-1.6.0
+tar -xf rdfind-1.6.0.tar.gz ; cd rdfind-1.6.0
 ./configure --disable-debug ; make install
-popd .. ; rm -rf rdfind-1.6.0
+cd .. ; rm -rf rdfind-1.6.0
 # Misc
 pip3 install pipenv awscli
 dnf -y remove nodejs-docs clang flatpak open-sans-fonts

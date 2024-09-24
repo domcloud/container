@@ -4,3 +4,6 @@ services:
     container_name: domcloud
     tty: true
     stdin_open: true
+    privileged: true
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup

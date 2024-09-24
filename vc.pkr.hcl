@@ -1,5 +1,3 @@
-# rocky-linux-docker.pkr.hcl
-
 packer {
   required_version = ">= 1.7.0"
 
