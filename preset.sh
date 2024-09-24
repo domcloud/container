@@ -24,7 +24,6 @@ EOF
 # SSH
 cat <<'EOF' | while read -r line; do
 PasswordAuthentication yes
-PermitRootLogin prohibit-password
 ClientAliveInterval 10
 ClientAliveCountMax 60
 PermitEmptyPasswords no
@@ -438,12 +437,34 @@ EOF
 # Bridge
 /usr/libexec/webmin/changepass.pl /etc/webmin root "ChangeMe"
 virtualmin create-domain --domain bridge.local --user bridge --pass "ChangeMe" --dir --unix
-echo 'bridge ALL = (root) NOPASSWD: /home/bridge/public_html/sudoutil.js' | EDITOR='tee' visudo /etc/sudoers.d/bridge
+cat <<'EOF' | EDITOR='tee' visudo /etc/sudoers.d/bridge
+bridge ALL = (root) NOPASSWD: /home/bridge/public_html/sudoutil.js
+bridge ALL = (root) NOPASSWD: /bin/systemctl restart bridge
+EOF
+cat <<'EOF' > /lib/systemd/system/bridge.service
+[Unit]
+Description=DOM Cloud Bridge
+Documentation=https://domcloud.co
+After=network.target
+
+[Service]
+Type=simple
+User=bridge
+WorkingDirectory=/home/bridge/public_html
+ExecStart=/usr/bin/node /home/bridge/public_html/app.js
+TimeoutStopSec=5
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
 sudo -u bridge bash <<EOF
 cd ~
 rm -rf public_html
 git clone https://github.com/domcloud/bridge public_html
 sh tools-init.sh
+echo "SECRET=ChangeMe" >> public_html/.env
 EOF
 
 exit 0
