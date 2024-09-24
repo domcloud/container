@@ -5,7 +5,9 @@ build-docker:
 run:
 	docker compose run domcloud
 build-image:
-# PACKER_CACHE_DIR=./output/cache PACKER_LOG=1 packer build vm.$(shell uname -m).pkr.hcl
+	sh ./imgprep.sh
+
+build-image-in-docker:
 	docker build -t image-build .
 	docker run --privileged \
 	-v "./output:/app/output" \

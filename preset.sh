@@ -35,7 +35,7 @@ EOF
 
     if grep -q "^#?$key " "$config_file"; then
         # If found, replace the line
-        sed -i "s|^$key .*|$line|" "$config_file"
+        sed -i "s|^#?$key .*|$line|" "$config_file"
     else
         # If not found, append the line to the end of the file
         echo "$line" >> "$config_file"
