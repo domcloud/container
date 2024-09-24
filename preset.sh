@@ -1,10 +1,10 @@
 
 # Contents
 wget -O /usr/local/bin/restart https://raw.githubusercontent.com/domcloud/bridge/main/userkill.sh && chmod 755 /usr/local/bin/restart
-$WWW = /usr/local/share/www && mkdir -p $WWW
+WWW=/usr/local/share/www && mkdir -p $WWW
 wget -O $WWW/deceptive.html https://raw.githubusercontent.com/domcloud/domcloud/master/share/deceptive.html  && chmod 0755 -R $WWW
 
-$SKEL = /etc/skel/public_html
+SKEL=/etc/skel/public_html
 mkdir -p $SKEL/.well-known && touch $SKEL/favicon.ico
 wget -O $SKEL/index.html https://raw.githubusercontent.com/domcloud/domcloud/master/share/index.html
 
@@ -88,7 +88,7 @@ key_buffer_size = 16M
 max_connections = 4096
 EOF
 
-$PGDATA = /var/lib/pgsql/16/data
+PGDATA=/var/lib/pgsql/16/data
 sudo -u postgres /usr/pgsql-16/bin/initdb -D $PGDATA
 sed -i "s/#listen_addresses = .*/listen_addresses = '*'/g" $PGDATA/postgresql.conf
 sed -i "s/max_connections = 100/max_connections = 4096/g" $PGDATA/postgresql.conf
@@ -445,3 +445,5 @@ rm -rf public_html
 git clone https://github.com/domcloud/bridge public_html
 sh tools-init.sh
 EOF
+
+exit 0
