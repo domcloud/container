@@ -34,6 +34,7 @@ source "qemu" "rocky_linux" {
   ssh_username = "root"
   ssh_timeout = "30m" # without KVM can be 10x slower
   headless      = false
+  shutdown_command = "/sbin/halt -h -p",
   qemuargs = [
     # ["-machine", "type=q35"], # no KVM
     # ["-display", "none"], # if inside docker

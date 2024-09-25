@@ -86,6 +86,7 @@ max_allowed_packet = 64M
 key_buffer_size = 16M
 max_connections = 4096
 EOF
+systemctl start mariadb # init db
 
 PGDATA=/var/lib/pgsql/16/data
 sudo -u postgres /usr/pgsql-16/bin/initdb -D $PGDATA
@@ -467,10 +468,9 @@ COMMIT
 EOF
 
 # Bridge
-/usr/libexec/webmin/changepass.pl /etc/webmin root "ChangeMe"
-virtualmin config-system --bundle MiniLEMP --exclude Postfix --exclude ProFTPd --exclude Dovecot \
-  --exclude EtcKeeper --exclude SASL --exclude Procmail --exclude Usermin --include PostgreSQL
-virtualmin create-domain --domain bridge.local --user bridge --pass "ChangeMe" --dir --unix --virtualmin-nginx --virtualmin-nginx-ssl
+/usr/libexec/webmin/changepass.pl /etc/webmin root "rocky"
+timeout 300 virtualmin config-system --include Webmin --include Nginx --include MySQL  --include PostgreSQL -l /root/vconfig.log
+virtualmin create-domain --domain localhost --user bridge --pass "rocky" --dir --unix --virtualmin-nginx --virtualmin-nginx-ssl
 cat <<'EOF' | EDITOR='tee' visudo /etc/sudoers.d/bridge
 bridge ALL = (root) NOPASSWD: /home/bridge/public_html/sudoutil.js
 bridge ALL = (root) NOPASSWD: /bin/systemctl restart bridge
@@ -499,14 +499,78 @@ rm -rf public_html
 git clone https://github.com/domcloud/bridge public_html
 cd public_html
 sh tools-init.sh
-echo "SECRET=ChangeMe" >> .env
+echo "SECRET=rocky" >> .env
 EOF
 
+
 systemctl daemon-reload
-systemctl enable bridge
+systemctl enable bridge --now
+
+sleep 3
+
+curl -X POST \
+  'http://localhost:2223/nginx/?domain=localhost' \
+  --header 'Accept: */*' \
+  --header 'User-Agent: DOM Cloud' \
+  --header 'Authorization: Bearer rocky' \
+  --header 'Content-Type: application/json' \
+  --data-raw '{
+  "nginx": {
+    "locations": [
+      {
+        "fastcgi": "on",
+        "root": "public_html/",
+        "passenger": {
+          "enabled": "off"
+        },
+        "match": "/phpmyadmin/"
+      },
+      {
+        "fastcgi": "on",
+        "root": "public_html/",
+        "passenger": {
+          "enabled": "off"
+        },
+        "match": "/phppgadmin/"
+      },
+      {
+        "root": "public_html/webssh/webssh/static",
+        "passenger": {
+          "app_root": "public_html/webssh",
+          "enabled": "on",
+          "app_start_command": "python run.py --port=$PORT",
+          "document_root": "public_html/webssh/webssh/static"
+        },
+        "rewrite": "^/webssh/(.*)$ /$1 break",
+        "match": "/webssh/"
+      },
+      {
+        "root": "public_html/webssh2/app/client/public",
+        "passenger": {
+          "app_root": "public_html/webssh2/app",
+          "app_start_command": "env PORT=$PORT node app.js",
+          "enabled": "on",
+          "document_root": "public_html/webssh2/app/client/public"
+        },
+        "match": "/ssh/"
+      },
+      {
+        "match": "/",
+        "proxy_pass": "http://127.0.0.1:2223/",
+      }
+    ],
+    "fastcgi": "on",
+    "index": "index.html index.php",
+    "root": "public_html/public",
+    "ssl": "on"
+  }
+}'
 
 # Sanity check
 cat /etc/passwd
-cat /etc/shadow
+
+sync
+
+sleep 3
 
 exit 0

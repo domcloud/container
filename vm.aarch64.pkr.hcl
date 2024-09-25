@@ -38,6 +38,7 @@ source "qemu" "rocky_linux" {
   ssh_timeout = "30m"
   headless      = false
   ssh_wait_timeout = "30m"
+  shutdown_command = "/sbin/halt -h -p",
   boot_command = [
     "<tab><bs><bs><bs><bs><bs>inst.text inst.ks=http://{{ .HTTPIP }}:{{ .HTTPPort }}/http/ks.cfg<enter><wait>"
   ] 

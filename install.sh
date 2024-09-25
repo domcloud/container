@@ -20,12 +20,12 @@ dnf -y module reset mariadb
 dnf -y module enable mariadb
 
 # Tools
+dnf -y remove php-* firewalld lynx gcc-toolset-13-* || true
 dnf -y install btop certbot clang cmake gcc-c++ git ncdu htop iftop ipset jq lsof make nano ncurses nodejs rsync socat strace tar time tmux vim wget xz yarn zstd \
   lib{curl,ffi,sqlite3x,tool-ltdl,md,yaml}-devel {brotli,mesa-libGL,nettle,openldap,passenger,python,perl,readline,xmlsec1,xmlsec1-openssl}-devel python3-pip \
   libreport-filesystem {langpacks,glibc-langpack}-en perl-{DBD-Pg,DBD-mysql,LWP-Protocol-https,macros,DateTime,Crypt-SSLeay,Text-ASCIITable,IO-Tty,XML-Simple} \
   earlyoom fail2ban-server iptables-services postfix mariadb-server wbm-virtual-server wbm-virtualmin-{nginx,nginx-ssl} virtualmin-config nginx bind sudo \
   openssh-server nginx-mod-http-passenger systemd-container
-dnf -y remove php-* firewalld lynx gcc-toolset-13-*; 
 ln -s /usr/bin/gcc /usr/bin/$(uname -m)-linux-gnu-gcc # fix spacy pip install
 
 # PHP
