@@ -463,8 +463,9 @@ sudo -u bridge bash <<EOF
 cd ~
 rm -rf public_html
 git clone https://github.com/domcloud/bridge public_html
+cd public_html
 sh tools-init.sh
-echo "SECRET=ChangeMe" >> public_html/.env
+echo "SECRET=ChangeMe" >> .env
 EOF
 
 exit 0
