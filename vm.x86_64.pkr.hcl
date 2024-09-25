@@ -14,7 +14,7 @@ packer {
 
 variable "output_directory" {
   type    = string
-  default = "./output/image"
+  default = "./output/image-x86_64"
 }
 
 # Define the source image builder - for QEMU
@@ -26,16 +26,19 @@ source "qemu" "rocky_linux" {
   http_directory = "."
   disk_size     = "10240"
   memory        = "1024"
-  cpu_model     = "qemu64"
+  # cpu_model     = "Haswell-v1" # no KVM
+  cpu_model     = "host" # with KVM
   ssh_port =  22
   boot_wait = "1s"
   ssh_password = "rocky"
   ssh_username = "root"
-  ssh_timeout = "30m"
+  ssh_timeout = "30m" # without KVM can be 10x slower
   headless      = false
   qemuargs = [
-    ["-machine", "type=q35"],
-    ["-display", "none"]
+    # ["-machine", "type=q35"], # no KVM
+    # ["-display", "none"], # if inside docker
+    ["-machine", "type=pc,accel=kvm"], # with KVM
+    ["-display", "gtk"], # with GTK
   ]
   boot_command = [
     "<tab><bs><bs><bs><bs><bs>inst.text inst.ks=http://{{ .HTTPIP }}:{{ .HTTPPort }}/http/ks.cfg<enter><wait>"

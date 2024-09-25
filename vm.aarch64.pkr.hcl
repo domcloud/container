@@ -14,7 +14,7 @@ packer {
 
 variable "output_directory" {
   type    = string
-  default = "./output/image"
+  default = "./output/image-aarch64"
 }
 
 # Define the source image builder - for QEMU
@@ -26,11 +26,11 @@ source "qemu" "rocky_linux" {
   http_directory = "."
   disk_size     = "10240"
   memory        = "1024"
-  cpu_model     = "cortex-a57"
+  cpu_model     = "max"
   qemuargs = [
-    ["-machine", "type=virt"],
+    ["-machine", "type=virt"], # no KVM
+    # ["-display", "none"],  # if inside docker
     ["-boot", "strict=off"],
-    ["-display", "none"]
   ]
   ssh_port =  22
   ssh_password = "rocky"
