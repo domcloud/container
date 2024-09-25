@@ -21,17 +21,22 @@ variable "output_directory" {
 source "qemu" "rocky_linux" {
   iso_url       = "https://download.rockylinux.org/pub/rocky/9.4/isos/x86_64/Rocky-9.4-x86_64-minimal.iso"
   iso_checksum  = "sha256:ee3ac97fdffab58652421941599902012179c37535aece76824673105169c4a2"
+  qemu_binary   = "qemu-system-x86_64"
   output_directory = var.output_directory
   http_directory = "."
   disk_size     = "10240"
   memory        = "1024"
-  cpu_model     = "host"
+  cpu_model     = "qemu64"
   ssh_port =  22
   boot_wait = "1s"
   ssh_password = "rocky"
   ssh_username = "root"
   ssh_timeout = "30m"
   headless      = false
+  qemuargs = [
+    ["-machine", "type=q35"],
+    ["-display", "none"]
+  ]
   boot_command = [
     "<tab><bs><bs><bs><bs><bs>inst.text inst.ks=http://{{ .HTTPIP }}:{{ .HTTPPort }}/http/ks.cfg<enter><wait>"
   ] 

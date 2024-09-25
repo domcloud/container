@@ -3,7 +3,7 @@
 FROM ubuntu:22.04
 
 RUN apt-get update && \
-apt-get install -y wget unzip qemu-kvm libvirt-clients libvirt-daemon-system \
+apt-get install -y wget unzip qemu-system-x86 qemu-system-arm libvirt-clients libvirt-daemon-system \
 bridge-utils virtinst dnf curl && \
 rm -rf /var/lib/apt/lists/*
 
