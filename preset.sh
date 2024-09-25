@@ -159,6 +159,38 @@ EOF
     fi
 done
 
+cat <<'EOF' > /etc/webmin/postgresql/config
+login=postgres
+repository=/home/db_repository
+start_cmd=systemctl start postgresql-16
+nodbi=0
+sameunix=1
+add_mode=1
+blob_mode=0
+basedb=template1
+perpage=25
+max_dbs=50
+date_subs=0
+dump_cmd=/usr/bin/pg_dump
+pid_file=/var/lib/pgsql/16/data/postmaster.pid
+psql=/usr/bin/psql
+access_own=0
+stop_cmd=systemctl stop postgresql-16
+style=0
+hba_conf=/var/lib/pgsql/16/data/pg_hba.conf
+setup_cmd=postgresql-setup --initdb
+max_text=1000
+access=*: *
+webmin_subs=0
+simple_sched=0
+user=postgres
+rstr_cmd=/usr/bin/pg_restore
+plib=
+host=
+sslmode=
+port=
+EOF
+
 cat <<'EOF' > /etc/webmin/virtual-server/plans/0
 ipfollow=
 aliaslimit=
@@ -436,7 +468,9 @@ EOF
 
 # Bridge
 /usr/libexec/webmin/changepass.pl /etc/webmin root "ChangeMe"
-virtualmin create-domain --domain bridge.local --user bridge --pass "ChangeMe" --dir --unix
+virtualmin config-system --bundle MiniLEMP --exclude Postfix --exclude ProFTPd --exclude Dovecot \
+  --exclude EtcKeeper --exclude SASL --exclude Procmail --exclude Usermin --include PostgreSQL
+virtualmin create-domain --domain bridge.local --user bridge --pass "ChangeMe" --dir --unix --virtualmin-nginx --virtualmin-nginx-ssl
 cat <<'EOF' | EDITOR='tee' visudo /etc/sudoers.d/bridge
 bridge ALL = (root) NOPASSWD: /home/bridge/public_html/sudoutil.js
 bridge ALL = (root) NOPASSWD: /bin/systemctl restart bridge
@@ -467,5 +501,12 @@ cd public_html
 sh tools-init.sh
 echo "SECRET=ChangeMe" >> .env
 EOF
+
+systemctl daemon-reload
+systemctl enable bridge
+
+# Sanity check
+cat /etc/passwd
+cat /etc/shadow
 
 exit 0
