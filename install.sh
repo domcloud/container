@@ -69,6 +69,7 @@ dnf -y remove nodejs-docs clang flatpak open-sans-fonts
 systemctl enable webmin mariadb nginx postgresql-16 iptables ip6tables fail2ban named php{74,81,82,83}-php-fpm earlyoom
 
 # Cleanup
-dnf -y update
+# nobest due https://cloudlinux.zendesk.com/hc/en-us/articles/15731606500124
+dnf -y update --nobest || true
 dnf -y clean all
 rm -rf /usr/share/{locale,doc,man}
