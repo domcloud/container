@@ -62,7 +62,7 @@ chmod +x /usr/local/bin/neofetch
 wget https://rdfind.pauldreik.se/rdfind-1.6.0.tar.gz
 tar -xf rdfind-1.6.0.tar.gz ; cd rdfind-1.6.0
 ./configure --disable-debug ; make install
-cd .. ; rm -rf rdfind-1.6.0
+cd .. ; rm -rf rdfind-1.6.0 rdfind-1.6.0.tar.gz
 # Misc
 pip3 install pipenv awscli
 dnf -y remove nodejs-docs clang flatpak open-sans-fonts
@@ -70,6 +70,6 @@ systemctl enable webmin mariadb nginx postgresql-16 iptables ip6tables fail2ban 
 
 # Cleanup
 # nobest due https://cloudlinux.zendesk.com/hc/en-us/articles/15731606500124
-dnf -y update --nobest || true
+dnf -y update --nobest
 dnf -y clean all
 rm -rf /usr/share/{locale,doc,man}

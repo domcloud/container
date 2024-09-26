@@ -469,7 +469,7 @@ EOF
 
 # Bridge
 /usr/libexec/webmin/changepass.pl /etc/webmin root "rocky"
-timeout 300 virtualmin config-system --include Webmin --include Nginx --include MySQL  --include PostgreSQL -l /root/vconfig.log
+timeout 600 virtualmin config-system --include Webmin --include Nginx --include MySQL  --include PostgreSQL -l /root/vconfig.log
 virtualmin create-domain --domain localhost --user bridge --pass "rocky" --dir --unix --virtualmin-nginx --virtualmin-nginx-ssl
 cat <<'EOF' | EDITOR='tee' visudo /etc/sudoers.d/bridge
 bridge ALL = (root) NOPASSWD: /home/bridge/public_html/sudoutil.js
@@ -494,12 +494,13 @@ WantedBy=multi-user.target
 EOF
 
 sudo -u bridge bash <<EOF
+export PATH=/usr/local/bin:$PATH
 cd ~
 rm -rf public_html
 git clone https://github.com/domcloud/bridge public_html
 cd public_html
 sh tools-init.sh
-echo "SECRET=rocky" >> .env
+echo "SECRET=rocky" > .env
 EOF
 
 
@@ -556,7 +557,7 @@ curl -X POST \
       },
       {
         "match": "/",
-        "proxy_pass": "http://127.0.0.1:2223/",
+        "proxy_pass": "http://127.0.0.1:2223/"
       }
     ],
     "fastcgi": "on",
