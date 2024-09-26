@@ -470,7 +470,7 @@ EOF
 # Bridge
 /usr/libexec/webmin/changepass.pl /etc/webmin root "rocky"
 git clone https://github.com/domcloud/Virtualmin-Config
-cd Virtualmin-Config && sh patch.sh && cd ..
+cd Virtualmin-Config && sh patch.sh && cd .. && rm -rf Virtualmin-Config
 timeout 900 virtualmin config-system --bundle DomCloud
 virtualmin create-domain --domain localhost --user bridge --pass "rocky" --dir --unix --virtualmin-nginx --virtualmin-nginx-ssl
 cat <<'EOF' | EDITOR='tee' visudo /etc/sudoers.d/bridge
