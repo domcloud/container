@@ -469,7 +469,9 @@ EOF
 
 # Bridge
 /usr/libexec/webmin/changepass.pl /etc/webmin root "rocky"
-timeout 600 virtualmin config-system --include Webmin --include Nginx --include MySQL  --include PostgreSQL -l /root/vconfig.log
+git clone https://github.com/domcloud/Virtualmin-Config
+cd Virtualmin-Config && sh patch.sh && cd ..
+timeout 900 virtualmin config-system --bundle DomCloud
 virtualmin create-domain --domain localhost --user bridge --pass "rocky" --dir --unix --virtualmin-nginx --virtualmin-nginx-ssl
 cat <<'EOF' | EDITOR='tee' visudo /etc/sudoers.d/bridge
 bridge ALL = (root) NOPASSWD: /home/bridge/public_html/sudoutil.js
@@ -501,8 +503,8 @@ git clone https://github.com/domcloud/bridge public_html
 cd public_html
 sh tools-init.sh
 echo "SECRET=rocky" > .env
+rm -rf ~/.cache ~/.npm ~/public_html/phpmyadmin/node_modules
 EOF
-
 
 systemctl daemon-reload
 systemctl enable bridge --now
@@ -516,55 +518,53 @@ curl -X POST \
   --header 'Authorization: Bearer rocky' \
   --header 'Content-Type: application/json' \
   --data-raw '{
-  "nginx": {
-    "locations": [
-      {
-        "fastcgi": "on",
-        "root": "public_html/",
-        "passenger": {
-          "enabled": "off"
-        },
-        "match": "/phpmyadmin/"
+  "locations": [
+    {
+      "fastcgi": "on",
+      "root": "public_html/",
+      "passenger": {
+        "enabled": "off"
       },
-      {
-        "fastcgi": "on",
-        "root": "public_html/",
-        "passenger": {
-          "enabled": "off"
-        },
-        "match": "/phppgadmin/"
+      "match": "/phpmyadmin/"
+    },
+    {
+      "fastcgi": "on",
+      "root": "public_html/",
+      "passenger": {
+        "enabled": "off"
       },
-      {
-        "root": "public_html/webssh/webssh/static",
-        "passenger": {
-          "app_root": "public_html/webssh",
-          "enabled": "on",
-          "app_start_command": "python run.py --port=$PORT",
-          "document_root": "public_html/webssh/webssh/static"
-        },
-        "rewrite": "^/webssh/(.*)$ /$1 break",
-        "match": "/webssh/"
+      "match": "/phppgadmin/"
+    },
+    {
+      "root": "public_html/webssh/webssh/static",
+      "passenger": {
+        "app_root": "public_html/webssh",
+        "enabled": "on",
+        "app_start_command": "python run.py --port=$PORT",
+        "document_root": "public_html/webssh/webssh/static"
       },
-      {
-        "root": "public_html/webssh2/app/client/public",
-        "passenger": {
-          "app_root": "public_html/webssh2/app",
-          "app_start_command": "env PORT=$PORT node app.js",
-          "enabled": "on",
-          "document_root": "public_html/webssh2/app/client/public"
-        },
-        "match": "/ssh/"
+      "rewrite": "^/webssh/(.*)$ /$1 break",
+      "match": "/webssh/"
+    },
+    {
+      "root": "public_html/webssh2/app/client/public",
+      "passenger": {
+        "app_root": "public_html/webssh2/app",
+        "app_start_command": "env PORT=$PORT node app.js",
+        "enabled": "on",
+        "document_root": "public_html/webssh2/app/client/public"
       },
-      {
-        "match": "/",
-        "proxy_pass": "http://127.0.0.1:2223/"
-      }
-    ],
-    "fastcgi": "on",
-    "index": "index.html index.php",
-    "root": "public_html/public",
-    "ssl": "on"
-  }
+      "match": "/ssh/"
+    },
+    {
+      "match": "/",
+      "proxy_pass": "http://127.0.0.1:2223"
+    }
+  ],
+  "fastcgi": "on",
+  "index": "index.html index.php",
+  "root": "public_html/public",
+  "ssl": "on"
 }'
 
 # Sanity check
