@@ -25,7 +25,7 @@ dnf -y install btop certbot clang cmake gcc-c++ git ncdu htop iftop ipset jq lso
   libreport-filesystem {langpacks,glibc-langpack}-en perl-{DBD-Pg,DBD-mysql,LWP-Protocol-https,macros,DateTime,Crypt-SSLeay,Text-ASCIITable,IO-Tty,XML-Simple} \
   earlyoom fail2ban-server iptables-services postfix mariadb-server wbm-virtual-server wbm-virtualmin-{nginx,nginx-ssl} virtualmin-config nginx bind sudo \
   openssh-server nginx-mod-http-passenger systemd-container libpq5-16*
-dnf -y firewalld lynx gcc-toolset-13-* || true
+dnf -y remove firewalld lynx gcc-toolset-13-* || true
 ln -s /usr/bin/gcc /usr/bin/$(uname -m)-linux-gnu-gcc # fix spacy pip install
 
 # PHP
