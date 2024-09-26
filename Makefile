@@ -1,23 +1,28 @@
 init:
 	packer init .
-build-docker:
+build-container:
 	packer build vc.pkr.hcl
-run:
+run-container:
 	docker compose run domcloud
-build-image:
+build-image-gtk:
 	sh ./imgprep.sh
 
-build-image-in-docker:
+build-image:
 	docker build -t image-build .
 	docker run --privileged \
 	-v "./output:/app/output" \
 	image-build
 
-convert-image-in-docker:
+convert-image:
+# Optimized ESXi 6.0 Compatible VMDK
 	docker run --privileged \
 	-v "./output:/app/output" \
 	-it image-build qemu-img convert \
-	-f qcow2 output/image-$(shell uname -m)/domcloud.qcow2 -O vhdx output/image-$(shell uname -m)/domcloud.vhdx
-	cd output/image-$(shell uname -m) && tar -czvf domcloud-$(shell uname -m).qcow2.tar.gz domcloud-$(shell uname -m).qcow2
-	cd output/image-$(shell uname -m) && tar -czvf domcloud-$(shell uname -m).vhdx.tar.gz domcloud-$(shell uname -m).vhdx
+	-f qcow2 -O vmdk -o adapter_type=lsilogic,subformat=streamOptimized,compat6  \
+	output/image-$(shell uname -m)/{packer-rocky_linux,domcloud-$(shell uname -m).vmdk}
+# Optimized QCOW2 (Shrunk by ~1.5 GB)
+	docker run --privileged \
+	-v "./output:/app/output" \
+	-e LIBGUESTFS_DEBUG=1 -e LIBGUESTFS_TRACE=1 -it image-build virt-sparsify \
+	output/image-$(shell uname -m)/{packer-rocky_linux,domcloud-$(shell uname -m).qcow2}
 	cd output/image-$(shell uname -m) && find . -type f -exec sha256sum {} > checksums.txt \;

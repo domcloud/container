@@ -4,7 +4,7 @@ FROM ubuntu:22.04
 
 RUN apt-get update && \
 apt-get install -y wget unzip qemu-system-x86 qemu-system-arm libvirt-clients libvirt-daemon-system \
-bridge-utils virtinst dnf curl && \
+bridge-utils virtinst dnf curl libguestfs-tools linux-image-generic && \
 rm -rf /var/lib/apt/lists/*
 
 RUN PACKER=packer_1.10.3_linux_$( [ "$(uname -m)" = "aarch64" ] && echo "arm64" || echo "amd64" ) && \

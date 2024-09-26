@@ -28,9 +28,10 @@ source "qemu" "rocky_linux" {
   memory        = "1024"
   cpu_model     = "max"
   qemuargs = [
-    ["-machine", "type=virt"], # no KVM
-    # ["-display", "none"],  # if inside docker
-    ["-boot", "strict=off"],
+    # ["-machine", "type=virt"], # if no KVM
+    # ["-display", "gtk"], # if has GTK
+    ["-display", "none"],
+    ["-machine", "type=virt,accel=kvm"],
   ]
   ssh_port =  22
   ssh_password = "rocky"

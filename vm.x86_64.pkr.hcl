@@ -36,10 +36,10 @@ source "qemu" "rocky_linux" {
   headless      = false
   shutdown_command = "/sbin/halt -h -p"
   qemuargs = [
-    # ["-machine", "type=q35"], # no KVM
-    # ["-display", "none"], # if inside docker
-    ["-machine", "type=pc,accel=kvm"], # with KVM
-    ["-display", "gtk"], # with GTK
+    # ["-machine", "type=q35"], # if no KVM
+    # ["-display", "gtk"], # if has GTK
+    ["-display", "none"],
+    ["-machine", "type=pc,accel=kvm"],
   ]
   boot_command = [
     "<tab><bs><bs><bs><bs><bs>inst.text inst.ks=http://{{ .HTTPIP }}:{{ .HTTPPort }}/http/ks.cfg<enter><wait>"
