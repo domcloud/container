@@ -419,8 +419,8 @@ cat <<'EOF' > /etc/sysconfig/iptables
 -A INPUT -p udp -m udp --sport 53 -j ACCEPT
 -A INPUT -p tcp -m tcp --dport 53 -j ACCEPT
 -A INPUT -p udp -m udp --dport 53 -j ACCEPT
--A INPUT -p tcp --dport 2443:2453 -j ACCEPT
--A INPUT -p tcp --dport 32000:65535 -j ACCEPT
+-A INPUT -p tcp -m multiport --dports 2443:2453 -j ACCEPT
+-A INPUT -p tcp -m multiport --dports 32000:65535 -j ACCEPT
 -A INPUT -j REJECT --reject-with icmp-host-prohibited
 -A FORWARD -j REJECT --reject-with icmp-host-prohibited
 -A OUTPUT -o lo -j ACCEPT
@@ -432,6 +432,7 @@ cat <<'EOF' > /etc/sysconfig/iptables
 -A OUTPUT -p udp -m udp --sport 53 -j ACCEPT
 -A OUTPUT -p tcp -m tcp --dport 25 -j REJECT
 -A OUTPUT -p tcp -m tcp --sport 25 -j REJECT
+-A OUTPUT -p tcp -m multiport --dports 1025:65535 -j ACCEPT
 -A OUTPUT -m set -j ACCEPT --match-set whitelist dst
 COMMIT
 EOF
@@ -450,8 +451,8 @@ cat <<'EOF' > /etc/sysconfig/ip6tables
 -A INPUT -p tcp -m tcp --dport 53 -j ACCEPT
 -A INPUT -p udp -m udp --dport 53 -j ACCEPT
 -A INPUT -p udp -m udp --dport 546 -j ACCEPT
--A INPUT -p tcp --dport 2443:2453 -j ACCEPT
--A INPUT -p tcp --dport 32000:65535 -j ACCEPT
+-A INPUT -p tcp -m multiport --dports 2443:2453 -j ACCEPT
+-A INPUT -p tcp -m multiport --dports 32000:65535 -j ACCEPT
 -A INPUT -j REJECT --reject-with icmp6-adm-prohibited
 -A FORWARD -j REJECT --reject-with icmp6-adm-prohibited
 -A OUTPUT -o lo -j ACCEPT
@@ -463,6 +464,7 @@ cat <<'EOF' > /etc/sysconfig/ip6tables
 -A OUTPUT -p udp -m udp --sport 53 -j ACCEPT
 -A OUTPUT -p tcp -m tcp --dport 25 -j REJECT
 -A OUTPUT -p tcp -m tcp --sport 25 -j REJECT
+-A OUTPUT -p tcp -m multiport --dports 1025:65535 -j ACCEPT
 -A OUTPUT -m set -j ACCEPT --match-set whitelist-v6 dst
 COMMIT
 EOF
