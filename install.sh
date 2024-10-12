@@ -53,7 +53,7 @@ wget -O pathman.tar.gz https://github.com/therootcompany/pathman/releases/downlo
 tar -xf pathman.tar.gz && mv $PATHMAN /usr/local/bin/pathman && rm -f pathman.tar.gz
 # NVIM + NvChad Support
 git clone https://github.com/neovim/neovim -b release-0.10 --filter=blob:none
-cd neovim && make CMAKE_BUILD_TYPE=RelWithDebInfo && make install && cd ..
+cd neovim && make CMAKE_BUILD_TYPE=Release && make install && cd ..
 dnf -y copr enable atim/lazygit && dnf -y install ripgrep lazygit && rm -rf neovim
 # Neofetch (Forked)
 wget -O /usr/local/bin/neofetch https://github.com/hykilpikonna/hyfetch/raw/1.4.11/neofetch
@@ -66,7 +66,7 @@ cd .. ; rm -rf rdfind-1.6.0 rdfind-1.6.0.tar.gz
 # Misc
 pip3 install pipenv awscli
 dnf -y remove nodejs-docs clang flatpak open-sans-fonts
-systemctl enable webmin mariadb nginx postgresql-16 iptables ip6tables fail2ban named php{74,81,82,83}-php-fpm earlyoom
+systemctl enable webmin mariadb nginx postgresql-16 {ip,ip6}tables fail2ban named php{74,81,82,83}-php-fpm earlyoom
 
 # Cleanup
 # nobest due https://cloudlinux.zendesk.com/hc/en-us/articles/15731606500124
