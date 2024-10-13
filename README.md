@@ -6,8 +6,8 @@ Set up your own DOM Cloud server instance inside a virtualized platform and cont
 
 Our self hosted solution is for our customers who:
 
-+ You're behind a corporate that mandates all data is self hosted to an on-premise server
-+ You wish you need more computing power or having the hardware under your control
++ Behind a corporate that mandates all data is self hosted to an on-premise server
++ Wishing for more computing power or having the hardware their your control
 
 With Caveats:
 
