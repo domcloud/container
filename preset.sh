@@ -401,7 +401,7 @@ enabled = true
 port = http,https
 logpath = /var/log/virtualmin/*error_log
 
-[wordpress-auth]
+[php]
 enabled = true
 port = http,https
 logpath = /var/log/virtualmin/*access_log
