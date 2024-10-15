@@ -41,7 +41,6 @@ EOF
     fi
 done
 
-
 # SystemD
 cat <<'EOF' > /etc/security/limits.conf
 root             soft    nofile          65535
@@ -88,8 +87,9 @@ max_connections = 4096
 EOF
 systemctl start mariadb # init db
 
-PGDATA=/var/lib/pgsql/16/data
-sudo -u postgres /usr/pgsql-16/bin/initdb -D $PGDATA
+PG=17
+PGDATA=/var/lib/pgsql/$PG/data
+sudo -u postgres /usr/pgsql-$PG/bin/initdb -D $PGDATA
 sed -i "s/#listen_addresses = .*/listen_addresses = '*'/g" $PGDATA/postgresql.conf
 sed -i "s/max_connections = 100/max_connections = 4096/g" $PGDATA/postgresql.conf
 cat <<'EOF' > $PGDATA/pg_hba.conf
@@ -160,10 +160,10 @@ EOF
     fi
 done
 
-cat <<'EOF' > /etc/webmin/postgresql/config
+cat <<EOF > /etc/webmin/postgresql/config
 login=postgres
 repository=/home/db_repository
-start_cmd=systemctl start postgresql-16
+start_cmd=systemctl start postgresql-$PG
 nodbi=0
 sameunix=1
 add_mode=1
@@ -173,12 +173,12 @@ perpage=25
 max_dbs=50
 date_subs=0
 dump_cmd=/usr/bin/pg_dump
-pid_file=/var/lib/pgsql/16/data/postmaster.pid
+pid_file=$PGDATA/postmaster.pid
 psql=/usr/bin/psql
 access_own=0
-stop_cmd=systemctl stop postgresql-16
+stop_cmd=systemctl stop postgresql-$PG
 style=0
-hba_conf=/var/lib/pgsql/16/data/pg_hba.conf
+hba_conf=$PGDATA/pg_hba.conf
 setup_cmd=postgresql-setup --initdb
 max_text=1000
 access=*: *

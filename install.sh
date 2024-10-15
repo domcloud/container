@@ -19,12 +19,14 @@ dnf -y module enable nodejs:20
 dnf -y module reset mariadb
 dnf -y module enable mariadb
 
+PG=17
+
 # Tools
 dnf -y install btop certbot clang cmake gcc-c++ git ncdu htop iftop ipset jq lsof make nano ncurses nodejs rsync socat strace tar time tmux vim wget xz yarn zstd \
   lib{curl,ffi,sqlite3x,tool-ltdl,md,yaml}-devel {brotli,mesa-libGL,nettle,openldap,passenger,python,perl,readline,xmlsec1,xmlsec1-openssl}-devel python3-pip \
   libreport-filesystem {langpacks,glibc-langpack}-en perl-{DBD-Pg,DBD-mysql,LWP-Protocol-https,macros,DateTime,Crypt-SSLeay,Text-ASCIITable,IO-Tty,XML-Simple} \
   earlyoom fail2ban-server iptables-services postfix mariadb-server wbm-virtual-server wbm-virtualmin-{nginx,nginx-ssl} virtualmin-config nginx bind sudo \
-  openssh-server nginx-mod-http-passenger systemd-container libpq5-16*
+  openssh-server nginx-mod-http-passenger systemd-container libpq5-$PG*
 dnf -y remove firewalld lynx gcc-toolset-13-* || true
 ln -s /usr/bin/gcc /usr/bin/$(uname -m)-linux-gnu-gcc # fix spacy pip install
 
@@ -36,12 +38,12 @@ find /etc/opt/remi/ -maxdepth 1 -name 'php*' -exec sed -i "s/upload_max_filesize
 find /etc/opt/remi/ -type f -name www.conf -print0 | xargs -0 sed -i 's/pm = dynamic/pm = ondemand/g'
 
 # Postgres
-dnf -y install postgresql16-{server,contrib} {postgis34,pgrouting,pgvector,pg_uuidv7,timescaledb}_16
+dnf -y install postgresql$PG-{server,contrib} {postgis34,pgrouting,pgvector,pg_uuidv7,timescaledb}_$PG
 for bin in "psql" "pg_dump" "pg_dumpall" "pg_restore"; do
-    update-alternatives --set "pgsql-$bin" "/usr/pgsql-16/bin/$bin"
+    update-alternatives --set "pgsql-$bin" "/usr/pgsql-$PG/bin/$bin"
 done
 for ext in "postgis" "postgis_raster" "postgis_sfcgal" "postgis_tiger_geocoders" "postgis_topology" "earthdistance" "address_standardizer" "address_standardizer_data_us" "pgrouting" "pg_uuidv7" "vector"; do
-  echo "trusted = true" >> "/usr/pgsql-16/share/extension/$ext.control"
+  echo "trusted = true" >> "/usr/pgsql-$PG/share/extension/$ext.control"
 done
 
 # Docker
@@ -66,7 +68,7 @@ cd .. ; rm -rf rdfind-1.6.0 rdfind-1.6.0.tar.gz
 # Misc
 pip3 install pipenv awscli
 dnf -y remove nodejs-docs clang flatpak open-sans-fonts
-systemctl enable webmin mariadb nginx postgresql-16 {ip,ip6}tables fail2ban named php{74,81,82,83}-php-fpm earlyoom
+systemctl enable webmin mariadb nginx postgresql-$PG {ip,ip6}tables fail2ban named php{74,81,82,83}-php-fpm earlyoom
 
 # Cleanup
 # nobest due https://cloudlinux.zendesk.com/hc/en-us/articles/15731606500124
