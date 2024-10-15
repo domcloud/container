@@ -54,9 +54,14 @@ PATHMAN=pathman-v0.6.0-linux-$( [ "$(uname -m)" = "aarch64" ] && echo "arm64" ||
 wget -O pathman.tar.gz https://github.com/therootcompany/pathman/releases/download/v0.6.0/$PATHMAN.tar.gz
 tar -xf pathman.tar.gz && mv $PATHMAN /usr/local/bin/pathman && rm -f pathman.tar.gz
 # NVIM + NvChad Support
-git clone https://github.com/neovim/neovim -b release-0.10 --filter=blob:none
-cd neovim && make CMAKE_BUILD_TYPE=Release && make install && cd ..
-dnf -y copr enable atim/lazygit && dnf -y install ripgrep lazygit && rm -rf neovim
+if [ "$(uname -m)" = "x86_64" ]; then
+  curl -LO https://github.com/neovim/neovim/releases/download/v0.10.2/nvim-linux64.tar.gz
+  tar -xzf nvim-linux64.tar.gz && cp -r nvim-linux64/* /usr/local/ && rmdir nvim-linux64
+else
+  git clone https://github.com/neovim/neovim -b release-0.10 --filter=blob:none
+  cd neovim && make CMAKE_BUILD_TYPE=Release && make install && cd .. && rm -rf neovim
+fi
+dnf -y copr enable atim/lazygit && dnf -y install ripgrep lazygit
 # Neofetch (Forked)
 wget -O /usr/local/bin/neofetch https://github.com/hykilpikonna/hyfetch/raw/1.4.11/neofetch
 chmod +x /usr/local/bin/neofetch
