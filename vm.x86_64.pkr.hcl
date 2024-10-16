@@ -12,6 +12,11 @@ packer {
   }
 }
 
+variable "display" {
+  type    = string
+  default = "none"
+}
+
 variable "output_directory" {
   type    = string
   default = "./output/image-x86_64"
@@ -36,9 +41,8 @@ source "qemu" "rocky_linux" {
   headless      = false
   shutdown_command = "/sbin/halt -h -p"
   qemuargs = [
+    ["-display", var.display], # "gtk" or "none"
     # ["-machine", "type=q35"], # if no KVM
-    # ["-display", "gtk"], # if has GTK
-    ["-display", "none"],
     ["-machine", "type=pc,accel=kvm"],
   ]
   boot_command = [

@@ -12,6 +12,11 @@ packer {
   }
 }
 
+variable "display" {
+  type    = string
+  default = "none"
+}
+
 variable "output_directory" {
   type    = string
   default = "./output/image-aarch64"
@@ -28,9 +33,8 @@ source "qemu" "rocky_linux" {
   memory        = "1024"
   cpu_model     = "max"
   qemuargs = [
+    ["-display", var.display], # "gtk" or "none"
     # ["-machine", "type=virt"], # if no KVM
-    # ["-display", "gtk"], # if has GTK
-    ["-display", "none"],
     ["-machine", "type=virt,accel=kvm"],
   ]
   ssh_port =  22
