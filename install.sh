@@ -1,6 +1,7 @@
 #!/bin/bash
 set -e
 cd /root
+export TERM=xterm-256color
 
 # Repos
 dnf -y install epel-release http://rpms.remirepo.net/enterprise/remi-release-9.rpm 

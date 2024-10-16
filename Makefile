@@ -5,7 +5,7 @@ build-container:
 run-container:
 	docker compose run domcloud
 build-image-gtk:
-	DISPLAY=gtk sh ./imgprep.sh
+	QEMU_DISPLAY=gtk sh ./imgprep.sh
 
 build-image:
 	docker build -t image-build .
