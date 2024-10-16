@@ -40,4 +40,4 @@ $(QCOW2_FILE): $(PACKER_FILE)
 
 $(CHECKSUM_FILE): $(VMDK_FILE) $(QCOW2_FILE)
 # Generate checksum
-	cd $(OUTPUT_DIR) && find . -type f -exec sha256sum {} \; > $(CHECKSUM_FILE)
+	cd $(OUTPUT_DIR) && find . -type f -exec sha256sum {} \; > checksums.txt
