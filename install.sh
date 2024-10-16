@@ -72,7 +72,7 @@ tar -xf rdfind-1.6.0.tar.gz ; cd rdfind-1.6.0
 cd .. ; rm -rf rdfind-1.6.0 rdfind-1.6.0.tar.gz
 # Misc
 pip3 install pipenv awscli
-dnf -y remove nodejs-docs clang flatpak open-sans-fonts
+dnf -y remove nodejs-docs clang flatpak open-sans-fonts rubygem-rdoc gl-manpages
 systemctl enable webmin mariadb nginx postgresql-$PG {ip,ip6}tables fail2ban named php{74,81,82,83}-php-fpm earlyoom
 
 # Cleanup
