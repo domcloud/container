@@ -9,7 +9,7 @@ dnf config-manager --add-repo https://download.docker.com/linux/centos/docker-ce
 curl -sSLo /etc/yum.repos.d/passenger.repo https://oss-binaries.phusionpassenger.com/yum/definitions/el-passenger.repo
 dnf -y install https://download.postgresql.org/pub/repos/yum/reporpms/EL-9-$(uname -m)/pgdg-redhat-repo-latest.noarch.rpm
 curl --silent --location https://dl.yarnpkg.com/rpm/yarn.repo > /etc/yum.repos.d/yarn.repo
-dnf config-manager --disable virtualmin pgdg{15,14,13,12} && dnf config-manager --enable crb
+dnf config-manager --disable virtualmin pgdg{16,15,14,13,12} && dnf config-manager --enable crb
 
 # Modules
 dnf -y module reset nginx
@@ -31,7 +31,7 @@ dnf -y remove firewalld lynx gcc-toolset-13-* || true
 ln -s /usr/bin/gcc /usr/bin/$(uname -m)-linux-gnu-gcc # fix spacy pip install
 
 # PHP
-dnf -y install php{74,81,82,83}-php-{bcmath,cli,common,devel,fpm,gd,imap,intl,mbstring,mysqlnd,opcache,pdo,pecl-mongodb,pecl-redis,pecl-zip,pgsql,process,sodium,soap,xml}
+dnf -y install php{74,83}-php-{bcmath,cli,common,devel,fpm,gd,imap,intl,mbstring,mysqlnd,opcache,pdo,pecl-mongodb,pecl-redis,pecl-zip,pgsql,process,sodium,soap,xml}
 dnf -y remove php-* && ln -s `which php83` /usr/bin/php || true
 curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 find /etc/opt/remi/ -maxdepth 1 -name 'php*' -exec sed -i "s/upload_max_filesize = 2M/upload_max_filesize = 512M/g" {}/php.ini \; -exec sed -i "s/post_max_size = 8M/post_max_size = 512M/g" {}/php.ini \; 
@@ -56,7 +56,7 @@ tar -xf pathman.tar.gz && mv $PATHMAN /usr/local/bin/pathman && rm -f pathman.ta
 # NVIM + NvChad Support
 if [ "$(uname -m)" = "x86_64" ]; then
   curl -LO https://github.com/neovim/neovim/releases/download/v0.10.2/nvim-linux64.tar.gz
-  tar -xzf nvim-linux64.tar.gz && cp -r nvim-linux64/* /usr/local/ && rmdir nvim-linux64
+  tar -xzf nvim-linux64.tar.gz && mv nvim-linux64/* /usr/local/ && rm -rf nvim-linux64*
 else
   git clone https://github.com/neovim/neovim -b release-0.10 --filter=blob:none
   cd neovim && make CMAKE_BUILD_TYPE=Release && make install && cd .. && rm -rf neovim
