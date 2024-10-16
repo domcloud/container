@@ -437,7 +437,6 @@ cat <<'EOF' > /etc/sysconfig/iptables
 COMMIT
 EOF
 
-
 cat <<'EOF' > /etc/sysconfig/ip6tables
 *filter
 :INPUT ACCEPT [0:0]
@@ -467,6 +466,22 @@ cat <<'EOF' > /etc/sysconfig/ip6tables
 -A OUTPUT -p tcp -m multiport --dports 1025:65535 -j ACCEPT
 -A OUTPUT -m set -j ACCEPT --match-set whitelist-v6 dst
 COMMIT
+EOF
+
+cat <<'EOF' > /var/spool/cron/root
+# Entried commented are safeguards implemented in DOM Cloud. You might not need them
+
+# 0 * * * * find '/var/spool/cron/' -not -name root -type f | xargs sed -i '/^\s*(\*|\d+,)/d'
+# */5 * * * * /usr/bin/node /home/bridge/public_html/sudokill.js -i bridge,do-agent,dbus,earlyoom,mysql,named,nobody,postgres,polkitd,rpc
+* * * * * pgrep PassengerAgent || systemctl restart nginx
+@daily passenger-config reopen-logs
+@weekly /usr/bin/node /home/bridge/public_html/sudocleanssl.js
+@weekly find /var/spool/clientmqueue /var/webmin/diffs -mindepth 1 -delete
+@weekly find /home -maxdepth 1 -type d -ctime +1 -exec rm -rf {}/{.cache,.npm,Downloads,public_html/.yarn/cache,public_html/node_modules/.cache,.composer/cache} \;
+@weekly find /home -maxdepth 1 -type d -ctime +1 -exec rdfind -minsize 100000 -makehardlinks true -makeresultsfile false {}/{.vscode-server,.pyenv,.rvm,.cargo,.local,go,.rustup,public_html/node_modules} \;
+@weekly /usr/bin/bash /home/bridge/public_html/src/whitelist/refresh.sh
+@reboot sleep 60 && /usr/bin/bash /home/bridge/public_html/src/whitelist/refresh.sh
+@monthly find /etc/letsencrypt/{csr,keys} -name *.pem -type f -mtime +180 -exec rm -f {} ';'
 EOF
 
 # Bridge
