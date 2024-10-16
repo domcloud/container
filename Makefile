@@ -19,10 +19,13 @@ convert-image:
 	-v "./output:/app/output" \
 	-it image-build qemu-img convert \
 	-f qcow2 -O vmdk -o adapter_type=lsilogic,subformat=streamOptimized,compat6  \
-	output/image-$(shell uname -m)/{packer-rocky_linux,domcloud-$(shell uname -m).vmdk}
+	output/image-$(shell uname -m)/packer-rocky_linux \
+	output/image-$(shell uname -m)/domcloud-$(shell uname -m).vmdk
 # Optimized QCOW2 (Shrunk by ~1.5 GB)
 	docker run --privileged \
 	-v "./output:/app/output" \
 	-e LIBGUESTFS_DEBUG=1 -e LIBGUESTFS_TRACE=1 -it image-build virt-sparsify \
-	output/image-$(shell uname -m)/{packer-rocky_linux,domcloud-$(shell uname -m).qcow2}
+	output/image-$(shell uname -m)/packer-rocky_linux \
+	output/image-$(shell uname -m)/domcloud-$(shell uname -m).qcow2
+# Generate checksum
 	cd output/image-$(shell uname -m) && find . -type f -exec sha256sum {} > checksums.txt \;
