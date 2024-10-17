@@ -28,7 +28,6 @@ dnf -y install btop certbot clang cmake gcc-c++ git ncdu htop iftop ipset jq lso
   libreport-filesystem {langpacks,glibc-langpack}-en perl-{DBD-Pg,DBD-mysql,LWP-Protocol-https,macros,DateTime,Crypt-SSLeay,Text-ASCIITable,IO-Tty,XML-Simple} \
   earlyoom fail2ban-server iptables-services postfix mariadb-server wbm-virtual-server wbm-virtualmin-{nginx,nginx-ssl} virtualmin-config nginx bind sudo \
   openssh-server nginx-mod-http-passenger systemd-container libpq5-$PG*
-dnf -y remove firewalld lynx gcc-toolset-13-* || true
 ln -s /usr/bin/gcc /usr/bin/$(uname -m)-linux-gnu-gcc # fix spacy pip install
 
 # PHP
@@ -73,7 +72,9 @@ tar -xf rdfind-1.6.0.tar.gz ; cd rdfind-1.6.0
 cd .. ; rm -rf rdfind-1.6.0 rdfind-1.6.0.tar.gz
 # Misc
 pip3 install pipenv awscli
-dnf -y remove nodejs-docs clang flatpak open-sans-fonts rubygem-rdoc gl-manpages
+dnf -y mark install ipset
+dnf -y remove firewalld lynx gcc-toolset-13-* nodejs-docs clang flatpak open-sans-fonts rubygem-rdoc gl-manpages
+ln -s /usr/lib/systemd/system/postgresql-17.service /usr/lib/systemd/system/postgresql.service
 systemctl enable webmin mariadb nginx postgresql-$PG {ip,ip6}tables fail2ban named php{74,83}-php-fpm earlyoom
 
 # Cleanup

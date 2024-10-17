@@ -163,7 +163,7 @@ done
 cat <<EOF > /etc/webmin/postgresql/config
 login=postgres
 repository=/home/db_repository
-start_cmd=systemctl start postgresql-$PG
+start_cmd=systemctl start postgresql
 nodbi=0
 sameunix=1
 add_mode=1
@@ -176,7 +176,7 @@ dump_cmd=/usr/bin/pg_dump
 pid_file=$PGDATA/postmaster.pid
 psql=/usr/bin/psql
 access_own=0
-stop_cmd=systemctl stop postgresql-$PG
+stop_cmd=systemctl stop postgresql
 style=0
 hba_conf=$PGDATA/pg_hba.conf
 setup_cmd=postgresql-setup --initdb
