@@ -59,11 +59,11 @@ SupplementaryGroups=adm
 EOF
 cat <<'EOF' > /etc/systemd/system/iptables.service.d/override.conf
 [Service]
-ExecStartPre=ipset -! create whitelist hash:ip
+ExecStartPre=sh -c "ipset restore -! < /etc/ipset"
 EOF
 cat <<'EOF' > /etc/systemd/system/ip6tables.service.d/override.conf
 [Service]
-ExecStartPre=ipset -! create whitelist-v6 hash:ip family inet6
+ExecStartPre=sh -c "ipset restore -! < /etc/ipset6"
 EOF
 
 # DB
@@ -468,6 +468,11 @@ cat <<'EOF' > /etc/sysconfig/ip6tables
 COMMIT
 EOF
 
+ipset create whitelist hash:ip
+ipset create whitelist-v6 hash:ip family inet6
+ipset save whitelist > /etc/ipset
+ipset save whitelist-v6 > /etc/ipset6
+
 cat <<'EOF' > /var/spool/cron/root
 # Entried commented are safeguards implemented in DOM Cloud. You might not need them
 
@@ -480,7 +485,6 @@ cat <<'EOF' > /var/spool/cron/root
 @weekly find /home -maxdepth 1 -type d -ctime +1 -exec rm -rf {}/{.cache,.npm,Downloads,public_html/.yarn/cache,public_html/node_modules/.cache,.composer/cache} \;
 @weekly find /home -maxdepth 1 -type d -ctime +1 -exec rdfind -minsize 100000 -makehardlinks true -makeresultsfile false {}/{.vscode-server,.pyenv,.rvm,.cargo,.local,go,.rustup,public_html/node_modules} \;
 @weekly /usr/bin/bash /home/bridge/public_html/src/whitelist/refresh.sh
-@reboot sleep 60 && /usr/bin/bash /home/bridge/public_html/src/whitelist/refresh.sh
 @monthly find /etc/letsencrypt/{csr,keys} -name *.pem -type f -mtime +180 -exec rm -f {} ';'
 EOF
 
