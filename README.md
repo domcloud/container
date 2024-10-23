@@ -15,6 +15,19 @@ With Caveats:
 + Requires good knowledge of Linux and its networking components to make everything works
 + You're resposible to everything a server needs to do, including keeping the software up to date
 
+Here's feature comparison:
+
+| Compare Features | Cloud | Self-Hosted |
+|:---|:---:|:---:|
+| Getting Started  | Easy  | Easy but Challenging |
+| Who own the Infra? | Us  | You |
+| Who monitor Infra? | Us  | You |
+| Has Public IP | ✅  | Depends on your ISP |
+| Use `nsp/nss.domcloud.co` NS   | ✅ | ❌ |
+| Can use `domcloud.dev` | ✅ | If not behind NAT |
+| Storage/Network Limit  | Calculated  | Unlimited  |
+| Can have `root` Access   | ❌ | ✅ |
+| Self-hosted email  | ❌ | Possible [but discouraged](https://cfenollosa.com/blog/after-self-hosting-my-email-for-twenty-three-years-i-have-thrown-in-the-towel-the-oligopoly-has-won.html) |
 
 ## Built Images
 
@@ -117,5 +130,7 @@ Why still connecting to our cloud portal?
 
 + Bridge is `headless`. There are no UI, just pure APIs. The APIs are used to communicate to your instance.
 + All tools works out of the box, including Deployment systems, templates and GitHub integration
-+ Connecting is free, no additional cost provided
++ Deployments for self-hosted instances doesn't use storage/data network/instance limit
++ You get some cloud features like backups, domcloud.dev domain, team collab, etc
++ Can be connected for free
 
