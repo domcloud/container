@@ -1,12 +1,19 @@
 
 # Contents
 wget -O /usr/local/bin/restart https://raw.githubusercontent.com/domcloud/bridge/main/userkill.sh && chmod 755 /usr/local/bin/restart
-WWW=/usr/local/share/www && mkdir -p $WWW
-wget -O $WWW/deceptive.html https://raw.githubusercontent.com/domcloud/domcloud/master/share/deceptive.html  && chmod 0755 -R $WWW
+WWW=/usr/local/share/www && WWWSOURCE=https://raw.githubusercontent.com/domcloud/domcloud/master/share && mkdir -p $WWW
+wget -O $WWW/deceptive.html $WWWSOURCE/deceptive.html
+wget -O $WWW/nosite.html $WWWSOURCE/nosite.html
+chmod 0755 -R $WWW
 
 SKEL=/etc/skel/public_html
 mkdir -p $SKEL/.well-known && touch $SKEL/favicon.ico
-wget -O $SKEL/index.html https://raw.githubusercontent.com/domcloud/domcloud/master/share/index.html
+wget -O $SKEL/index.html $WWWSOURCE/index.html
+
+mkdir -p /etc/ssl/default/
+wget https://raw.githubusercontent.com/willnode/forward-domain/refs/heads/main/test/certs/localhost/key.pem -P /etc/ssl/default/
+wget https://raw.githubusercontent.com/willnode/forward-domain/refs/heads/main/test/certs/localhost/cert.pem -P /etc/ssl/default/
+
 
 echo "gem: --no-document" > /etc/gemrc
 cat <<'EOF' > /etc/gitconfig
@@ -109,7 +116,7 @@ bind_spf=
 bind_sub=yes
 cert_type=sha1
 collect_noall=1
-collect_interval=none
+collect_interval=60
 combined_cert=2
 disable=web,mysql,postgres
 dns_records=@
@@ -132,7 +139,7 @@ mysql_ssl=0
 mysql_suffix=${USER}_
 nolink_certs=2
 passwd_mode=0
-php_fpm=pm = ondemand	pm.max_children = 4	pm.process_idle_timeout = 3600s
+php_fpm=pm = ondemand	pm.max_children = 8	pm.process_idle_timeout = 18000s
 php_log=1
 php_noedit=0
 php_sock=1
@@ -221,7 +228,7 @@ php_socket=1
 nginx_cmd=/usr/sbin/nginx
 add_to=/etc/nginx/conf.d
 http2=0
-listen_mode=1
+listen_mode=0
 child_procs=4
 extra_dirs=
 rotate_cmd=nginx -s reload
@@ -326,12 +333,12 @@ http {
     map $sent_http_content_type $expires {
         default off;
         text/html epoch;
-        text/css max;
-        application/javascript max;
-        ~image/ max;
-        ~font/ max;
-        ~audio/ max;
-        ~video/ max;
+        text/css 7d;
+        application/javascript 7d;
+        ~image/ 7d;
+        ~font/ 7d;
+        ~audio/ 7d;
+        ~video/ 7d;
     }
     expires $expires;
     server {
@@ -339,6 +346,20 @@ http {
         listen 80;
         listen [::]:80;
         return 301 https://$host$request_uri;
+    }
+    server {
+        server_name _;
+        listen 443 ssl;
+        listen [::]:443 ssl;
+
+        ssl_certificate /etc/ssl/default/cert.pem;
+        ssl_certificate_key /etc/ssl/default/key.pem;
+
+        location / {
+            root /usr/local/share/www;
+            index nosite.html;
+            try_files $uri /nosite.html;
+        }
     }
     include /etc/nginx/conf.d/*.conf;
 }
