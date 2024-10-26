@@ -46,6 +46,11 @@ for ext in "postgis" "postgis_raster" "postgis_sfcgal" "postgis_tiger_geocoders"
   echo "trusted = true" >> "/usr/pgsql-$PG/share/extension/$ext.control"
 done
 
+# Proxyfix
+PROXYFIX=proxy-fix-linux-$( [ "$(uname -m)" = "aarch64" ] && echo "arm64" || echo "amd64" )
+wget https://github.com/domcloud/proxy-fix/releases/download/v0.2.1/$PROXYFIX.tar.gz
+tar -xf $PROXYFIX.tar.gz && mv $PROXYFIX /usr/local/bin/proxfix && rm -rf $PROXYFIX*
+
 # Docker
 dnf -y install docker-ce docker-ce-cli containerd.io docker-compose-plugin fuse-overlayfs slirp4netns
 modprobe ip_tables && echo "ip_tables" >> /etc/modules
@@ -56,7 +61,7 @@ tar -xf pathman.tar.gz && mv $PATHMAN /usr/local/bin/pathman && rm -f pathman.ta
 # NVIM + NvChad Support
 if [ "$(uname -m)" = "x86_64" ]; then
   curl -LO https://github.com/neovim/neovim/releases/download/v0.10.2/nvim-linux64.tar.gz
-  tar -xzf nvim-linux64.tar.gz && mv nvim-linux64/* /usr/local/ && rm -rf nvim-linux64*
+  tar -xzf nvim-linux64.tar.gz && chown -R root:root nvim-linux64 && rsync -a nvim-linux64/ /usr/local/ && rm -rf nvim-linux64*
 else
   git clone https://github.com/neovim/neovim -b release-0.10 --filter=blob:none
   cd neovim && make CMAKE_BUILD_TYPE=Release && make install && cd .. && rm -rf neovim
