@@ -28,7 +28,7 @@ dnf -y install btop certbot clang cmake gcc-c++ git ncdu htop iftop ipset jq lso
   libreport-filesystem {langpacks,glibc-langpack}-en perl-{DBD-Pg,DBD-mysql,LWP-Protocol-https,macros,DateTime,Crypt-SSLeay,Text-ASCIITable,IO-Tty,XML-Simple} \
   earlyoom fail2ban-server iptables-services postfix mariadb-server wbm-virtual-server wbm-virtualmin-{nginx,nginx-ssl} virtualmin-config nginx bind sudo \
   openssh-server nginx-mod-http-passenger systemd-container libpq5-$PG*
-ln -s /usr/bin/gcc /usr/bin/$(uname -m)-linux-gnu-gcc # fix spacy pip install
+ln -s /usr/bin/gcc /usr/bin/$(uname -m)-linux-gnu-gcc # fix pip install with native libs for aarch64
 
 # PHP
 dnf -y install php{74,83}-php-{bcmath,cli,common,devel,fpm,gd,imap,intl,mbstring,mysqlnd,opcache,pdo,pecl-mongodb,pecl-redis,pecl-zip,pgsql,process,sodium,soap,xml}
@@ -38,9 +38,9 @@ find /etc/opt/remi/ -maxdepth 1 -name 'php*' -exec sed -i "s/upload_max_filesize
 find /etc/opt/remi/ -type f -name www.conf -print0 | xargs -0 sed -i 's/pm = dynamic/pm = ondemand/g'
 
 # Postgres
-dnf -y install postgresql$PG-{server,contrib} {postgis34,pgrouting,pgvector,pg_uuidv7,timescaledb}_$PG
-for bin in "psql" "pg_dump" "pg_dumpall" "pg_restore"; do
-    update-alternatives --set "pgsql-$bin" "/usr/pgsql-$PG/bin/$bin"
+dnf -y install postgresql$PG-{server,contrib,devel} {postgis34,pgrouting,pgvector,pg_uuidv7,timescaledb}_$PG
+for bin in "psql" "pg_dump" "pg_dumpall" "pg_restore" "pg_config"; do
+    alternatives --install /usr/bin/$bin "pgsql-$bin" "/usr/pgsql-$PG/bin/$bin" ${PG}00
 done
 for ext in "postgis" "postgis_raster" "postgis_sfcgal" "postgis_tiger_geocoders" "postgis_topology" "earthdistance" "address_standardizer" "address_standardizer_data_us" "pgrouting" "pg_uuidv7" "vector"; do
   echo "trusted = true" >> "/usr/pgsql-$PG/share/extension/$ext.control"
@@ -48,7 +48,7 @@ done
 
 # Proxyfix
 PROXYFIX=proxy-fix-linux-$( [ "$(uname -m)" = "aarch64" ] && echo "arm64" || echo "amd64" )
-wget https://github.com/domcloud/proxy-fix/releases/download/v0.2.1/$PROXYFIX.tar.gz
+wget https://github.com/domcloud/proxy-fix/releases/download/v0.2.5/$PROXYFIX.tar.gz
 tar -xf $PROXYFIX.tar.gz && mv $PROXYFIX /usr/local/bin/proxfix && rm -rf $PROXYFIX*
 
 # Docker
