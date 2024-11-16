@@ -22,7 +22,7 @@ dnf -y module enable mariadb
 PG=17
 
 # Tools
-dnf -y install btop bzip2 certbot clang cmake gcc-c++ git ncdu htop iftop ipset jq lsof make nano ncurses nodejs ruby rsync screen socat strace tar time tmux vim wget whois xz yarn zstd \
+dnf -y install btop bzip2 certbot clang cmake gcc-c++ git ncdu htop iftop ipset jq lsof make nano ninja-build ncurses nodejs ruby rsync screen socat strace tar time tmux vim wget whois xz yarn zstd \
   lib{curl,ffi,sqlite3x,tool-ltdl,md,yaml}-devel {brotli,bzip2,mesa-libGL,nettle,openldap,passenger,python,perl,readline,ruby,xmlsec1,xmlsec1-openssl}-devel python3-pip \
   libreport-filesystem {langpacks,glibc-langpack}-en perl-{DBD-Pg,DBD-mysql,LWP-Protocol-https,macros,DateTime,Crypt-SSLeay,Text-ASCIITable,IO-Tty,XML-Simple} \
   earlyoom fail2ban-server iptables-services postfix mariadb-server wbm-virtual-server wbm-virtualmin-{nginx,nginx-ssl} virtualmin-config bind sudo \

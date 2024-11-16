@@ -461,9 +461,11 @@ cat <<'EOF' > /etc/sysconfig/iptables
 :FORWARD ACCEPT [0:0]
 -A INPUT -p icmp -j ACCEPT
 -A INPUT -i lo -j ACCEPT
--A INPUT -p tcp -m multiport --dports 22,53,80,443,3306,5432 -j ACCEPT
+-A INPUT -p tcp -m multiport --dports 22,80,443,3306,5432 -j ACCEPT
 -A INPUT -p tcp -m multiport --dports 2443:2453,32000:65535 -j ACCEPT
--A INPUT -p udp -m multiport --dports 53,443 -j ACCEPT
+-A INPUT -p udp -m multiport --dports 443 -j ACCEPT
+-A INPUT -p tcp -m multiport --ports 53 -j ACCEPT
+-A INPUT -p udp -m multiport --ports 53 -j ACCEPT
 -A INPUT -j REJECT --reject-with icmp-host-prohibited
 -A FORWARD -j REJECT --reject-with icmp-host-prohibited
 -A OUTPUT -o lo -j ACCEPT
@@ -471,7 +473,7 @@ cat <<'EOF' > /etc/sysconfig/iptables
 -A INPUT -p tcp -m multiport --dports 22,53 -j ACCEPT
 -A INPUT -p udp -m multiport --dports 53 -j ACCEPT
 -A OUTPUT -p tcp -m tcp --dport 25 -j REJECT
--A OUTPUT -m set -j ACCEPT --match-set whitelist dst
+-A OUTPUT -m set --match-set whitelist dst -j ACCEPT
 COMMIT
 EOF
 
@@ -482,17 +484,19 @@ cat <<'EOF' > /etc/sysconfig/ip6tables
 :FORWARD ACCEPT [0:0]
 -A INPUT -p ipv6-icmp -j ACCEPT
 -A INPUT -i lo -j ACCEPT
--A INPUT -p tcp -m multiport --dports 22,53,80,443,3306,5432 -j ACCEPT
+-A INPUT -p tcp -m multiport --dports 22,80,443,3306,5432 -j ACCEPT
 -A INPUT -p tcp -m multiport --dports 2443:2453,32000:65535 -j ACCEPT
--A INPUT -p udp -m multiport --dports 53,443 -j ACCEPT
+-A INPUT -p udp -m multiport --dports 443 -j ACCEPT
+-A INPUT -p tcp -m multiport --ports 53 -j ACCEPT
+-A INPUT -p udp -m multiport --ports 53 -j ACCEPT
 -A INPUT -j REJECT --reject-with icmp6-adm-prohibited
 -A FORWARD -j REJECT --reject-with icmp6-adm-prohibited
 -A OUTPUT -o lo -j ACCEPT
 -A OUTPUT -m conntrack --ctstate ESTABLISHED -j ACCEPT
--A INPUT -p tcp -m multiport --dports 22,53 -j ACCEPT
--A INPUT -p udp -m multiport --dports 53 -j ACCEPT
+-A OUTPUT -p tcp -m multiport --dports 22,53 -j ACCEPT
+-A OUTPUT -p udp -m multiport --dports 53 -j ACCEPT
 -A OUTPUT -p tcp -m tcp --dport 25 -j REJECT
--A OUTPUT -m set -j ACCEPT --match-set whitelist-v6 dst
+-A OUTPUT -m set --match-set whitelist-v6 dst -j ACCEPT
 COMMIT
 EOF
 
