@@ -49,6 +49,30 @@ EOF
 done
 
 # SystemD
+cat <<'EOF' > /usr/lib/systemd/system/nginx.service
+[Unit]
+Description=The nginx HTTP and reverse proxy server
+After=network-online.target remote-fs.target nss-lookup.target
+Wants=network-online.target
+
+[Service]
+Type=forking
+PIDFile=/run/nginx.pid
+# Nginx will fail to start if /run/nginx.pid already exists but has the wrong
+# SELinux context. This might happen when running `nginx -t` from the cmdline.
+# https://bugzilla.redhat.com/show_bug.cgi?id=1268621
+ExecStartPre=/usr/bin/rm -f /run/nginx.pid
+ExecStartPre=/usr/local/sbin/nginx -t
+ExecStart=/usr/local/sbin/nginx
+ExecReload=/usr/local/sbin/nginx -s reload
+KillSignal=SIGQUIT
+TimeoutStopSec=5
+KillMode=mixed
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
+EOF
 cat <<'EOF' > /etc/security/limits.conf
 root             soft    nofile          65535
 @nginx           hard    as              2048000
@@ -114,6 +138,7 @@ avail_xterm=1
 aws_cmd=aws
 bind_spf=
 bind_sub=yes
+bw_active=1
 cert_type=sha1
 collect_noall=1
 collect_interval=60
@@ -282,10 +307,11 @@ passenger_max_instances_per_app 1;
 EOF
 
 cat <<'EOF' > /etc/nginx/finetuning.conf
-server_names_hash_bucket_size 64;
+server_names_hash_bucket_size 128;
 server_names_hash_max_size 131072;
-limit_req_zone $binary_remote_addr zone=basic_limit:50m rate=2r/s;
-limit_req zone=basic_limit burst=500 nodelay;
+limit_req_status 429;
+limit_req zone=basic_limit burst=6000 nodelay;
+limit_req_zone $server_name zone=basic_limit:50m rate=100r/s;
 gzip_types text/css application/javascript image/svg+xml;
 gzip_min_length 1024;
 gzip_comp_level 3;
@@ -435,25 +461,16 @@ cat <<'EOF' > /etc/sysconfig/iptables
 :FORWARD ACCEPT [0:0]
 -A INPUT -p icmp -j ACCEPT
 -A INPUT -i lo -j ACCEPT
--A INPUT -p tcp -m multiport --dports 22,80,443,3306,5432 -j ACCEPT
--A INPUT -p tcp -m tcp --sport 53 -j ACCEPT
--A INPUT -p udp -m udp --sport 53 -j ACCEPT
--A INPUT -p tcp -m tcp --dport 53 -j ACCEPT
--A INPUT -p udp -m udp --dport 53 -j ACCEPT
--A INPUT -p tcp -m multiport --dports 2443:2453 -j ACCEPT
--A INPUT -p tcp -m multiport --dports 32000:65535 -j ACCEPT
+-A INPUT -p tcp -m multiport --dports 22,53,80,443,3306,5432 -j ACCEPT
+-A INPUT -p tcp -m multiport --dports 2443:2453,32000:65535 -j ACCEPT
+-A INPUT -p udp -m multiport --dports 53,443 -j ACCEPT
 -A INPUT -j REJECT --reject-with icmp-host-prohibited
 -A FORWARD -j REJECT --reject-with icmp-host-prohibited
 -A OUTPUT -o lo -j ACCEPT
 -A OUTPUT -m conntrack --ctstate ESTABLISHED -j ACCEPT
--A OUTPUT -p tcp --dport 22 -j ACCEPT
--A OUTPUT -p tcp -m tcp --dport 53 -j ACCEPT
--A OUTPUT -p udp -m udp --dport 53 -j ACCEPT
--A OUTPUT -p tcp -m tcp --sport 53 -j ACCEPT
--A OUTPUT -p udp -m udp --sport 53 -j ACCEPT
+-A INPUT -p tcp -m multiport --dports 22,53 -j ACCEPT
+-A INPUT -p udp -m multiport --dports 53 -j ACCEPT
 -A OUTPUT -p tcp -m tcp --dport 25 -j REJECT
--A OUTPUT -p tcp -m tcp --sport 25 -j REJECT
--A OUTPUT -p tcp -m multiport --dports 1025:65535 -j ACCEPT
 -A OUTPUT -m set -j ACCEPT --match-set whitelist dst
 COMMIT
 EOF
@@ -465,26 +482,16 @@ cat <<'EOF' > /etc/sysconfig/ip6tables
 :FORWARD ACCEPT [0:0]
 -A INPUT -p ipv6-icmp -j ACCEPT
 -A INPUT -i lo -j ACCEPT
--A INPUT -p tcp -m multiport --dports 22,80,443,3306,5432 -j ACCEPT
--A INPUT -p tcp -m tcp --sport 53 -j ACCEPT
--A INPUT -p udp -m udp --sport 53 -j ACCEPT
--A INPUT -p tcp -m tcp --dport 53 -j ACCEPT
--A INPUT -p udp -m udp --dport 53 -j ACCEPT
--A INPUT -p udp -m udp --dport 546 -j ACCEPT
--A INPUT -p tcp -m multiport --dports 2443:2453 -j ACCEPT
--A INPUT -p tcp -m multiport --dports 32000:65535 -j ACCEPT
+-A INPUT -p tcp -m multiport --dports 22,53,80,443,3306,5432 -j ACCEPT
+-A INPUT -p tcp -m multiport --dports 2443:2453,32000:65535 -j ACCEPT
+-A INPUT -p udp -m multiport --dports 53,443 -j ACCEPT
 -A INPUT -j REJECT --reject-with icmp6-adm-prohibited
 -A FORWARD -j REJECT --reject-with icmp6-adm-prohibited
 -A OUTPUT -o lo -j ACCEPT
 -A OUTPUT -m conntrack --ctstate ESTABLISHED -j ACCEPT
--A OUTPUT -p tcp --dport 22 -j ACCEPT
--A OUTPUT -p tcp -m tcp --dport 53 -j ACCEPT
--A OUTPUT -p udp -m udp --dport 53 -j ACCEPT
--A OUTPUT -p tcp -m tcp --sport 53 -j ACCEPT
--A OUTPUT -p udp -m udp --sport 53 -j ACCEPT
+-A INPUT -p tcp -m multiport --dports 22,53 -j ACCEPT
+-A INPUT -p udp -m multiport --dports 53 -j ACCEPT
 -A OUTPUT -p tcp -m tcp --dport 25 -j REJECT
--A OUTPUT -p tcp -m tcp --sport 25 -j REJECT
--A OUTPUT -p tcp -m multiport --dports 1025:65535 -j ACCEPT
 -A OUTPUT -m set -j ACCEPT --match-set whitelist-v6 dst
 COMMIT
 EOF
@@ -496,10 +503,10 @@ ipset save whitelist-v6 > /etc/ipset6
 
 cat <<'EOF' > /var/spool/cron/root
 # Entried commented are safeguards implemented in DOM Cloud. You might not need them
-
 # 0 * * * * find '/var/spool/cron/' -not -name root -type f | xargs sed -i '/^\s*(\*|\d+,)/d'
 # */5 * * * * /usr/bin/node /home/bridge/public_html/sudokill.js -i bridge,do-agent,dbus,earlyoom,mysql,named,nobody,postgres,polkitd,rpc
-* * * * * pgrep PassengerAgent || systemctl restart nginx
+
+* * * * * /usr/local/lib/nginx-builder/cleanup.sh
 @daily passenger-config reopen-logs
 @weekly /usr/bin/node /home/bridge/public_html/sudocleanssl.js
 @weekly find /var/spool/clientmqueue /var/webmin/diffs -mindepth 1 -delete
