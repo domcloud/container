@@ -312,16 +312,20 @@ server_names_hash_max_size 131072;
 limit_req_status 429;
 limit_req zone=basic_limit burst=6000 nodelay;
 limit_req_zone $server_name zone=basic_limit:50m rate=100r/s;
-gzip_types text/css application/javascript image/svg+xml;
-gzip_min_length 1024;
+gzip_types application/atom+xml application/javascript application/json application/rss+xml
+           application/vnd.ms-fontobject application/x-font-opentype application/x-font-ttf
+           image/svg+xml image/x-icon image/x-ms-bmp text/css text/plain text/xml;
+gzip_min_length 1000;
 gzip_comp_level 3;
 gzip on;
 sendfile on;
+aio threads;
+directio 16m;
 tcp_nopush on;
 keepalive_timeout 60;
 keepalive_requests 1000;
-directio 16m;
 output_buffers 3 512k;
+client_body_buffer_size 256k;
 client_max_body_size 512m;
 disable_symlinks if_not_owner;
 proxy_http_version 1.1;
@@ -329,11 +333,12 @@ ssl_protocols TLSv1.2 TLSv1.3;
 server_tokens off;
 merge_slashes off;
 msie_padding off;
-ssl_session_cache shared:SSL:1m;
+ssl_prefer_server_ciphers on;
+ssl_session_cache shared:SSL:16m;
 ssl_session_timeout 1h;
 ssl_session_tickets off;
 ssl_early_data on;
-ssl_buffer_size 4k;
+ssl_buffer_size 8k;
 EOF
 
 cat <<'EOF' > /etc/nginx/nginx.conf
@@ -375,6 +380,8 @@ http {
     }
     server {
         server_name _;
+        listen 443 quic reuseport;
+        listen [::]:443 quic reuseport;
         listen 443 ssl;
         listen [::]:443 ssl;
 
@@ -470,8 +477,8 @@ cat <<'EOF' > /etc/sysconfig/iptables
 -A FORWARD -j REJECT --reject-with icmp-host-prohibited
 -A OUTPUT -o lo -j ACCEPT
 -A OUTPUT -m conntrack --ctstate ESTABLISHED -j ACCEPT
--A INPUT -p tcp -m multiport --dports 22,53 -j ACCEPT
--A INPUT -p udp -m multiport --dports 53 -j ACCEPT
+-A OUTPUT -p tcp -m multiport --dports 22,53 -j ACCEPT
+-A OUTPUT -p udp -m multiport --dports 53 -j ACCEPT
 -A OUTPUT -p tcp -m tcp --dport 25 -j REJECT
 -A OUTPUT -m set --match-set whitelist dst -j ACCEPT
 COMMIT
@@ -486,7 +493,7 @@ cat <<'EOF' > /etc/sysconfig/ip6tables
 -A INPUT -i lo -j ACCEPT
 -A INPUT -p tcp -m multiport --dports 22,80,443,3306,5432 -j ACCEPT
 -A INPUT -p tcp -m multiport --dports 2443:2453,32000:65535 -j ACCEPT
--A INPUT -p udp -m multiport --dports 443 -j ACCEPT
+-A INPUT -p udp -m multiport --dports 443,546 -j ACCEPT
 -A INPUT -p tcp -m multiport --ports 53 -j ACCEPT
 -A INPUT -p udp -m multiport --ports 53 -j ACCEPT
 -A INPUT -j REJECT --reject-with icmp6-adm-prohibited
