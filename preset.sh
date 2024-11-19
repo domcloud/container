@@ -470,7 +470,7 @@ cat <<'EOF' > /etc/sysconfig/iptables
 -A INPUT -i lo -j ACCEPT
 -A INPUT -p tcp -m multiport --dports 22,80,443,3306,5432 -j ACCEPT
 -A INPUT -p tcp -m multiport --dports 2443:2453,32000:65535 -j ACCEPT
--A INPUT -p udp -m multiport --dports 443 -j ACCEPT
+-A INPUT -p udp -m multiport --dports 67,68,443 -j ACCEPT
 -A INPUT -p tcp -m multiport --ports 53 -j ACCEPT
 -A INPUT -p udp -m multiport --ports 53 -j ACCEPT
 -A INPUT -j REJECT --reject-with icmp-host-prohibited
@@ -478,7 +478,9 @@ cat <<'EOF' > /etc/sysconfig/iptables
 -A OUTPUT -o lo -j ACCEPT
 -A OUTPUT -m conntrack --ctstate ESTABLISHED -j ACCEPT
 -A OUTPUT -p tcp -m multiport --dports 22,53 -j ACCEPT
--A OUTPUT -p udp -m multiport --dports 53 -j ACCEPT
+-A OUTPUT -p udp -m multiport --dports 67,68 -j ACCEPT
+-A OUTPUT -p tcp -m multiport --ports 53 -j ACCEPT
+-A OUTPUT -p udp -m multiport --ports 53 -j ACCEPT
 -A OUTPUT -p tcp -m tcp --dport 25 -j REJECT
 -A OUTPUT -m set --match-set whitelist dst -j ACCEPT
 COMMIT
@@ -493,7 +495,7 @@ cat <<'EOF' > /etc/sysconfig/ip6tables
 -A INPUT -i lo -j ACCEPT
 -A INPUT -p tcp -m multiport --dports 22,80,443,3306,5432 -j ACCEPT
 -A INPUT -p tcp -m multiport --dports 2443:2453,32000:65535 -j ACCEPT
--A INPUT -p udp -m multiport --dports 443,546 -j ACCEPT
+-A INPUT -p udp -m multiport --dports 443,546,547 -j ACCEPT
 -A INPUT -p tcp -m multiport --ports 53 -j ACCEPT
 -A INPUT -p udp -m multiport --ports 53 -j ACCEPT
 -A INPUT -j REJECT --reject-with icmp6-adm-prohibited
@@ -501,7 +503,9 @@ cat <<'EOF' > /etc/sysconfig/ip6tables
 -A OUTPUT -o lo -j ACCEPT
 -A OUTPUT -m conntrack --ctstate ESTABLISHED -j ACCEPT
 -A OUTPUT -p tcp -m multiport --dports 22,53 -j ACCEPT
--A OUTPUT -p udp -m multiport --dports 53 -j ACCEPT
+-A OUTPUT -p udp -m multiport --dports 546,547 -j ACCEPT
+-A OUTPUT -p tcp -m multiport --ports 53 -j ACCEPT
+-A OUTPUT -p udp -m multiport --ports 53 -j ACCEPT
 -A OUTPUT -p tcp -m tcp --dport 25 -j REJECT
 -A OUTPUT -m set --match-set whitelist-v6 dst -j ACCEPT
 COMMIT
@@ -512,8 +516,20 @@ ipset create whitelist-v6 hash:ip family inet6
 ipset save whitelist > /etc/ipset
 ipset save whitelist-v6 > /etc/ipset6
 
+sed -i 's/listen-on .*/listen-on port 53 { any; };/g' /etc/named.conf
+sed -i 's/listen-on-v6 .*/listen-on-v6 port 53 { any; };/g' /etc/named.conf
+sed -i '/allow-query/d' /etc/named.conf
+sed -i '/allow-recursive/d' /etc/named.conf
+sed -i 's/recursion no/recursion yes/g' /etc/named.conf
+touch /etc/cloud/cloud-init.disabled
+cat <<'EOF' > /etc/resolv.conf
+nameserver 127.0.0.1
+nameserver 1.1.1.1
+nameserver 1.0.0.1
+EOF
+
 cat <<'EOF' > /var/spool/cron/root
-# Entried commented are safeguards implemented in DOM Cloud. You might not need them
+# Entry commented are safeguards implemented in DOM Cloud. You might not need them
 # 0 * * * * find '/var/spool/cron/' -not -name root -type f | xargs sed -i '/^\s*(\*|\d+,)/d'
 # */5 * * * * /usr/bin/node /home/bridge/public_html/sudokill.js -i bridge,do-agent,dbus,earlyoom,mysql,named,nobody,postgres,polkitd,rpc
 
