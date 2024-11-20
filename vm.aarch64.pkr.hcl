@@ -24,13 +24,13 @@ variable "output_directory" {
 
 # Define the source image builder - for QEMU
 source "qemu" "rocky_linux" {
-  iso_url       = "https://download.rockylinux.org/pub/rocky/9.4/isos/aarch64/Rocky-9.4-aarch64-minimal.iso"
-  iso_checksum  = "sha256:0a3e9464fe3fb00ec04e3cce138ec4ccfdc2757e6eef50313fe52fe3332f46b5"
+  iso_url       = "https://download.rockylinux.org/pub/rocky/9.5/isos/aarch64/Rocky-9.5-aarch64-minimal.iso"
+  iso_checksum  = "sha256:5bd7a6bd90ae54c9f9e4c2e8c957b33fb61fbffcede251fe73f0b0beb42fd9ca"
   qemu_binary   = "qemu-system-aarch64"
   output_directory = var.output_directory
   http_directory = "."
   disk_size     = "10240"
-  memory        = "1024"
+  memory        = "2048"
   cpu_model     = "max"
   qemuargs = [
     ["-display", var.display], # "gtk" or "none"

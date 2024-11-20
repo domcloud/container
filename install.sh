@@ -15,7 +15,7 @@ dnf config-manager --disable virtualmin pgdg{16,15,14,13,12} && dnf config-manag
 dnf -y module reset nginx
 dnf -y module enable nginx:1.24
 dnf -y module reset nodejs
-dnf -y module enable nodejs:20
+dnf -y module enable nodejs:22
 dnf -y module reset mariadb
 dnf -y module enable mariadb
 
@@ -23,7 +23,7 @@ PG=17
 
 # Tools
 dnf -y install btop bzip2 certbot clang cmake gcc-c++ git ncdu htop iftop ipset jq lsof make nano ninja-build ncurses nodejs ruby rsync screen socat strace tar time tmux vim wget whois xz yarn zstd \
-  lib{curl,ffi,sqlite3x,tool-ltdl,md,yaml}-devel {brotli,bzip2,mesa-libGL,nettle,openldap,passenger,python,perl,readline,ruby,xmlsec1,xmlsec1-openssl}-devel python3-pip \
+  lib{curl,ffi,sqlite3x,tool-ltdl,md,yaml}-devel {brotli,bzip2,mesa-libGL,nettle,openldap,python,perl,readline,ruby,xmlsec1,xmlsec1-openssl}-devel python3-pip rubygem-{rack,rake} \
   libreport-filesystem {langpacks,glibc-langpack}-en perl-{DBD-Pg,DBD-mysql,LWP-Protocol-https,macros,DateTime,Crypt-SSLeay,Text-ASCIITable,IO-Tty,XML-Simple} \
   earlyoom fail2ban-server iptables-services postfix mariadb-server wbm-virtual-server wbm-virtualmin-{nginx,nginx-ssl} virtualmin-config bind sudo \
   openssh-server systemd-container libpq5-$PG*
@@ -34,6 +34,7 @@ git clone https://github.com/domcloud/nginx-builder/ /usr/local/lib/nginx-builde
 cd /usr/local/lib/nginx-builder/
 make install
 ln -s /usr/local/sbin/nginx /usr/sbin/nginx
+cp /usr/local/lib/nginx-builder/passenger/bin/* /usr/local/bin
 
 # PHP
 dnf -y install php{74,83}-php-{bcmath,cli,common,devel,fpm,gd,imap,intl,mbstring,mysqlnd,opcache,pdo,pecl-mongodb,pecl-redis,pecl-zip,pgsql,process,sodium,soap,xml}
@@ -83,7 +84,7 @@ cd .. ; rm -rf rdfind-1.6.0 rdfind-1.6.0.tar.gz
 # Misc
 pip3 install pipenv awscli
 dnf -y mark install ipset
-dnf -y remove firewalld lynx gcc-toolset-13-* nodejs-docs clang flatpak open-sans-fonts rubygem-rdoc gl-manpages
+dnf -y remove lynx gcc-toolset-13-* nodejs-docs clang flatpak open-sans-fonts rubygem-rdoc gl-manpages
 ln -s /usr/lib/systemd/system/postgresql-$PG.service /usr/lib/systemd/system/postgresql.service
 systemctl enable webmin mariadb postgresql-$PG {ip,ip6}tables fail2ban named php{74,83}-php-fpm earlyoom
 

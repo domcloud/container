@@ -7,8 +7,8 @@ apt-get install -y wget unzip qemu-system-x86 qemu-system-arm libvirt-clients li
 bridge-utils virtinst dnf curl libguestfs-tools linux-image-generic && \
 rm -rf /var/lib/apt/lists/*
 
-RUN PACKER=packer_1.10.3_linux_$( [ "$(uname -m)" = "aarch64" ] && echo "arm64" || echo "amd64" ) && \
-curl -fsSL https://releases.hashicorp.com/packer/1.10.3/$PACKER.zip -o /tmp/packer.zip && \
+RUN PACKER=packer_1.11.2_linux_$( [ "$(uname -m)" = "aarch64" ] && echo "arm64" || echo "amd64" ) && \
+curl -fsSL https://releases.hashicorp.com/packer/1.11.2/$PACKER.zip -o /tmp/packer.zip && \
 unzip /tmp/packer.zip -d /usr/local/bin && \
 rm /tmp/packer.zip
 

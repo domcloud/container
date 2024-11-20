@@ -24,13 +24,13 @@ variable "output_directory" {
 
 # Define the source image builder - for QEMU
 source "qemu" "rocky_linux" {
-  iso_url       = "https://download.rockylinux.org/pub/rocky/9.4/isos/x86_64/Rocky-9.4-x86_64-minimal.iso"
-  iso_checksum  = "sha256:ee3ac97fdffab58652421941599902012179c37535aece76824673105169c4a2"
+  iso_url       = "https://download.rockylinux.org/pub/rocky/9.5/isos/x86_64/Rocky-9.5-x86_64-minimal.iso"
+  iso_checksum  = "sha256:eedbdc2875c32c7f00e70fc861edef48587c7cbfd106885af80bdf434543820b"
   qemu_binary   = "qemu-system-x86_64"
   output_directory = var.output_directory
   http_directory = "."
   disk_size     = "10240"
-  memory        = "1024"
+  memory        = "2048"
   # cpu_model     = "Haswell-v1" # no KVM
   cpu_model     = "host" # with KVM
   ssh_port =  22
