@@ -178,7 +178,6 @@ status=0
 usermin_ssl=0
 virtual_skel=/etc/skel
 webmin_ssl=0
-wizard_run=1
 EOF
     # Extract the key part (before '=') to use as a pattern for sed
     key=$(echo "$line" | cut -d'=' -f1)
@@ -562,7 +561,7 @@ cat <<'EOF' > /var/spool/cron/root
 # 0 * * * * find '/var/spool/cron/' -not -name root -type f | xargs sed -i '/^\s*(\*|\d+,)/d'
 # */5 * * * * /usr/bin/node /home/bridge/public_html/sudokill.js -i bridge,do-agent,dbus,earlyoom,mysql,named,nobody,postgres,polkitd,rpc
 
-* * * * * /usr/local/lib/nginx-builder/cleanup.sh
+*/5 * * * * /usr/local/lib/nginx-builder/cleanup.sh
 @daily passenger-config reopen-logs
 @weekly /usr/bin/node /home/bridge/public_html/sudocleanssl.js
 @weekly find /var/spool/clientmqueue /var/webmin/diffs -mindepth 1 -delete
@@ -671,6 +670,8 @@ curl -X POST \
   "root": "public_html/public",
   "ssl": "on"
 }'
+
+echo "wizard_run=1" >> /etc/webmin/virtual-server/config
 
 # Sanity check
 cat /etc/passwd

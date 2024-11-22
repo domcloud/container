@@ -29,8 +29,9 @@ source "qemu" "rocky_linux" {
   qemu_binary   = "qemu-system-aarch64"
   output_directory = var.output_directory
   http_directory = "."
-  disk_size     = "10240"
+  disk_size     = "40960"
   memory        = "2048"
+  cores         = 4
   cpu_model     = "max"
   qemuargs = [
     ["-display", var.display], # "gtk" or "none"

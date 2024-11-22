@@ -33,7 +33,9 @@ ln -s /usr/bin/gcc /usr/bin/$(uname -m)-linux-gnu-gcc # fix pip install with nat
 git clone https://github.com/domcloud/nginx-builder/ /usr/local/lib/nginx-builder
 cd /usr/local/lib/nginx-builder/
 make install
+make clean
 ln -s /usr/local/sbin/nginx /usr/sbin/nginx
+cd /root
 
 # PHP
 dnf -y install php{74,83}-php-{bcmath,cli,common,devel,fpm,gd,imap,intl,mbstring,mysqlnd,opcache,pdo,pecl-mongodb,pecl-redis,pecl-zip,pgsql,process,sodium,soap,xml}
@@ -43,13 +45,16 @@ find /etc/opt/remi/ -maxdepth 1 -name 'php*' -exec sed -i "s/upload_max_filesize
 find /etc/opt/remi/ -type f -name www.conf -print0 | xargs -0 sed -i 's/pm = dynamic/pm = ondemand/g'
 
 # Postgres
-dnf -y install postgresql$PG-{server,contrib,devel} {postgis34,pgrouting,pgvector,pg_uuidv7,timescaledb}_$PG
+dnf -y install postgresql$PG-{server,contrib,devel}
 for bin in "psql" "pg_dump" "pg_dumpall" "pg_restore" "pg_config"; do
     alternatives --install /usr/bin/$bin "pgsql-$bin" "/usr/pgsql-$PG/bin/$bin" ${PG}00
 done
-for ext in "postgis" "postgis_raster" "postgis_sfcgal" "postgis_tiger_geocoders" "postgis_topology" "earthdistance" "address_standardizer" "address_standardizer_data_us" "pgrouting" "pg_uuidv7" "vector"; do
-  echo "trusted = true" >> "/usr/pgsql-$PG/share/extension/$ext.control"
-done
+
+# Not everyone needs this
+# dnf -y install {postgis34,pgrouting,pgvector,pg_uuidv7,timescaledb}_$PG
+# for ext in "postgis" "postgis_raster" "postgis_sfcgal" "postgis_tiger_geocoders" "postgis_topology" "earthdistance" "address_standardizer" "address_standardizer_data_us" "pgrouting" "pg_uuidv7" "vector"; do
+#   echo "trusted = true" >> "/usr/pgsql-$PG/share/extension/$ext.control"
+# done
 
 # Proxyfix
 PROXYFIX=proxy-fix-linux-$( [ "$(uname -m)" = "aarch64" ] && echo "arm64" || echo "amd64" )
@@ -59,6 +64,7 @@ tar -xf $PROXYFIX.tar.gz && mv $PROXYFIX /usr/local/bin/proxfix && rm -rf $PROXY
 # Docker
 dnf -y install docker-ce docker-ce-cli containerd.io docker-compose-plugin fuse-overlayfs slirp4netns
 modprobe ip_tables && echo "ip_tables" >> /etc/modules
+
 # Pathman
 PATHMAN=pathman-v0.6.0-linux-$( [ "$(uname -m)" = "aarch64" ] && echo "arm64" || echo "amd64_v1" )
 wget -O pathman.tar.gz https://github.com/therootcompany/pathman/releases/download/v0.6.0/$PATHMAN.tar.gz
@@ -88,7 +94,7 @@ ln -s /usr/lib/systemd/system/postgresql-$PG.service /usr/lib/systemd/system/pos
 systemctl enable webmin mariadb postgresql-$PG {ip,ip6}tables fail2ban named php{74,83}-php-fpm earlyoom
 
 # Cleanup
-# nobest due https://cloudlinux.zendesk.com/hc/en-us/articles/15731606500124
+# nobest since sometimes broken like https://cloudlinux.zendesk.com/hc/en-us/articles/15731606500124
 dnf -y update --nobest
 dnf -y clean all
 rm -rf /usr/share/{locale,doc,man}
