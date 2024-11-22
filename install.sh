@@ -4,12 +4,12 @@ cd /root
 export TERM=xterm-256color
 
 # Repos
-dnf -y install epel-release http://rpms.remirepo.net/enterprise/remi-release-9.rpm 
-curl -fsSL https://software.virtualmin.com/gpl/scripts/virtualmin-install.sh | sh -s -- --setup
-dnf config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+dnf -y install epel-release http://rpms.remirepo.net/enterprise/remi-release-9.rpm && dnf config-manager --enable crb
 dnf -y install https://download.postgresql.org/pub/repos/yum/reporpms/EL-9-$(uname -m)/pgdg-redhat-repo-latest.noarch.rpm
+curl -fsSL https://software.virtualmin.com/gpl/scripts/virtualmin-install.sh | sh -s -- --setup
 curl --silent --location https://dl.yarnpkg.com/rpm/yarn.repo > /etc/yum.repos.d/yarn.repo
-dnf config-manager --disable virtualmin pgdg{16,15,14,13,12} && dnf config-manager --enable crb
+dnf config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+dnf config-manager --disable virtualmin pgdg{16,15,14,13,12}
 
 # Modules
 dnf -y module reset nginx
@@ -22,7 +22,7 @@ dnf -y module enable mariadb
 PG=17
 
 # Tools
-dnf -y install btop bzip2 certbot clang cmake gcc-c++ git ncdu htop iftop ipset jq lsof make nano ninja-build ncurses npm nodejs ruby rsync screen socat strace tar time tmux vim wget whois xz yarn zstd \
+dnf -y install awscli btop bzip2 certbot clang cmake gcc-c++ git ncdu htop iftop ipset jq lsof make nano ninja-build ncurses npm nodejs ruby rsync screen socat strace tar time tmux vim wget whois xz yarn zstd \
   lib{curl,ffi,sqlite3x,tool-ltdl,md,yaml}-devel {brotli,bzip2,mesa-libGL,nettle,openldap,python,perl,readline,ruby,xmlsec1,xmlsec1-openssl}-devel python3-pip rubygem-{json,rack,rake} \
   libreport-filesystem {langpacks,glibc-langpack}-en perl-{DBD-Pg,DBD-mysql,LWP-Protocol-https,macros,DateTime,Crypt-SSLeay,Text-ASCIITable,IO-Tty,XML-Simple} \
   earlyoom fail2ban-server iptables-services postfix mariadb-server wbm-virtual-server wbm-virtualmin-{nginx,nginx-ssl} virtualmin-config bind sudo \
@@ -81,7 +81,7 @@ tar -xf rdfind-1.6.0.tar.gz ; cd rdfind-1.6.0
 ./configure --disable-debug ; make install
 cd .. ; rm -rf rdfind-1.6.0 rdfind-1.6.0.tar.gz
 # Misc
-pip3 install pipenv awscli
+pip3 install pipenv
 dnf -y mark install ipset
 dnf -y remove lynx gcc-toolset-13-* nodejs-docs clang flatpak open-sans-fonts rubygem-rdoc gl-manpages
 ln -s /usr/lib/systemd/system/postgresql-$PG.service /usr/lib/systemd/system/postgresql.service

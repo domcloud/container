@@ -58,10 +58,8 @@ Wants=network-online.target
 [Service]
 Type=forking
 PIDFile=/run/nginx.pid
-# Nginx will fail to start if /run/nginx.pid already exists but has the wrong
-# SELinux context. This might happen when running `nginx -t` from the cmdline.
-# https://bugzilla.redhat.com/show_bug.cgi?id=1268621
 ExecStartPre=/usr/bin/rm -f /run/nginx.pid
+ExecStartPre=/usr/bin/mkdir -p /var/run/passenger-instreg
 ExecStartPre=/usr/local/sbin/nginx -t
 ExecStart=/usr/local/sbin/nginx
 ExecReload=/usr/local/sbin/nginx -s reload
@@ -132,7 +130,6 @@ EOF
 sed -i 's/port=10000/port=2443/g' /etc/webmin/miniserv.conf
 
 cat <<'EOF' | while read -r line; do
-dns_ip=10.0.2.15
 allow_subdoms=0
 auto_letsencrypt=0
 avail_xterm=1
@@ -140,11 +137,13 @@ aws_cmd=aws
 bind_spf=
 bind_sub=yes
 bw_active=1
+bw_owner=0
 cert_type=sha1
 collect_noall=1
 collect_interval=60
 combined_cert=2
 disable=web,mysql,postgres
+dns_ip=10.0.2.15
 dns_records=@
 dovecot_ssl=0
 hard_quotas=0
@@ -179,6 +178,7 @@ status=0
 usermin_ssl=0
 virtual_skel=/etc/skel
 webmin_ssl=0
+wizard_run=1
 EOF
     # Extract the key part (before '=') to use as a pattern for sed
     key=$(echo "$line" | cut -d'=' -f1)
@@ -192,6 +192,36 @@ EOF
         echo "$line" >> "$config_file"
     fi
 done
+
+cat <<EOF > /etc/webmin/webmincron/crons/173224301830730.cron
+months=*
+arg0=bw.pl
+active=1
+module=virtual-server
+func=run_cron_script
+days=*
+mins=0
+hours=0,12
+user=root
+id=173224301830730
+weekdays=*
+EOF
+
+cat <<EOF > /etc/webmin/webmincron/crons/1732240335203271.cron
+mins=17
+active=1
+months=*
+days=*
+module=virtual-server
+id=1732240335203271
+func=run_cron_script
+arg0=collectinfo.pl
+weekdays=*
+hours=*
+user=root
+special=
+interval= 
+EOF
 
 cat <<EOF > /etc/webmin/postgresql/config
 login=postgres

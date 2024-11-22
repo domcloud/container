@@ -31,6 +31,7 @@ source "qemu" "rocky_linux" {
   http_directory = "."
   disk_size     = "10240"
   memory        = "2048"
+  cores         = 4
   # cpu_model     = "Haswell-v1" # no KVM
   cpu_model     = "host" # with KVM
   ssh_port =  22
