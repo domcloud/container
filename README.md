@@ -57,7 +57,7 @@ The image consist of [Rocky Linux Minimal ISO](https://rockylinux.org/download) 
 To run the final image using [QEMU](https://www.qemu.org):
 
 ```bash
-qemu-system-x86_64 -hda domcloud-x86_64.qcow2 -smp 2 -m 2048 -net nic -net user,hostfwd=tcp::22-:22,hostfwd=tcp::80-:80,hostfwd=tcp::443-:443,hostfwd=tcp::2443-:2443 -cpu max -accel kvm
+qemu-system-x86_64 -hda domcloud-x86_64.qcow2 -smp 2 -m 2048 -net nic -net user,hostfwd=tcp::2022-:22,hostfwd=tcp::2080-:80,hostfwd=tcp::3443-:443,hostfwd=tcp::2443-:2443 -cpu max -accel kvm
 # Windows: -cpu Broadwell -accel whpx,kernel-irqchip=off
 ```
 

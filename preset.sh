@@ -132,6 +132,7 @@ EOF
 sed -i 's/port=10000/port=2443/g' /etc/webmin/miniserv.conf
 
 cat <<'EOF' | while read -r line; do
+dns_ip=10.0.2.15
 allow_subdoms=0
 auto_letsencrypt=0
 avail_xterm=1
@@ -291,9 +292,9 @@ EOF
 
 
 cat <<'EOF' > /etc/nginx/passenger.conf
-# passenger_root /usr/share/ruby/vendor_ruby/phusion_passenger/locations.ini;
-# passenger_ruby /usr/bin/ruby;
-# passenger_instance_registry_dir /var/run/passenger-instreg;
+passenger_root /usr/local/lib/nginx-builder/passenger;
+passenger_ruby /usr/bin/ruby;
+passenger_instance_registry_dir /var/run/passenger-instreg;
 passenger_python /usr/bin/python3;
 passenger_nodejs /usr/bin/node;
 passenger_friendly_error_pages on;
@@ -516,12 +517,10 @@ ipset create whitelist-v6 hash:ip family inet6
 ipset save whitelist > /etc/ipset
 ipset save whitelist-v6 > /etc/ipset6
 
-sed -i 's/listen-on .*/listen-on port 53 { any; };/g' /etc/named.conf
-sed -i 's/listen-on-v6 .*/listen-on-v6 port 53 { any; };/g' /etc/named.conf
 sed -i '/allow-query/d' /etc/named.conf
 sed -i '/allow-recursive/d' /etc/named.conf
 sed -i 's/recursion no/recursion yes/g' /etc/named.conf
-touch /etc/cloud/cloud-init.disabled
+mkdir -p /etc/cloud && touch /etc/cloud/cloud-init.disabled
 cat <<'EOF' > /etc/resolv.conf
 nameserver 127.0.0.1
 nameserver 1.1.1.1

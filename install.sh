@@ -22,8 +22,8 @@ dnf -y module enable mariadb
 PG=17
 
 # Tools
-dnf -y install btop bzip2 certbot clang cmake gcc-c++ git ncdu htop iftop ipset jq lsof make nano ninja-build ncurses nodejs ruby rsync screen socat strace tar time tmux vim wget whois xz yarn zstd \
-  lib{curl,ffi,sqlite3x,tool-ltdl,md,yaml}-devel {brotli,bzip2,mesa-libGL,nettle,openldap,python,perl,readline,ruby,xmlsec1,xmlsec1-openssl}-devel python3-pip rubygem-{rack,rake} \
+dnf -y install btop bzip2 certbot clang cmake gcc-c++ git ncdu htop iftop ipset jq lsof make nano ninja-build ncurses npm nodejs ruby rsync screen socat strace tar time tmux vim wget whois xz yarn zstd \
+  lib{curl,ffi,sqlite3x,tool-ltdl,md,yaml}-devel {brotli,bzip2,mesa-libGL,nettle,openldap,python,perl,readline,ruby,xmlsec1,xmlsec1-openssl}-devel python3-pip rubygem-{json,rack,rake} \
   libreport-filesystem {langpacks,glibc-langpack}-en perl-{DBD-Pg,DBD-mysql,LWP-Protocol-https,macros,DateTime,Crypt-SSLeay,Text-ASCIITable,IO-Tty,XML-Simple} \
   earlyoom fail2ban-server iptables-services postfix mariadb-server wbm-virtual-server wbm-virtualmin-{nginx,nginx-ssl} virtualmin-config bind sudo \
   openssh-server systemd-container libpq5-$PG*
@@ -34,7 +34,6 @@ git clone https://github.com/domcloud/nginx-builder/ /usr/local/lib/nginx-builde
 cd /usr/local/lib/nginx-builder/
 make install
 ln -s /usr/local/sbin/nginx /usr/sbin/nginx
-cp /usr/local/lib/nginx-builder/passenger/bin/* /usr/local/bin
 
 # PHP
 dnf -y install php{74,83}-php-{bcmath,cli,common,devel,fpm,gd,imap,intl,mbstring,mysqlnd,opcache,pdo,pecl-mongodb,pecl-redis,pecl-zip,pgsql,process,sodium,soap,xml}
