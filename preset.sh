@@ -319,7 +319,6 @@ fastcgi_split_path_info ^(.+\.php)(/.+)$;
 fastcgi_read_timeout 600s;
 EOF
 
-
 cat <<'EOF' > /etc/nginx/passenger.conf
 passenger_root /usr/local/lib/nginx-builder/passenger;
 passenger_ruby /usr/bin/ruby;
@@ -334,6 +333,18 @@ passenger_min_instances 0;
 passenger_max_pool_size 32;
 passenger_pool_idle_time 18000;
 passenger_max_instances_per_app 1;
+EOF
+
+cat <<'EOF' > /etc/nginx/proxy.conf
+proxy_set_header Upgrade           $http_upgrade;
+proxy_set_header Connection        "upgrade";
+proxy_set_header Host              $host;
+proxy_set_header X-Real-IP         $remote_addr;
+proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+proxy_set_header X-Forwarded-Proto $scheme;
+proxy_set_header X-Forwarded-Host  $host;
+proxy_set_header X-Forwarded-Port  $server_port;
+proxy_request_buffering off;
 EOF
 
 cat <<'EOF' > /etc/nginx/finetuning.conf
@@ -363,6 +374,7 @@ ssl_protocols TLSv1.2 TLSv1.3;
 server_tokens off;
 merge_slashes off;
 msie_padding off;
+quic_gso on;
 ssl_prefer_server_ciphers on;
 ssl_session_cache shared:SSL:16m;
 ssl_session_timeout 1h;
@@ -389,6 +401,7 @@ http {
     include /etc/nginx/mime.types;
     include /etc/nginx/finetuning.conf;
     include /etc/nginx/fastcgi.conf;
+    include /etc/nginx/proxy.conf;
     include /etc/nginx/passenger.conf;
     default_type application/octet-stream;
     map $sent_http_content_type $expires {
