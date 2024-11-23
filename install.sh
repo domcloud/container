@@ -6,7 +6,7 @@ export TERM=xterm-256color
 # Repos
 dnf -y install epel-release http://rpms.remirepo.net/enterprise/remi-release-9.rpm && dnf config-manager --enable crb
 dnf -y install https://download.postgresql.org/pub/repos/yum/reporpms/EL-9-$(uname -m)/pgdg-redhat-repo-latest.noarch.rpm
-curl -fsSL https://software.virtualmin.com/gpl/scripts/virtualmin-install.sh | sh -s -- --setup
+curl -fsSL https://software.virtualmin.com/gpl/scripts/virtualmin-install.sh | sh -s -- --setup --verbose
 curl --silent --location https://dl.yarnpkg.com/rpm/yarn.repo > /etc/yum.repos.d/yarn.repo
 dnf config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
 dnf config-manager --disable virtualmin pgdg{16,15,14,13,12}
@@ -23,7 +23,7 @@ PG=17
 
 # Tools
 dnf -y install awscli btop bzip2 certbot clang cmake gcc-c++ git ncdu htop iftop ipset jq lsof make nano ninja-build ncurses npm nodejs ruby rsync screen socat strace tar time tmux vim wget whois xz yarn zstd \
-  lib{curl,ffi,sqlite3x,tool-ltdl,md,yaml}-devel {brotli,bzip2,mesa-libGL,nettle,openldap,python,perl,readline,ruby,xmlsec1,xmlsec1-openssl}-devel python3-pip rubygem-{json,rack,rake} \
+  lib{curl,ffi,sqlite3x,tool-ltdl,md,yaml}-devel {brotli,bzip2,mesa-libGL,nettle,openldap,pcre2,perl,python,readline,ruby,xmlsec1,xmlsec1-openssl}-devel python3-pip rubygem-{json,rack,rake} \
   libreport-filesystem {langpacks,glibc-langpack}-en perl-{DBD-Pg,DBD-mysql,LWP-Protocol-https,macros,DateTime,Crypt-SSLeay,Text-ASCIITable,IO-Tty,XML-Simple} \
   earlyoom fail2ban-server iptables-services postfix mariadb-server wbm-virtual-server wbm-virtualmin-{nginx,nginx-ssl} virtualmin-config bind sudo \
   openssh-server systemd-container libpq5-$PG*

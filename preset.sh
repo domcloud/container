@@ -356,7 +356,7 @@ limit_req_zone $server_name zone=basic_limit:50m rate=100r/s;
 gzip_types application/atom+xml application/javascript application/json application/rss+xml
            application/vnd.ms-fontobject application/x-font-opentype application/x-font-ttf
            image/svg+xml image/x-icon image/x-ms-bmp text/css text/plain text/xml;
-gzip_min_length 1000;
+gzip_min_length 256;
 gzip_comp_level 3;
 gzip on;
 sendfile on;
@@ -375,6 +375,7 @@ server_tokens off;
 merge_slashes off;
 msie_padding off;
 quic_gso on;
+quic_retry on;
 ssl_prefer_server_ciphers on;
 ssl_session_cache shared:SSL:16m;
 ssl_session_timeout 1h;
@@ -688,6 +689,7 @@ echo "wizard_run=1" >> /etc/webmin/virtual-server/config
 
 # Sanity check
 cat /etc/passwd
+df -h
 
 sync
 
