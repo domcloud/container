@@ -31,7 +31,6 @@ source "qemu" "rocky_linux" {
   http_directory = "."
   disk_size     = "40960"
   memory        = "2048"
-  cores         = 4
   cpu_model     = "host"
   qemuargs = [
     ["-display", var.display],
