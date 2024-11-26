@@ -19,7 +19,7 @@ variable "display" {
 
 variable "output_directory" {
   type    = string
-  default = "./output/image-aarch64"
+  default = "./output/image-arm64"
 }
 
 # Define the source image builder - for QEMU

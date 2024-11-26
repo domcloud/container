@@ -31,13 +31,15 @@ Here's feature comparison:
 
 ## Built Images
 
-The most recent one built on 2024-09-26:
+The most recent one built on 2024-11-25:
 
-+ [domcloud-x86_64.qcow2](https://domcloud-images.fra1.cdn.digitaloceanspaces.com/2409/domcloud-x86_64.qcow2) 4.41 GB
-+ [domcloud-x86_64.vmdx](https://domcloud-images.fra1.cdn.digitaloceanspaces.com/2409/domcloud-x86_64.vmdx) 2.84 GB
-+ [checksum](https://domcloud-images.fra1.cdn.digitaloceanspaces.com/2409/checksums.txt)
++ [domcloud-x86_64.qcow2](https://domcloud-images.fra1.cdn.digitaloceanspaces.com/2411/domcloud-x86_64.qcow2) 4.3 GB
++ [domcloud-x86_64.vmdk](https://domcloud-images.fra1.cdn.digitaloceanspaces.com/2411/domcloud-x86_64.vmdk) 2.6 GB
++ [domcloud-aarch64.qcow2](https://domcloud-images.fra1.cdn.digitaloceanspaces.com/2411/domcloud-aarch64.qcow2) 4.2 GB
++ [domcloud-aarch64.vmdk](https://domcloud-images.fra1.cdn.digitaloceanspaces.com/2411/domcloud-aarch64.vmdk) 2.9 GB
++ [checksum](https://domcloud-images.fra1.cdn.digitaloceanspaces.com/2411/checksums.txt)
 
-Select based on Virtualization platform e.g. Proxmox and QEMU uses `QCOW2` while VMWare and VirtualBox uses `VMDK`. `aarch64` builds is not available yet, you can simply the scripts we mention below. 
+Select based on Virtualization platform e.g. Proxmox and QEMU uses `QCOW2` while VMWare and VirtualBox uses `VMDK`.
 
 If you don't want to download our custom prebuilt images, you can run these from freshly installed [Rocky Linux Minimal ISO](https://rockylinux.org/download) instead:
 
