@@ -1,3 +1,6 @@
+#!/bin/bash
+set -e
+cd /root
 
 # Contents
 wget -O /usr/local/bin/restart https://raw.githubusercontent.com/domcloud/bridge/main/userkill.sh && chmod 755 /usr/local/bin/restart
@@ -635,9 +638,12 @@ EOF
 systemctl daemon-reload
 systemctl enable bridge --now
 
-sleep 3
+while ! curl -sS http://localhost:2223/status/about; do
+    sleep 1
+done
+echo ""
 
-curl -X POST \
+curl -sSX POST \
   'http://localhost:2223/nginx/?domain=localhost' \
   --header 'Accept: */*' \
   --header 'User-Agent: DOM Cloud' \

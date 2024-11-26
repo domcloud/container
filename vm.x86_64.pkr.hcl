@@ -32,8 +32,7 @@ source "qemu" "rocky_linux" {
   disk_size     = "40960"
   memory        = "2048"
   cores         = 4
-  # cpu_model     = "Haswell-v1" # no KVM
-  cpu_model     = "host" # with KVM
+  cpu_model     = "host" # if no KVM use "Haswell-v1"
   ssh_port =  22
   boot_wait = "1s"
   ssh_password = "rocky"
@@ -43,12 +42,13 @@ source "qemu" "rocky_linux" {
   shutdown_command = "/sbin/halt -h -p"
   qemuargs = [
     ["-display", var.display], # "gtk" or "none"
-    # ["-machine", "type=q35"], # if no KVM
-    ["-machine", "type=pc,accel=kvm"],
+    ["-machine", "type=pc,accel=kvm"], # "type=q35" if no KVM
   ]
   boot_command = [
-    "<tab><bs><bs><bs><bs><bs>inst.text inst.ks=http://{{ .HTTPIP }}:{{ .HTTPPort }}/http/ks.cfg<enter><wait>"
-  ] 
+    "<tab><bs><bs><bs><bs><bs>inst.text",
+    " inst.ks=http://{{ .HTTPIP }}:{{ .HTTPPort }}/http/ks.cfg",
+    "<enter><wait>"
+  ]
 }
 
 # Provision with an external shell script

@@ -19,7 +19,7 @@ variable "display" {
 
 variable "output_directory" {
   type    = string
-  default = "./output/image-aarch64"
+  default = "./output/image-arm64"
 }
 
 # Define the source image builder - for QEMU
@@ -29,14 +29,14 @@ source "qemu" "rocky_linux" {
   qemu_binary   = "qemu-system-aarch64"
   output_directory = var.output_directory
   http_directory = "."
+  cores         = 4
   disk_size     = "40960"
   memory        = "2048"
-  cores         = 4
   cpu_model     = "host"
   qemuargs = [
     ["-display", var.display],
-    ["-machine", "type=virt,accel=kvm,highmem=off"],
-    ["-bios", "/usr/share/AAVMF/AAVMF_CODE.fd"],
+    ["-machine", "type=virt,accel=hvf,highmem=off"],
+    ["-bios", "/opt/homebrew/share/qemu/edk2-aarch64-code.fd"],
     [ "-device", "ramfb" ],
     [ "-device", "qemu-xhci" ],
     [ "-device", "usb-kbd" ],
