@@ -94,6 +94,13 @@ cat <<'EOF' > /etc/systemd/system/ip6tables.service.d/override.conf
 [Service]
 ExecStartPre=sh -c "ipset restore -! < /etc/ipset6"
 EOF
+mkdir -p /etc/systemd/system/user.slice.d
+cat <<'EOF' > /etc/systemd/system/user.slice.d/50-cpu-limit.conf
+[Slice]
+CPUAccounting=yes
+CPUQuota=70%
+EOF
+
 
 # DB
 cat <<'EOF' > /etc/my.cnf.d/mariadb-server.cnf
