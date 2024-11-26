@@ -29,6 +29,7 @@ source "qemu" "rocky_linux" {
   qemu_binary   = "qemu-system-aarch64"
   output_directory = var.output_directory
   http_directory = "."
+  cores         = 4
   disk_size     = "40960"
   memory        = "2048"
   cpu_model     = "host"
@@ -50,11 +51,9 @@ source "qemu" "rocky_linux" {
   shutdown_command = "/sbin/halt -h -p"
   boot_wait = "7s"
   boot_command = [
-    "e",              # Press 'e' to edit the default boot entry
-    "<down><down>",   # Navigate down to the kernel line (adjust the number of <down> presses as needed)
-    "<end>",          # Move to the end of the line
-    " inst.text inst.ks=http://{{ .HTTPIP }}:{{ .HTTPPort }}/http/ks.cfg",  # Append the installation parameters
-    "<f10>"        # Boot with the modified parameters
+    "<up>e<down><down><end>",
+    " inst.text inst.ks=http://{{ .HTTPIP }}:{{ .HTTPPort }}/http/ks.cfg",
+    "<f10>"
   ]
 }
 

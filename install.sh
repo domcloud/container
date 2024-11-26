@@ -70,11 +70,13 @@ PATHMAN=pathman-v0.6.0-linux-$( [ "$(uname -m)" = "aarch64" ] && echo "arm64" ||
 wget -O pathman.tar.gz https://github.com/therootcompany/pathman/releases/download/v0.6.0/$PATHMAN.tar.gz
 tar -xf pathman.tar.gz && mv $PATHMAN /usr/local/bin/pathman && rm -f pathman.tar.gz
 # NVIM + NvChad Support
+NVIM_V=0.10.2
 if [ "$(uname -m)" = "x86_64" ]; then
-  curl -LO https://github.com/neovim/neovim/releases/download/v0.10.2/nvim-linux64.tar.gz
+  curl -LO https://github.com/neovim/neovim/releases/download/v$NVIM_V/nvim-linux64.tar.gz
   tar -xzf nvim-linux64.tar.gz && chown -R root:root nvim-linux64 && rsync -a nvim-linux64/ /usr/local/ && rm -rf nvim-linux64*
 else
-  git clone https://github.com/neovim/neovim -b release-0.10 --filter=blob:none
+  curl -LO https://github.com/neovim/neovim/archive/refs/tags/v$NVIM_V.tar.gz
+  tar -xzf v$NVIM_V.tar.gz && mv neovim-$NVIM_V neovim && rm -f v$NVIM_V.tar.gz
   cd neovim && make CMAKE_BUILD_TYPE=Release && make install && cd .. && rm -rf neovim
 fi
 dnf -y copr enable atim/lazygit && dnf -y install ripgrep lazygit

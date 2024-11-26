@@ -35,8 +35,8 @@ source "qemu" "rocky_linux" {
   cpu_model     = "host"
   qemuargs = [
     ["-display", var.display],
-    ["-machine", "type=virt,accel=hvf,highmem=off"],
-    ["-bios", "/opt/homebrew/share/qemu/edk2-aarch64-code.fd"],
+    ["-machine", "type=virt,accel=kvm,highmem=off"],
+    ["-bios", "/usr/share/AAVMF/AAVMF_CODE.fd"],
     [ "-device", "ramfb" ],
     [ "-device", "qemu-xhci" ],
     [ "-device", "usb-kbd" ],
@@ -51,11 +51,9 @@ source "qemu" "rocky_linux" {
   shutdown_command = "/sbin/halt -h -p"
   boot_wait = "7s"
   boot_command = [
-    "e",              # Press 'e' to edit the default boot entry
-    "<down><down>",   # Navigate down to the kernel line (adjust the number of <down> presses as needed)
-    "<end>",          # Move to the end of the line
-    " inst.text inst.ks=http://{{ .HTTPIP }}:{{ .HTTPPort }}/http/ks.cfg",  # Append the installation parameters
-    "<f10>"        # Boot with the modified parameters
+    "<up>e<down><down><end>",
+    " inst.text inst.ks=http://{{ .HTTPIP }}:{{ .HTTPPort }}/http/ks.cfg",
+    "<f10>"
   ]
 }
 
