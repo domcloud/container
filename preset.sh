@@ -489,6 +489,7 @@ cat <<'EOF' > /etc/fail2ban/jail.local
 [DEFAULT]
 maxretry = 10
 bantime = 86400 ; 24h
+ignoreip = 127.0.0.1/8 ::1
 
 [sshd]
 enabled = true
