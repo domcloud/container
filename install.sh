@@ -41,7 +41,7 @@ find /etc/opt/remi/ -type f -name www.conf -print0 | xargs -0 sed -i 's/pm = dyn
 
 # Postgres
 dnf -y install postgresql$PG-{server,contrib}
-for bin in "psql" "pg_dump" "pg_dumpall" "pg_restore" "pg_config"; do
+for bin in "psql" "pg_ctl" "pg_dump" "pg_dumpall" "pg_restore" "pg_config" "pg_isready" "postgres"; do
     alternatives --install /usr/bin/$bin "pgsql-$bin" "/usr/pgsql-$PG/bin/$bin" ${PG}00
 done
 
