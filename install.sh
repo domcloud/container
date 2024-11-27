@@ -40,13 +40,13 @@ find /etc/opt/remi/ -maxdepth 1 -name 'php*' -exec sed -i "s/upload_max_filesize
 find /etc/opt/remi/ -type f -name www.conf -print0 | xargs -0 sed -i 's/pm = dynamic/pm = ondemand/g'
 
 # Postgres
-dnf -y install postgresql$PG-{server,contrib,devel}
+dnf -y install postgresql$PG-{server,contrib}
 for bin in "psql" "pg_dump" "pg_dumpall" "pg_restore" "pg_config"; do
     alternatives --install /usr/bin/$bin "pgsql-$bin" "/usr/pgsql-$PG/bin/$bin" ${PG}00
 done
 
-# Not everyone needs this
-# dnf -y install {postgis34,pgrouting,pgvector,pg_uuidv7,timescaledb}_$PG
+# Not everyone needs this. Also, postgresql-devel install would also install clang n gcc toolset
+# dnf -y install {postgis34,pgrouting,pgvector,pg_uuidv7,timescaledb}_$PG postgresql$PG-devel
 # for ext in "postgis" "postgis_raster" "postgis_sfcgal" "postgis_tiger_geocoders" "postgis_topology" "earthdistance" "address_standardizer" "address_standardizer_data_us" "pgrouting" "pg_uuidv7" "vector"; do
 #   echo "trusted = true" >> "/usr/pgsql-$PG/share/extension/$ext.control"
 # done
@@ -86,7 +86,7 @@ RDFIND=rdfind-1.6.0
 wget https://rdfind.pauldreik.se/$RDFIND.tar.gz
 tar -xf $RDFIND.tar.gz ; cd $RDFIND
 ./configure --disable-debug ; make install
-cd .. ; rm -f $RDFIND*
+cd .. ; rm -rf $RDFIND*
 # Misc
 pip3 install pipenv
 dnf -y mark install ipset

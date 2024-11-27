@@ -98,11 +98,7 @@ cat <<'EOF' > /etc/systemd/system/ip6tables.service.d/override.conf
 ExecStartPre=sh -c "ipset restore -! < /etc/ipset6"
 EOF
 mkdir -p /etc/systemd/system/user.slice.d
-cat <<'EOF' > /etc/systemd/system/user.slice.d/50-cpu-limit.conf
-[Slice]
-CPUAccounting=yes
-CPUQuota=70%
-EOF
+echo -e "[Slice]\nCPUAccounting=yes\nCPUQuota=$(( $(nproc) * 70 ))%" > /etc/systemd/system/user.slice.d/50-cpu-limit.conf
 
 
 # DB
