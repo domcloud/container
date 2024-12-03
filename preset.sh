@@ -51,6 +51,17 @@ EOF
     fi
 done
 
+cat <<'EOF' > /etc/sudo_banner
+***********************************************
+Sorry!  You can't have root access!  Read more:
+https://domcloud.co/docs/intro/security#no-sudo
+***********************************************
+EOF
+cat <<'EOF' | EDITOR='tee' visudo /etc/sudoers.d/banner
+Defaults        lecture_file = /etc/sudo_banner
+Defaults        lecture = always
+EOF
+
 # SystemD
 cat <<'EOF' > /usr/lib/systemd/system/nginx.service
 [Unit]
