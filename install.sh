@@ -46,7 +46,7 @@ for bin in "psql" "pg_ctl" "pg_dump" "pg_dumpall" "pg_restore" "pg_config" "pg_i
 done
 
 # Not everyone needs this. Also, postgresql-devel install would also install clang n gcc toolset
-# dnf -y install {postgis34,pgrouting,pgvector,pg_uuidv7,timescaledb}_$PG postgresql$PG-devel
+# dnf -y install {postgis35,pgrouting,pgvector,pg_uuidv7,timescaledb}_$PG postgresql$PG-devel
 # for ext in "postgis" "postgis_raster" "postgis_sfcgal" "postgis_tiger_geocoders" "postgis_topology" "earthdistance" "address_standardizer" "address_standardizer_data_us" "pgrouting" "pg_uuidv7" "vector"; do
 #   echo "trusted = true" >> "/usr/pgsql-$PG/share/extension/$ext.control"
 # done
