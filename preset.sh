@@ -577,7 +577,7 @@ EOF
 
 cat <<'EOF' > /var/spool/cron/root
 # Entry commented are safeguards implemented in DOM Cloud. You might not need them
-# 0 * * * * find '/var/spool/cron/' -not -name root -type f | xargs sed -i '/^\s*(\*|\d+,)/d'
+# 0 * * * * find '/var/spool/cron/' -not -name root -type f | xargs sed -ri '/^\s*(\*|[0-9]*,)/d'
 # */5 * * * * /usr/bin/node /home/bridge/public_html/sudokill.js -i bridge,do-agent,dbus,earlyoom,mysql,named,nobody,postgres,polkitd,rpc
 
 */5 * * * * /usr/local/lib/nginx-builder/cleanup.sh
