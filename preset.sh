@@ -224,8 +224,6 @@ arg0=collectinfo.pl
 weekdays=*
 hours=*
 user=root
-special=
-interval= 
 EOF
 
 cat <<EOF > /etc/webmin/postgresql/config
@@ -640,60 +638,65 @@ done
 echo ""
 
 curl -sSX POST \
-  'http://localhost:2223/nginx/?domain=localhost' \
+  'http://localhost:2223/runner/?domain=localhost' \
   --header 'Accept: */*' \
   --header 'User-Agent: DOM Cloud' \
   --header 'Authorization: Bearer rocky' \
   --header 'Content-Type: application/json' \
   --data-raw '{
-  "locations": [
-    {
+  "nginx": {
+    "locations": [
+      {
+        "fastcgi": "on",
+        "root": "public_html/",
+        "passenger": {
+          "enabled": "off"
+        },
+        "match": "/phpmyadmin/"
+      },
+      {
+        "fastcgi": "on",
+        "root": "public_html/",
+        "passenger": {
+          "enabled": "off"
+        },
+        "match": "/phppgadmin/"
+      },
+      {
+        "root": "public_html/webssh/webssh/static",
+        "passenger": {
+          "app_root": "public_html/webssh",
+          "enabled": "on",
+          "app_start_command": "python run.py --port=$PORT",
+          "document_root": "public_html/webssh/webssh/static"
+        },
+        "rewrite": "^/webssh/(.*)$ /$1 break",
+        "match": "/webssh/"
+      },
+      {
+        "root": "public_html/webssh2/app/client/public",
+        "passenger": {
+          "app_root": "public_html/webssh2/app",
+          "app_start_command": "env PORT=$PORT node app.js",
+          "enabled": "on",
+          "document_root": "public_html/webssh2/app/client/public"
+        },
+        "match": "/ssh/"
+      },
+      {
+        "match": "^~ /.well-known/",
+        "try_files": "$uri $uri/ =404"
+      },
+      {
+        "match": "/",
+        "proxy_pass": "http://127.0.0.1:2223"
+      }],
       "fastcgi": "on",
-      "root": "public_html/",
-      "passenger": {
-        "enabled": "off"
-      },
-      "match": "/phpmyadmin/"
-    },
-    {
-      "fastcgi": "on",
-      "root": "public_html/",
-      "passenger": {
-        "enabled": "off"
-      },
-      "match": "/phppgadmin/"
-    },
-    {
-      "root": "public_html/webssh/webssh/static",
-      "passenger": {
-        "app_root": "public_html/webssh",
-        "enabled": "on",
-        "app_start_command": "python run.py --port=$PORT",
-        "document_root": "public_html/webssh/webssh/static"
-      },
-      "rewrite": "^/webssh/(.*)$ /$1 break",
-      "match": "/webssh/"
-    },
-    {
-      "root": "public_html/webssh2/app/client/public",
-      "passenger": {
-        "app_root": "public_html/webssh2/app",
-        "app_start_command": "env PORT=$PORT node app.js",
-        "enabled": "on",
-        "document_root": "public_html/webssh2/app/client/public"
-      },
-      "match": "/ssh/"
-    },
-    {
-      "match": "/",
-      "proxy_pass": "http://127.0.0.1:2223"
+      "index": "index.html index.php",
+      "root": "public_html/public",
+      "ssl": "on"
     }
-  ],
-  "fastcgi": "on",
-  "index": "index.html index.php",
-  "root": "public_html/public",
-  "ssl": "on"
-}'
+  }'
 
 echo "wizard_run=1" >> /etc/webmin/virtual-server/config
 
