@@ -62,6 +62,9 @@ Defaults        lecture_file = /etc/sudo_banner
 Defaults        lecture = always
 EOF
 
+# NTP
+timedatectl set-local-rtc 0
+
 # SystemD
 cat <<'EOF' > /usr/lib/systemd/system/nginx.service
 [Unit]
@@ -542,10 +545,8 @@ cat <<'EOF' > /etc/sysconfig/iptables
 -A FORWARD -j REJECT --reject-with icmp-host-prohibited
 -A OUTPUT -o lo -j ACCEPT
 -A OUTPUT -m conntrack --ctstate ESTABLISHED -j ACCEPT
--A OUTPUT -p tcp -m multiport --dports 22,53 -j ACCEPT
--A OUTPUT -p udp -m multiport --dports 67,68 -j ACCEPT
--A OUTPUT -p tcp -m multiport --ports 53 -j ACCEPT
--A OUTPUT -p udp -m multiport --ports 53 -j ACCEPT
+-A OUTPUT -p tcp -m multiport --ports 22,53 -j ACCEPT
+-A OUTPUT -p udp -m multiport --ports 53,67,68 -j ACCEPT
 -A OUTPUT -p tcp -m tcp --dport 25 -j REJECT
 -A OUTPUT -m set --match-set whitelist dst -j ACCEPT
 COMMIT
@@ -567,10 +568,8 @@ cat <<'EOF' > /etc/sysconfig/ip6tables
 -A FORWARD -j REJECT --reject-with icmp6-adm-prohibited
 -A OUTPUT -o lo -j ACCEPT
 -A OUTPUT -m conntrack --ctstate ESTABLISHED -j ACCEPT
--A OUTPUT -p tcp -m multiport --dports 22,53 -j ACCEPT
--A OUTPUT -p udp -m multiport --dports 546,547 -j ACCEPT
--A OUTPUT -p tcp -m multiport --ports 53 -j ACCEPT
--A OUTPUT -p udp -m multiport --ports 53 -j ACCEPT
+-A OUTPUT -p tcp -m multiport --ports 22,53 -j ACCEPT
+-A OUTPUT -p udp -m multiport --ports 53,546,547 -j ACCEPT
 -A OUTPUT -p tcp -m tcp --dport 25 -j REJECT
 -A OUTPUT -m set --match-set whitelist-v6 dst -j ACCEPT
 COMMIT
