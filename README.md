@@ -31,12 +31,12 @@ Here's feature comparison:
 
 ## Built Images
 
-The most recent one built on 2024-11-25:
+The most recent one built on 2024-12-06:
 
-+ [domcloud-x86_64.qcow2](https://domcloud-images.fra1.cdn.digitaloceanspaces.com/2411/domcloud-x86_64.qcow2) 4.3 GB
-+ [domcloud-x86_64.vmdk](https://domcloud-images.fra1.cdn.digitaloceanspaces.com/2411/domcloud-x86_64.vmdk) 2.6 GB
-+ [domcloud-aarch64.qcow2](https://domcloud-images.fra1.cdn.digitaloceanspaces.com/2411/domcloud-aarch64.qcow2) 4.2 GB
-+ [domcloud-aarch64.vmdk](https://domcloud-images.fra1.cdn.digitaloceanspaces.com/2411/domcloud-aarch64.vmdk) 2.9 GB
++ [domcloud-x86_64.qcow2](https://domcloud-images.fra1.cdn.digitaloceanspaces.com/2412/domcloud-x86_64.qcow2) 4.5 GB
++ [domcloud-x86_64.vmdk](https://domcloud-images.fra1.cdn.digitaloceanspaces.com/2412/domcloud-x86_64.vmdk) 2.6 GB
++ [domcloud-aarch64.qcow2](https://domcloud-images.fra1.cdn.digitaloceanspaces.com/2412/domcloud-aarch64.qcow2) 4.3 GB
++ [domcloud-aarch64.vmdk](https://domcloud-images.fra1.cdn.digitaloceanspaces.com/2412/domcloud-aarch64.vmdk) 2.5 GB
 + [checksum](https://domcloud-images.fra1.cdn.digitaloceanspaces.com/2411/checksums.txt)
 
 Select based on Virtualization platform e.g. Proxmox and QEMU uses `QCOW2` while VMWare and VirtualBox uses `VMDK`.
