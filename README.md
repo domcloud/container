@@ -111,6 +111,7 @@ The VM is built with QEMU. The networking IP addresses definitely changed and yo
 1. Identify your IP addresses, run `nmcli dev show ens3` or `ip addr show scope global` in terminal.
 2. Go to `Virtualmin` -> `Addresses and Networking` -> `Change IP Addresses`
 3. Enter old IP `10.0.2.15` and new IP. Click `Change Now`.
+4. Also Update DNS default IP address by go to `Virtualmin Configuration` -> `Networking Settings` -> Default IP Address for DNS records.
 
 ### Rename Bridge's `localhost` domain
 
