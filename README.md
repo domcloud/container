@@ -124,6 +124,38 @@ virtualmin change-domain --username bridge --new-domain mynewdomain.com
 
 Run `yum update --nobest`.
 
+### Expand Disk
+
+The disk is prebuilt with capped at 40 GB. Here's how it layouted.
+
+```
+# lsblk
+NAME               MAJ:MIN RM  SIZE RO TYPE MOUNTPOINTS
+sr0                 11:0    1 1024M  0 rom
+vda                252:0    0  256G  0 disk
+├─vda1             252:1    0    1G  0 part /boot
+└─vda2             252:2    0   39G  0 part
+  ├─rl_rocky9-root 253:0    0 36.9G  0 lvm  /
+  └─rl_rocky9-swap 253:1    0    2G  0 lvm  [SWAP]
+```
+
+The `vda` is the real disk provisioned by the system. To extend the `vda2`: 
+
+2. Open `parted /dev/vda`
+    + `resizepart`
+    + Select 2 `vda2`
+    + Enter the new size `100%`
+3. `partprobe`
+4. `pvresize /dev/vda2`
+5. Resize swap
+    + Turn off the swap `swapoff /dev/mapper/rl_rocky9-swap`
+    + Extend it (say 8GB) `lvresize -L 8G /dev/rl_rocky9/swap`
+    + `mkswap /dev/rl_rocky9/swap`
+    + `swapon /dev/rl_rocky9/swap`
+6. Resize main disk
+    + `lvresize -l +100%FREE /dev/rl_rocky9/root`
+    + `xfs_growfs /`
+
 ## Connect to DOM Cloud
 
 Goto `Servers` section in [DOM Cloud Portal Dashboard](https://my.domcloud.co) to connect to our cloud portal.

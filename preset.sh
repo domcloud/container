@@ -228,20 +228,6 @@ id=173224301830730
 weekdays=*
 EOF
 
-cat <<EOF > /etc/webmin/webmincron/crons/1732240335203271.cron
-mins=17
-active=1
-months=*
-days=*
-module=virtual-server
-id=1732240335203271
-func=run_cron_script
-arg0=collectinfo.pl
-weekdays=*
-hours=*
-user=root
-EOF
-
 cat <<EOF > /etc/webmin/postgresql/config
 login=postgres
 repository=/home/db_repository
