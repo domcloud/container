@@ -172,6 +172,7 @@ dns_ip=10.0.2.15
 dns_records=@
 dovecot_ssl=0
 hard_quotas=0
+hashpass=0
 hide_pro_tips=1
 html_perms=0750
 jail_age=
@@ -188,7 +189,7 @@ mysql_mkdb=0
 mysql_ssl=0
 mysql_suffix=${USER}_
 nolink_certs=2
-passwd_mode=0
+passwd_mode=1
 php_fpm=pm = ondemand	pm.max_children = 8	pm.process_idle_timeout = 18000s
 php_log=1
 php_noedit=0
