@@ -111,9 +111,12 @@ cat <<'EOF' > /etc/systemd/system/ip6tables.service.d/override.conf
 [Service]
 ExecStartPre=sh -c "ipset restore -! < /etc/ipset6"
 EOF
-mkdir -p /etc/systemd/system/user.slice.d
-echo -e "[Slice]\nCPUAccounting=yes\nCPUQuota=$(( $(nproc) * 70 ))%" > /etc/systemd/system/user.slice.d/50-cpu-limit.conf
-
+SLICEDIR=/etc/systemd/system/user.slice.d; mkdir -p $SLICEDIR
+# You may want to set limit
+# CPULIMIT=$(echo $(( $(nproc) * 70 ))%)
+# MEMLIMIT=$(echo $(( $(grep MemTotal /proc/meminfo | awk '{print $2}') * 80 / 100 / 1024 ))M)
+echo -e "[Slice]\nCPUAccounting=yes\nCPUQuota=$CPULIMIT" > $SLICEDIR/50-cpu-limit.conf
+echo -e "[Slice]\nMemoryAccounting=yes\nMemoryMax=$MEMLIMIT\nMemorySwapMax=0" > $SLICEDIR/50-mem-limit.conf
 
 # DB
 cat <<'EOF' > /etc/my.cnf.d/mariadb-server.cnf
