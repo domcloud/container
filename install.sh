@@ -33,8 +33,8 @@ cd /usr/local/lib/nginx-builder/ && make install && make clean && cd /root
 ln -s /usr/local/sbin/nginx /usr/sbin/nginx
 
 # PHP
-dnf -y install php{74,83}-php-{bcmath,cli,common,devel,fpm,gd,imap,intl,mbstring,mysqlnd,opcache,pdo,pecl-mongodb,pecl-redis,pecl-zip,pgsql,process,sodium,soap,xml}
-dnf -y remove php-* && ln -s `which php83` /usr/bin/php || true
+dnf -y install php{74,84}-php-{bcmath,cli,common,devel,fpm,gd,imap,intl,mbstring,mysqlnd,opcache,pdo,pecl-mongodb,pecl-redis,pecl-zip,pgsql,process,sodium,soap,xml}
+dnf -y remove php-* && ln -s `which php84` /usr/bin/php || true
 curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 find /etc/opt/remi/ -maxdepth 1 -name 'php*' -exec sed -i "s/upload_max_filesize = 2M/upload_max_filesize = 512M/g" {}/php.ini \; -exec sed -i "s/post_max_size = 8M/post_max_size = 512M/g" {}/php.ini \; 
 find /etc/opt/remi/ -type f -name www.conf -print0 | xargs -0 sed -i 's/pm = dynamic/pm = ondemand/g'
@@ -92,7 +92,7 @@ pip3 install pipenv
 dnf -y mark install ipset
 dnf -y remove lynx gcc-toolset-13-* nodejs-docs clang flatpak open-sans-fonts rubygem-rdoc gl-manpages
 ln -s /usr/lib/systemd/system/postgresql-$PG.service /usr/lib/systemd/system/postgresql.service
-systemctl enable webmin mariadb postgresql-$PG {ip,ip6}tables fail2ban named php{74,83}-php-fpm earlyoom
+systemctl enable webmin mariadb postgresql-$PG {ip,ip6}tables fail2ban named php{74,84}-php-fpm earlyoom
 chmod +x /usr/local/bin/* && chown root:root /usr/local/bin/*
 
 # Cleanup
