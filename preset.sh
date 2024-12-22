@@ -94,7 +94,8 @@ root             soft    nofile          65535
 @nginx           hard    nproc           64
 @nginx           hard    priority        5
 EOF
-mkdir -p /etc/systemd/system/{nginx,earlyoom,iptables,ip6tables}.service.d
+PG=17
+mkdir -p /etc/systemd/system/{nginx,earlyoom,iptables,ip6tables,mariadb,postgresql-$PG}.service.d
 cat <<'EOF' > /etc/systemd/system/nginx.service.d/override.conf
 [Service]
 LimitNOFILE=65535
@@ -110,6 +111,14 @@ EOF
 cat <<'EOF' > /etc/systemd/system/ip6tables.service.d/override.conf
 [Service]
 ExecStartPre=sh -c "ipset restore -! < /etc/ipset6"
+EOF
+cat <<'EOF' > /etc/systemd/system/mariadb.service.d/override.conf
+[Service]
+Restart=on-failure
+EOF
+cat <<'EOF' > /etc/systemd/system/postgresql-$PG.service.d/override.conf
+[Service]
+Restart=on-failure
 EOF
 SLICEDIR=/etc/systemd/system/user.slice.d; mkdir -p $SLICEDIR
 # You may want to set limit
@@ -139,7 +148,6 @@ max_connections = 4096
 EOF
 systemctl start mariadb # init db
 
-PG=17
 PGDATA=/var/lib/pgsql/$PG/data
 sudo -u postgres /usr/pgsql-$PG/bin/initdb -D $PGDATA
 sed -i "s/#listen_addresses = .*/listen_addresses = '*'/g" $PGDATA/postgresql.conf
