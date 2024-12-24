@@ -34,6 +34,8 @@ ln -s /usr/local/sbin/nginx /usr/sbin/nginx
 
 # PHP
 dnf -y install php{74,84}-php-{bcmath,cli,common,devel,fpm,gd,imap,intl,mbstring,mysqlnd,opcache,pdo,pecl-mongodb,pecl-redis,pecl-zip,pgsql,process,sodium,soap,xml}
+# curl https://packages.microsoft.com/config/rhel/9/prod.repo | tee /etc/yum.repos.d/mssql-release.repo
+# dnf -y install php74-php-ioncube-loader php{74,81,82,83,84}-php-{pecl-imagick-im7,sqlsrv} msodbcsql17 # optional, installed in cloud
 dnf -y remove php-* && ln -s `which php84` /usr/bin/php || true
 curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 find /etc/opt/remi/ -maxdepth 1 -name 'php*' -exec sed -i "s/upload_max_filesize = 2M/upload_max_filesize = 512M/g" {}/php.ini \; -exec sed -i "s/post_max_size = 8M/post_max_size = 512M/g" {}/php.ini \; 
