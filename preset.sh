@@ -158,6 +158,22 @@ host    all             all             0.0.0.0/0               md5
 host    all             all             ::/0                    md5
 EOF
 
+# valkey
+VALKEY=/etc/valkey
+cp $VALKEY/valkey.conf $VALKEY/valkey.conf.default
+sed -i "s/# aclfile /aclfile /g" $VALKEY/valkey.conf
+sed -i "s/# maxmemory <bytes>/maxmemory 256mb/g" $VALKEY/valkey.conf
+sed -i "s/# maxmemory-policy noeviction/maxmemory-policy allkeys-lru/g" $VALKEY/valkey.conf
+sed -i "s/# maxmemory-samples 5/maxmemory-samples 3/g" $VALKEY/valkey.conf
+cat <<'EOF' > $VALKEY/users.acl
+user default on nopass sanitize-payload &* -@all +@connection
+user root on >rocky &* +@all
+EOF
+touch $VALKEY/usermap.acl
+echo "-@all +@connection +@read +@write +@keyspace -KEYS +@transaction +@geo +@hash +@set +@sortedset +@bitmap +@pubsub" $VALKEY/usertmpl.acl
+chmod 0700 $VALKEY/*
+chown valkey:valkey $VALKEY/*
+
 sed -i 's/port=10000/port=2443/g' /etc/webmin/miniserv.conf
 
 cat <<'EOF' | while read -r line; do

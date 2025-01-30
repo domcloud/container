@@ -21,7 +21,7 @@ PG=17
 
 # Tools
 dnf -y install awscli btop bzip2 certbot clang cmake gcc-c++ git ncdu htop iftop ipset jq lsof make nano ninja-build ncurses npm nodejs ripgrep ruby rsync screen socat strace tar time tmux vim wget whois xz yarn zstd \
-  lib{curl,ffi,sqlite3x,tool-ltdl,md,yaml}-devel {brotli,bzip2,mesa-libGL,nettle,openldap,pcre2,perl,python,readline,ruby,xmlsec1,xmlsec1-openssl}-devel python3-pip rubygem-{json,rack,rake} \
+  lib{curl,ffi,sqlite3x,tool-ltdl,md,yaml}-devel {brotli,bzip2,mesa-libGL,nettle,openldap,pcre2,perl,python,readline,redis,ruby,xmlsec1,xmlsec1-openssl,valkey}-devel python3-pip rubygem-{json,rack,rake} \
   libreport-filesystem {langpacks,glibc-langpack}-en perl-{DBD-Pg,DBD-mysql,LWP-Protocol-https,macros,DateTime,Crypt-SSLeay,Text-ASCIITable,IO-Tty,XML-Simple} \
   earlyoom fail2ban-server iptables-services postfix mariadb-server wbm-virtual-server wbm-virtualmin-{nginx,nginx-ssl} virtualmin-config bind sudo \
   openssh-server systemd-container libpq5-$PG*
@@ -52,6 +52,10 @@ done
 # for ext in "postgis" "postgis_raster" "postgis_sfcgal" "postgis_tiger_geocoders" "postgis_topology" "earthdistance" "address_standardizer" "address_standardizer_data_us" "pgrouting" "pg_uuidv7" "vector"; do
 #   echo "trusted = true" >> "/usr/pgsql-$PG/share/extension/$ext.control"
 # done
+
+# Valkey
+dnf -y install valkey
+ln -s /usr/bin/valkey-cli /usr/local/bin/redis-cli
 
 # Proxyfix
 PROXYFIX=proxy-fix-linux-$( [ "$(uname -m)" = "aarch64" ] && echo "arm64" || echo "amd64" )
@@ -94,7 +98,7 @@ pip3 install pipenv
 dnf -y mark install ipset
 dnf -y remove lynx gcc-toolset-13-* nodejs-docs clang flatpak open-sans-fonts rubygem-rdoc gl-manpages
 ln -s /usr/lib/systemd/system/postgresql-$PG.service /usr/lib/systemd/system/postgresql.service
-systemctl enable webmin mariadb postgresql-$PG {ip,ip6}tables fail2ban named php{74,84}-php-fpm earlyoom
+systemctl enable webmin mariadb postgresql-$PG {ip,ip6}tables fail2ban named php{74,84}-php-fpm earlyoom valkey
 chmod +x /usr/local/bin/* && chown root:root /usr/local/bin/*
 
 # Cleanup
