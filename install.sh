@@ -23,14 +23,15 @@ PG=17
 dnf -y install awscli bison btop bzip2 certbot clang cmake gcc-c++ git ncdu htop iftop ipset jq lsof make nano ninja-build ncurses npm nodejs patch ripgrep ruby rsync screen socat strace tar time tmux vim wget whois xz yarn zstd \
   lib{curl,ffi,sqlite3x,tool-ltdl,md,yaml}-devel {brotli,bzip2,mesa-libGL,nettle,openldap,pcre2,perl,python,readline,redis,ruby,xmlsec1,xmlsec1-openssl,valkey}-devel python3-pip rubygem-{json,rack,rake} \
   libreport-filesystem {langpacks,glibc-langpack}-en perl-{DBD-Pg,DBD-mysql,LWP-Protocol-https,macros,DateTime,Crypt-SSLeay,Text-ASCIITable,IO-Tty,XML-Simple} \
-  earlyoom fail2ban-server iptables-services postfix mariadb-server wbm-virtual-server wbm-virtualmin-{nginx,nginx-ssl} virtualmin-config bind sudo \
+  earlyoom fail2ban-server iptables-services postfix mariadb-server valkey wbm-virtual-server wbm-virtualmin-{nginx,nginx-ssl} virtualmin-config bind sudo \
   openssh-server systemd-container libpq5-$PG*
 ln -s /usr/bin/gcc /usr/bin/$(uname -m)-linux-gnu-gcc # fix pip install with native libs for aarch64
+ln -s /usr/bin/valkey-cli /usr/local/bin/redis-cli # redis compatibility
 
 # NGINX
 git clone https://github.com/domcloud/nginx-builder/ /usr/local/lib/nginx-builder
 cd /usr/local/lib/nginx-builder/ && make install && make clean && cd /root
-ln -s /usr/local/sbin/nginx /usr/sbin/nginx
+ln -s /usr/local/sbin/nginx /usr/sbin/nginx # nginx compatibility
 
 # PHP
 dnf -y install php{74,84}-php-{bcmath,cli,common,devel,fpm,gd,imap,intl,mbstring,mysqlnd,opcache,pdo,pecl-mongodb,pecl-redis,pecl-zip,pgsql,process,sodium,soap,xml}
@@ -53,10 +54,6 @@ done
 #   echo "trusted = true" >> "/usr/pgsql-$PG/share/extension/$ext.control"
 # done
 
-# Valkey
-dnf -y install valkey
-ln -s /usr/bin/valkey-cli /usr/local/bin/redis-cli
-
 # Proxyfix
 PROXYFIX=proxy-fix-linux-$( [ "$(uname -m)" = "aarch64" ] && echo "arm64" || echo "amd64" )
 wget https://github.com/domcloud/proxy-fix/releases/download/v0.2.5/$PROXYFIX.tar.gz
@@ -71,7 +68,7 @@ PATHMAN=pathman-v0.6.0-linux-$( [ "$(uname -m)" = "aarch64" ] && echo "arm64" ||
 wget -O pathman.tar.gz https://github.com/therootcompany/pathman/releases/download/v0.6.0/$PATHMAN.tar.gz
 tar -xf pathman.tar.gz && mv $PATHMAN /usr/local/bin/pathman && rm -f pathman.tar.gz
 # NVIM for NvChad
-NVIM_V=0.10.2
+NVIM_V=0.10.4
 if [ "$(uname -m)" = "x86_64" ]; then
   curl -sSLO https://github.com/neovim/neovim/releases/download/v$NVIM_V/nvim-linux64.tar.gz
   tar -xf nvim-linux64.tar.gz && chown -R root:root nvim-linux64 && rsync -a nvim-linux64/ /usr/local/ && rm -rf nvim-linux64*
@@ -81,8 +78,8 @@ else
   cd neovim && make CMAKE_BUILD_TYPE=Release && make install && cd .. && rm -rf neovim
 fi
 # Lazygit for NVIM
-LAZYGIT=lazygit_0.44.1_Linux_$( [ "$(uname -m)" = "aarch64" ] && echo "arm64" || echo "x86_64" )
-curl -sSLO https://github.com/jesseduffield/lazygit/releases/download/v0.44.1/$LAZYGIT.tar.gz
+LAZYGIT=lazygit_0.45.2_Linux_$( [ "$(uname -m)" = "aarch64" ] && echo "arm64" || echo "x86_64" )
+curl -sSLO https://github.com/jesseduffield/lazygit/releases/download/v0.45.2/$LAZYGIT.tar.gz
 tar -xf $LAZYGIT.tar.gz && mv lazygit /usr/local/bin/ && rm -f $LAZYGIT.tar.gz
 
 # Neofetch (Forked)

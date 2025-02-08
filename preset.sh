@@ -17,7 +17,7 @@ mkdir -p /etc/ssl/default/
 wget https://raw.githubusercontent.com/willnode/forward-domain/refs/heads/main/test/certs/localhost/key.pem -P /etc/ssl/default/
 wget https://raw.githubusercontent.com/willnode/forward-domain/refs/heads/main/test/certs/localhost/cert.pem -P /etc/ssl/default/
 
-
+# Config
 echo "gem: --no-document" > /etc/gemrc
 cat <<'EOF' > /etc/gitconfig
 [pull]
@@ -29,6 +29,9 @@ cat <<'EOF' > /etc/environment
 LC_ALL="en_US.UTF-8"
 LC_CTYPE="en_US.UTF-8"
 LANGUAGE="en_US.UTF-8"
+EOF
+cat <<'EOF' > /etc/default/earlyoom
+EARLYOOM_ARGS="-r 0 -m 4 -M 409600 -g --prefer '^(node|python|ruby|java)' --avoid '^(dnf|mariadbd|named|nginx|polkitd|postmaster|sshd|php-fpm|valkey-server)$'"
 EOF
 
 # SSH
@@ -95,7 +98,7 @@ root             soft    nofile          65535
 @nginx           hard    priority        5
 EOF
 PG=17
-mkdir -p /etc/systemd/system/{nginx,earlyoom,iptables,ip6tables,mariadb,postgresql-$PG}.service.d
+mkdir -p /etc/systemd/system/{nginx,earlyoom,iptables,ip6tables,mariadb,postgresql-$PG,valkey}.service.d
 cat <<'EOF' > /etc/systemd/system/nginx.service.d/override.conf
 [Service]
 LimitNOFILE=65535
@@ -117,6 +120,10 @@ cat <<'EOF' > /etc/systemd/system/mariadb.service.d/override.conf
 Restart=on-failure
 EOF
 cat <<'EOF' > /etc/systemd/system/postgresql-$PG.service.d/override.conf
+[Service]
+Restart=on-failure
+EOF
+cat <<'EOF' > /etc/systemd/system/valkey.service.d/override.conf
 [Service]
 Restart=on-failure
 EOF
@@ -349,6 +356,7 @@ fastcgi_param REMOTE_PORT $remote_port;
 fastcgi_param SERVER_ADDR $server_addr;
 fastcgi_param SERVER_PORT $server_port;
 fastcgi_param SERVER_NAME $server_name;
+fastcgi_param HTTP_HOST $host;
 fastcgi_param PATH_INFO $fastcgi_path_info;
 fastcgi_param HTTPS $https;
 fastcgi_split_path_info ^(.+\.php)(/.+)$;
@@ -606,7 +614,7 @@ EOF
 cat <<'EOF' > /var/spool/cron/root
 # Entry commented are safeguards implemented in DOM Cloud. You might not need them
 # 0 * * * * find '/var/spool/cron/' -not -name root -type f | xargs sed -ri '/^\s*(\*|[0-9]*,)/d'
-# */5 * * * * /usr/bin/node /home/bridge/public_html/sudokill.js -i bridge,do-agent,dbus,earlyoom,mysql,named,nobody,postgres,polkitd,rpc
+# */5 * * * * /usr/bin/node /home/bridge/public_html/sudokill.js -i bridge,do-agent,dbus,earlyoom,mysql,named,nobody,postgres,polkitd,rpc,valkey
 
 */5 * * * * /usr/local/lib/nginx-builder/cleanup.sh
 @daily passenger-config reopen-logs
@@ -689,6 +697,14 @@ curl -sSX POST \
           "enabled": "off"
         },
         "match": "/phppgadmin/"
+      },
+      {
+        "fastcgi": "on",
+        "root": "public_html/",
+        "passenger": {
+          "enabled": "off"
+        },
+        "match": "/phprdadmin/"
       },
       {
         "root": "public_html/webssh/webssh/static",
