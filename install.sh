@@ -24,14 +24,14 @@ dnf -y install awscli bison btop bzip2 certbot clang cmake gcc-c++ git ncdu htop
   lib{curl,ffi,sqlite3x,tool-ltdl,md,yaml}-devel {brotli,bzip2,mesa-libGL,nettle,openldap,pcre2,perl,python,readline,redis,ruby,xmlsec1,xmlsec1-openssl,valkey}-devel python3-pip rubygem-{json,rack,rake} \
   libreport-filesystem {langpacks,glibc-langpack}-en perl-{DBD-Pg,DBD-mysql,LWP-Protocol-https,macros,DateTime,Crypt-SSLeay,Text-ASCIITable,IO-Tty,XML-Simple} \
   earlyoom fail2ban-server iptables-services postfix mariadb-server valkey wbm-virtual-server wbm-virtualmin-{nginx,nginx-ssl} virtualmin-config bind sudo \
-  openssh-server systemd-container libpq5-$PG*
-ln -s /usr/bin/gcc /usr/bin/$(uname -m)-linux-gnu-gcc # fix pip install with native libs for aarch64
-ln -s /usr/bin/valkey-cli /usr/local/bin/redis-cli # redis compatibility
+  openssh-server systemd-container libpq5-$PG* --skip-broken --nobest
+ln -s /usr/bin/gcc /usr/bin/$(uname -m)-linux-gnu-gcc || true # fix pip install with native libs for aarch64
+ln -s /usr/bin/valkey-cli /usr/local/bin/redis-cli || true # redis compatibility
 
 # NGINX
 git clone https://github.com/domcloud/nginx-builder/ /usr/local/lib/nginx-builder
 cd /usr/local/lib/nginx-builder/ && make install && make clean && cd /root
-ln -s /usr/local/sbin/nginx /usr/sbin/nginx # nginx compatibility
+ln -fs /usr/local/sbin/nginx /usr/sbin/nginx # nginx compatibility
 
 # PHP
 dnf -y install php{74,84}-php-{bcmath,cli,common,devel,fpm,gd,imap,intl,mbstring,mysqlnd,opcache,pdo,pecl-mongodb,pecl-redis,pecl-zip,pgsql,process,sodium,soap,xml}
