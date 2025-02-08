@@ -29,7 +29,11 @@ ln -s /usr/bin/gcc /usr/bin/$(uname -m)-linux-gnu-gcc || true # fix pip install 
 ln -s /usr/bin/valkey-cli /usr/local/bin/redis-cli || true # redis compatibility
 
 # NGINX
-git clone https://github.com/domcloud/nginx-builder/ /usr/local/lib/nginx-builder
+if [ ! -d "/usr/local/lib/nginx-builder" ]; then
+  git clone https://github.com/domcloud/nginx-builder/ /usr/local/lib/nginx-builder
+else
+  git -C /usr/local/lib/nginx-builder pull
+fi
 cd /usr/local/lib/nginx-builder/ && make install && make clean && cd /root
 ln -fs /usr/local/sbin/nginx /usr/sbin/nginx # nginx compatibility
 
@@ -37,7 +41,7 @@ ln -fs /usr/local/sbin/nginx /usr/sbin/nginx # nginx compatibility
 dnf -y install php{74,84}-php-{bcmath,cli,common,devel,fpm,gd,imap,intl,mbstring,mysqlnd,opcache,pdo,pecl-mongodb,pecl-redis,pecl-zip,pgsql,process,sodium,soap,xml}
 # curl https://packages.microsoft.com/config/rhel/9/prod.repo | tee /etc/yum.repos.d/mssql-release.repo
 # dnf -y install php74-php-ioncube-loader php{74,81,82,83,84}-php-{pecl-imagick-im7,sqlsrv} msodbcsql17 # optional, installed in cloud
-dnf -y remove php-* && ln -s `which php84` /usr/bin/php || true
+dnf -y remove php-* && ln -fs `which php84` /usr/bin/php || true
 curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 find /etc/opt/remi/ -maxdepth 1 -name 'php*' -exec sed -i "s/upload_max_filesize = 2M/upload_max_filesize = 512M/g" {}/php.ini \; -exec sed -i "s/post_max_size = 8M/post_max_size = 512M/g" {}/php.ini \; 
 find /etc/opt/remi/ -type f -name www.conf -print0 | xargs -0 sed -i 's/pm = dynamic/pm = ondemand/g'
@@ -56,31 +60,40 @@ done
 
 # Proxyfix
 PROXYFIX=proxy-fix-linux-$( [ "$(uname -m)" = "aarch64" ] && echo "arm64" || echo "amd64" )
-wget https://github.com/domcloud/proxy-fix/releases/download/v0.2.5/$PROXYFIX.tar.gz
-tar -xf $PROXYFIX.tar.gz && mv $PROXYFIX /usr/local/bin/proxfix && rm -rf $PROXYFIX*
+if ! command -v proxfix &> /dev/null; then
+  wget https://github.com/domcloud/proxy-fix/releases/download/v0.2.5/$PROXYFIX.tar.gz
+  tar -xf $PROXYFIX.tar.gz && mv $PROXYFIX /usr/local/bin/proxfix && rm -rf $PROXYFIX*
+fi
 
 # Docker
 dnf -y install docker-ce docker-ce-cli containerd.io docker-compose-plugin fuse-overlayfs slirp4netns
-modprobe ip_tables && echo "ip_tables" >> /etc/modules
+modprobe ip_tables && echo "ip_tables" > /etc/modules
 
 # Pathman
 PATHMAN=pathman-v0.6.0-linux-$( [ "$(uname -m)" = "aarch64" ] && echo "arm64" || echo "amd64_v1" )
-wget -O pathman.tar.gz https://github.com/therootcompany/pathman/releases/download/v0.6.0/$PATHMAN.tar.gz
-tar -xf pathman.tar.gz && mv $PATHMAN /usr/local/bin/pathman && rm -f pathman.tar.gz
+if ! command -v pathman &> /dev/null; then
+  wget -O pathman.tar.gz https://github.com/therootcompany/pathman/releases/download/v0.6.0/$PATHMAN.tar.gz
+  tar -xf pathman.tar.gz && mv $PATHMAN /usr/local/bin/pathman && rm -f pathman.tar.gz
+fi
 # NVIM for NvChad
 NVIM_V=0.10.4
-if [ "$(uname -m)" = "x86_64" ]; then
-  curl -sSLO https://github.com/neovim/neovim/releases/download/v$NVIM_V/nvim-linux64.tar.gz
-  tar -xf nvim-linux64.tar.gz && chown -R root:root nvim-linux64 && rsync -a nvim-linux64/ /usr/local/ && rm -rf nvim-linux64*
-else
-  curl -sSLO https://github.com/neovim/neovim/archive/refs/tags/v$NVIM_V.tar.gz
-  tar -xf v$NVIM_V.tar.gz && mv neovim-$NVIM_V neovim && rm -f v$NVIM_V.tar.gz
-  cd neovim && make CMAKE_BUILD_TYPE=Release && make install && cd .. && rm -rf neovim
+if ! command -v neovim &> /dev/null; then
+  if [ "$(uname -m)" = "x86_64" ]; then
+    curl -sSLO https://github.com/neovim/neovim/releases/download/v$NVIM_V/nvim-linux64.tar.gz
+    tar -xf nvim-linux64.tar.gz && chown -R root:root nvim-linux64 && rsync -a nvim-linux64/ /usr/local/ && rm -rf nvim-linux64*
+  else
+    curl -sSLO https://github.com/neovim/neovim/archive/refs/tags/v$NVIM_V.tar.gz
+    tar -xf v$NVIM_V.tar.gz && mv neovim-$NVIM_V neovim && rm -f v$NVIM_V.tar.gz
+    cd neovim && make CMAKE_BUILD_TYPE=Release && make install && cd .. && rm -rf neovim
+  fi
 fi
+
 # Lazygit for NVIM
 LAZYGIT=lazygit_0.45.2_Linux_$( [ "$(uname -m)" = "aarch64" ] && echo "arm64" || echo "x86_64" )
-curl -sSLO https://github.com/jesseduffield/lazygit/releases/download/v0.45.2/$LAZYGIT.tar.gz
-tar -xf $LAZYGIT.tar.gz && mv lazygit /usr/local/bin/ && rm -f $LAZYGIT.tar.gz
+if ! command -v lazygit &> /dev/null; then
+  curl -sSLO https://github.com/jesseduffield/lazygit/releases/download/v0.45.2/$LAZYGIT.tar.gz
+  tar -xf $LAZYGIT.tar.gz && mv lazygit /usr/local/bin/ && rm -f $LAZYGIT.tar.gz
+fi
 
 # Neofetch (Forked)
 wget -O /usr/local/bin/neofetch https://github.com/hykilpikonna/hyfetch/raw/1.4.11/neofetch
