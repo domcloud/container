@@ -156,7 +156,7 @@ EOF
 systemctl start mariadb # init db
 
 PGDATA=/var/lib/pgsql/$PG/data
-sudo -u postgres /usr/pgsql-$PG/bin/initdb -D $PGDATA
+sudo -u postgres /usr/pgsql-$PG/bin/initdb -D $PGDATA || true
 sed -i "s/#listen_addresses = .*/listen_addresses = '*'/g" $PGDATA/postgresql.conf
 sed -i "s/max_connections = 100/max_connections = 4096/g" $PGDATA/postgresql.conf
 cat <<'EOF' > $PGDATA/pg_hba.conf
@@ -172,7 +172,7 @@ sed -i "s/# aclfile /aclfile /g" $VALKEY/valkey.conf
 sed -i "s/# maxmemory <bytes>/maxmemory 256mb/g" $VALKEY/valkey.conf
 sed -i "s/# maxmemory-policy noeviction/maxmemory-policy allkeys-lru/g" $VALKEY/valkey.conf
 sed -i "s/# maxmemory-samples 5/maxmemory-samples 3/g" $VALKEY/valkey.conf
-cat <<'EOF' > $VALKEY/users.acl
+[ -f $VALKEY/users.acl ] || cat <<'EOF' > $VALKEY/users.acl
 user default off nopass sanitize-payload resetchannels +@all
 user root on sanitize-payload >rocky ~* &* +@all
 EOF
@@ -627,6 +627,7 @@ cat <<'EOF' > /var/spool/cron/root
 EOF
 
 # Bridge
+if [ ! -e "/lib/systemd/system/bridge.service" ]; then
 /usr/libexec/webmin/changepass.pl /etc/webmin root "rocky"
 git clone https://github.com/domcloud/Virtualmin-Config
 cd Virtualmin-Config && sh patch.sh && cd .. && rm -rf Virtualmin-Config
@@ -741,6 +742,7 @@ curl -sSX POST \
       "ssl": "on"
     }
   }'
+fi
 
 echo "wizard_run=1" >> /etc/webmin/virtual-server/config
 
