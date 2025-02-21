@@ -47,3 +47,6 @@ curl -fsSL https://software.virtualmin.com/gpl/scripts/virtualmin-install.sh | s
 apt-get install -y nginx-full webmin-virtualmin-nginx webmin-virtualmin-nginx-ssl
 
 virtualmin-config-system -i Nginx
+
+curl -fsSL https://deb.nodesource.com/setup_22.x | sudo bash - 
+apt-get install nodejs
