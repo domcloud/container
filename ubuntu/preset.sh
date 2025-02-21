@@ -2,6 +2,18 @@
 sed -i 's/port=10000/port=2443/g' /etc/webmin/miniserv.conf
 
 
+#init postgresql DB
+PG=17
+PGDATA=/usr/share/postgresql/$PG/data
+sudo -u postgres /usr/lib/postgresql/$PG/bin/initdb -D $PGDATA || true
+sed -i "s/#listen_addresses = .*/listen_addresses = '*'/g" $PGDATA/postgresql.conf
+sed -i "s/max_connections = 100/max_connections = 4096/g" $PGDATA/postgresql.conf
+cat <<'EOF' > $PGDATA/pg_hba.conf
+local   all             all                                     peer
+host    all             all             0.0.0.0/0               md5
+host    all             all             ::/0                    md5
+EOF
+
 cat <<'EOF' | while read -r line; do
 allow_subdoms=0
 auto_letsencrypt=0
