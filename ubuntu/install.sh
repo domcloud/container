@@ -5,6 +5,7 @@ export TERM=xterm-256color
 
 #Prerequites
 apt-get update
+apt-get -y install libdbd-{pg,mysql}-perl libcrypt-ssleay-perl libxml-simple-perl libtext-asciitable-perl liblwp-protocol-https-perl
 
 #Repos
 curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
@@ -41,6 +42,11 @@ apt update && apt install npm -y
     # Install the latest version of PostgreSQL:
     # If you want a specific version, use 'postgresql-16' or similar instead of 'postgresql'
         apt-get -y install postgresql
+
+#Tools
+    #ALL
+        apt-get update
+        apt-get install bzip2 valkey-server bison btop clang certbot cmake git ncdu htop iftop ipset jq lsof make nano ninja-build ncurses-bin patch ripgrep ruby rsync screen socat strace tar time tmux vim wget whois xz-utils zstd -y
 
 curl -fsSL https://software.virtualmin.com/gpl/scripts/virtualmin-install.sh | sh -s -- --setup --verbose
 
