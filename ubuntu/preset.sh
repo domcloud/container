@@ -83,4 +83,73 @@ EOF
     fi
 done
 
+cat <<'EOF' > /etc/webmin/virtual-server/plans/0
+ipfollow=
+aliaslimit=
+migrate=0
+capabilities=domain users aliases dbs scripts ssl redirect admins phpver phpmode backup sharedips passwd spf records
+bwlimit=
+aliasdomslimit=
+uquota=
+name=Default Plan
+safeunder=1
+file=/etc/webmin/virtual-server/plans/0
+mailboxlimit=
+nodbname=0
+quota=
+forceunder=1
+featurelimits=
+norename=1
+id=0
+domslimit=
+dbslimit=
+realdomslimit=
+scripts=
+EOF
+
+cat <<'EOF' > /etc/webmin/virtualmin-nginx/config
+add_to=/etc/nginx/sites-available
+stop_cmd=systemctl stop nginx
+apply_cmd=systemctl reload nginx
+child_procs=4
+add_link=/etc/nginx/sites-enabled
+start_cmd=systemctl start nginx
+nginx_cmd=/usr/sbin/nginx
+php_socket=1
+nginx_config=/etc/nginx/nginx.conf
+listen_mode=0
+EOF
+
 /usr/share/webmin/changepass.pl /etc/webmin root "rocky"
+virtualmin create-domain --domain localhost --user bridge --pass "rocky" --dir --unix --virtualmin-nginx --virtualmin-nginx-ssl
+cat <<'EOF' | EDITOR='tee' visudo /etc/sudoers.d/bridge
+bridge ALL = (root) NOPASSWD: /home/bridge/public_html/sudoutil.js
+bridge ALL = (root) NOPASSWD: /bin/systemctl restart bridge
+EOF
+cat <<'EOF' > /lib/systemd/system/bridge.service
+[Unit]
+Description=DOM Cloud Bridge
+Documentation=https://domcloud.co
+After=network.target
+
+[Service]
+Type=simple
+User=bridge
+WorkingDirectory=/home/bridge/public_html
+ExecStart=/usr/bin/node /home/bridge/public_html/app.js
+TimeoutStopSec=5
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+EOF
+sudo -u bridge bash <<EOF
+export PATH=/usr/local/bin:$PATH
+cd ~
+rm -rf public_html
+git clone https://github.com/domcloud/bridge public_html
+cd public_html
+sh tools-init.sh
+echo "SECRET=rocky" > .env
+rm -rf ~/.cache ~/.npm ~/public_html/phpmyadmin/node_modules
+EOF
