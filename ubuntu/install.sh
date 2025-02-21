@@ -43,10 +43,52 @@ apt update && apt install npm -y
     # If you want a specific version, use 'postgresql-16' or similar instead of 'postgresql'
         apt-get -y install postgresql
 
+# Install PHP and extensions
+    add-apt-repository ppa:ondrej/php; apt-get update
+    apt-get install php{7.4,8.4}-{bcmath,cli,common,dev,fpm,gd,imap,igbinary,intl,mbstring,mysql,opcache,mongodb,readline,redis,zip,pgsql,soap,xml} -y
+    find /etc/php/ -maxdepth 1 -mindepth 1 -exec sed -i "s/upload_max_filesize = 2M/upload_max_filesize = 512M/g" {}/fpm/php.ini \; -exec sed -i "s/post_max_size = 8M/post_max_size = 512M/g" {}/fpm/php.ini \; 
+
 #Tools
     #ALL
         apt-get update
-        apt-get install bzip2 valkey-server bison btop clang certbot cmake git ncdu htop iftop ipset jq lsof make nano ninja-build ncurses-bin patch ripgrep ruby rsync screen socat strace tar time tmux vim wget whois xz-utils zstd -y
+        apt-get install bzip2 valkey-server bison btop clang certbot cmake git ncdu htop iftop ipset jq lsof make nano ninja-build ncurses-bin patch ripgrep ruby rsync screen socat strace tar time tmux vim wget whois xz-utils zstd libcurl4-openssl-dev \
+                libffi-dev \
+                libsqlite3-dev \
+                libtool \
+                libssl-dev \
+                libyaml-dev \
+                brotli \
+                libbz2-dev \
+                libgl1-mesa-dev \
+                libldap2-dev \
+                libpcre2-dev \
+                python3-dev \
+                libreadline-dev \
+                redis-server \
+                libxmlsec1-dev \
+                python3-pip \
+                ruby-json \
+                ruby-rack \
+                language-pack-en \
+                libc-bin \
+                libdbd-pg-perl \
+                libdbd-mysql-perl \
+                liblwp-protocol-https-perl \
+                libdatetime-perl \
+                libcrypt-ssleay-perl \
+                libtext-asciitable-perl \
+                libio-tty-perl \
+                libxml-simple-perl \
+                earlyoom \
+                fail2ban \
+                iptables \
+                postfix \
+                bind9 \
+                sudo \
+                openssh-server \
+                systemd-container \
+                libpq-dev \
+                -y
 
 curl -fsSL https://software.virtualmin.com/gpl/scripts/virtualmin-install.sh | sh -s -- --setup --verbose
 
