@@ -361,6 +361,9 @@ fastcgi_param PATH_INFO $fastcgi_path_info;
 fastcgi_param HTTPS $https;
 fastcgi_split_path_info ^(.+\.php)(/.+)$;
 fastcgi_read_timeout 600s;
+fastcgi_buffers 16 32k;
+fastcgi_buffer_size 64k;
+fastcgi_busy_buffers_size 64k;
 EOF
 
 cat <<'EOF' > /etc/nginx/passenger.conf
