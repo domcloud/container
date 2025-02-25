@@ -1,5 +1,10 @@
 #!/bin/bash
 
+if [ -z "$(echo $BASH_VERSION$ZSH_VERSION)" ]; then
+    echo "❌ This script requires Bash or Zsh!" >&2
+    exit 1
+fi
+
 SHARED_PASS=rocky
 WEBMIN_USERS_FILE="/etc/webmin/miniserv.users"
 BRIDGE_ENV_FILE="/home/bridge/public_html/.env"
@@ -18,6 +23,7 @@ test_linux() {
 }
 
 test_webmin() {
+    [[ -f "$WEBMIN_USERS_FILE" ]] || return 1
     WEBMIN_HASH=$(grep "^root:" "$WEBMIN_USERS_FILE" | cut -d: -f2)
     SALT=$(echo "$WEBMIN_HASH" | cut -d'$' -f3)
     GENERATED_HASH=$(openssl passwd -6 -salt "$SALT" "$SHARED_PASS")
@@ -39,7 +45,7 @@ test_valkey() {
     echo "AUTH root $SHARED_PASS" | valkey-cli &>/dev/null;
 }
 
-echo This script change any unchanged password to make your OS secure.
+echo This script detect if you haven\'t change any password in this OS then perform changes it for you.
 echo ""
 
 echo "[ 1 / 5 ] Checking your linux root password..."
@@ -50,6 +56,7 @@ if test_linux; then
     if [ $? -eq 0 ]; then
         echo "Password changed successfully."
         echo "New linux root password: $NEW_PASS"
+        echo KEEP THIS LINUX ROOT PASSWORD OR RISK LOCKED OUT
     else
         echo "Failed to change linux root password."
         exit 1
@@ -77,12 +84,12 @@ if test_valkey; then
     if echo -e "AUTH root $SHARED_PASS\nACL SETUSER root >$NEW_PASS\nACL SAVE" | valkey-cli; then
         echo "Password changed successfully."
         echo "New valkey root password: $SHARED_PASS"
-         if [[ -f $BRIDGE_ENV_FILE && -w $BRIDGE_ENV_FILE ]]; then
+        if [[ -f $BRIDGE_ENV_FILE && -w $BRIDGE_ENV_FILE ]]; then
             sed -i '/^REDIS_URL=/d' "$BRIDGE_ENV_FILE"
             echo "REDIS_URL=\"redis://root:$NEWPASS@localhost:6379\"" >> "$BRIDGE_ENV_FILE"
             echo "Valkey root password has been written to bridge env file"
             systemctl restart bridge || true
-        end
+        fi
     else
         echo "Failed to change valkey root password."
     fi
