@@ -4,10 +4,14 @@ build-container:
 	packer build vc.pkr.hcl
 run-container:
 	docker compose run domcloud
-build-image-gtk:
-	QEMU_DISPLAY=gtk sh ./imgprep.sh
-build-image-cocoa:
-	QEMU_DISPLAY=cocoa sh ./imgprep.sh
+build-rocky-gtk:
+	QEMU_DISPLAY=gtk OS=rocky sh ./imgprep.sh
+build-rocky-cocoa:
+	QEMU_DISPLAY=cocoa OS=rocky sh ./imgprep.sh
+build-ubuntu-gtk:
+	QEMU_DISPLAY=gtk OS=ubuntu sh ./imgprep.sh
+build-ubuntu-cocoa:
+	QEMU_DISPLAY=cocoa OS=ubuntu sh ./imgprep.sh
 
 build-image:
 	docker build -t image-build .

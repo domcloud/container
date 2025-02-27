@@ -44,7 +44,7 @@ Select based on Virtualization platform e.g. Proxmox and QEMU uses `QCOW2` while
 If you don't want to download our custom prebuilt images, you can run these from freshly installed [Rocky Linux Minimal ISO](https://rockylinux.org/download) instead:
 
 ```sh
-# make sure to run this inside root privilenge:
+# make sure to run this using root:
 curl -sSL https://github.com/domcloud/container/raw/refs/heads/master/install.sh | bash
 curl -sSL https://github.com/domcloud/container/raw/refs/heads/master/preset.sh | bash
 ```
@@ -54,7 +54,6 @@ curl -sSL https://github.com/domcloud/container/raw/refs/heads/master/preset.sh 
 We use [Hashicorp Packer](https://developer.hashicorp.com/packer/docs/install) to build images. We ran it inside privilenged docker. Simply run `make build-image`. With KVM acceleration the build should be done around one hour.
 
 The image consist of [Rocky Linux Minimal ISO](https://rockylinux.org/download) + Some scripts that installs Virtualmin and additional services to make it exactly like how a DOM Cloud server works. See [install.sh](./install.sh) and [preset.sh](./preset.sh) to see the install scripts.
-
 
 To run the final image using [QEMU](https://www.qemu.org):
 
@@ -88,14 +87,12 @@ If you don't have a public IP address or you're just running the whole VM behind
 
 ### Change your VM passwords
 
-You have 4 passwords to change:
+You have 5 passwords to change. To change it, run this script:
 
-1. Root password, change it with `passwd`
-2. Webmin root password, change it with `/usr/libexec/webmin/changepass.pl /etc/webmin root "<password>"`
-3. User `bridge` password, change it with `passwd bridge`
-4. `bridge` HTTP Secret key, change it in `/home/bridge/public_html/.env` and restart it `sudo systemctl restart bridge`.
-
-Note that the `bridge` HTTP Secret key is used to be communitated with DOM Cloud software. More below.
+```sh
+# make sure to run this using root:
+curl -sSL https://github.com/domcloud/container/raw/refs/heads/master/genpass.sh | bash
+```
 
 ### Check Virtualmin Configuration
 
@@ -118,14 +115,26 @@ The VM is built with QEMU. The networking IP addresses definitely changed and yo
 The bridge default domain name is defaulted to `localhost` so you can open it via your laptop. But to connect it to DOM Cloud, you must put it to a domain. You can run this in SSH:
 
 ```sh
-virtualmin change-domain --username bridge --new-domain mynewdomain.com
+virtualmin change-domain --username bridge --new-domain mysystemdomain.com
 ```
+
+Make sure to insert A or AAAA record to that domain.
+
+### Get SSL for the Bridge's Domain
+
+First, change your system hostname to the domain
+
+```sh
+sudo hostnamectl set-hostname "mysystemdomain.com"
+```
+
+Then go to Manage Virtual Server > Setup SSL Certificate > SSL Providers and click "Request Certificate"
 
 ### Update Packages
 
-Run `yum update --nobest`.
+Run `yum update`.
 
-### Expand Disk
+### Expand Disk (Rocky / XFS)
 
 The disk is prebuilt with capped at 40 GB. Here's how it layouted.
 
