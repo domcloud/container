@@ -98,7 +98,7 @@ root             soft    nofile          65535
 @nginx           hard    priority        5
 EOF
 PG=17
-mkdir -p /etc/systemd/system/{nginx,earlyoom,iptables,ip6tables,mariadb,postgresql-$PG,valkey}.service.d
+mkdir -p /etc/systemd/system/{nginx,earlyoom,mariadb,postgresql-$PG,valkey}.service.d
 cat <<'EOF' > /etc/systemd/system/nginx.service.d/override.conf
 [Service]
 LimitNOFILE=65535
@@ -106,14 +106,6 @@ EOF
 cat <<'EOF' > /etc/systemd/system/earlyoom.service.d/override.conf
 [Service]
 SupplementaryGroups=adm
-EOF
-cat <<'EOF' > /etc/systemd/system/iptables.service.d/override.conf
-[Service]
-ExecStartPre=sh -c "ipset restore -! < /etc/ipset"
-EOF
-cat <<'EOF' > /etc/systemd/system/ip6tables.service.d/override.conf
-[Service]
-ExecStartPre=sh -c "ipset restore -! < /etc/ipset6"
 EOF
 cat <<'EOF' > /etc/systemd/system/mariadb.service.d/override.conf
 [Service]
@@ -560,56 +552,109 @@ port = http,https
 logpath = /var/log/virtualmin/*access_log
 EOF
 
-cat <<'EOF' > /etc/sysconfig/iptables
-*filter
-:INPUT ACCEPT [0:0]
-:OUTPUT ACCEPT [0:0]
-:FORWARD ACCEPT [0:0]
--A INPUT -p icmp -j ACCEPT
--A INPUT -i lo -j ACCEPT
--A INPUT -p tcp -m multiport --dports 22,80,443,3306,5432 -j ACCEPT
--A INPUT -p tcp -m multiport --dports 2443:2453,32000:65535 -j ACCEPT
--A INPUT -p udp -m multiport --dports 67,68,443 -j ACCEPT
--A INPUT -p tcp -m multiport --ports 53 -j ACCEPT
--A INPUT -p udp -m multiport --ports 53 -j ACCEPT
--A INPUT -j REJECT --reject-with icmp-host-prohibited
--A FORWARD -j REJECT --reject-with icmp-host-prohibited
--A OUTPUT -o lo -j ACCEPT
--A OUTPUT -m conntrack --ctstate ESTABLISHED -j ACCEPT
--A OUTPUT -p tcp -m multiport --ports 22,53 -j ACCEPT
--A OUTPUT -p udp -m multiport --ports 53,67,68 -j ACCEPT
--A OUTPUT -p tcp -m tcp --dport 25 -j REJECT
--A OUTPUT -m set --match-set whitelist dst -j ACCEPT
-COMMIT
+cat <<'EOF' > /etc/nftables.conf
+#!/usr/sbin/nft -f
+
+flush ruleset
+
+table inet filter {
+  chain INPUT {
+    type filter hook input priority filter; policy accept;
+    ct state established,related accept
+    ip protocol icmp limit rate 4/second accept
+    ip6 nexthdr ipv6-icmp limit rate 4/second accept
+    ip protocol igmp limit rate 4/second accept
+    iifname lo accept
+  
+    tcp dport { 22, 53, 80, 443, 3306, 5432, 2443-2453, 32000-65535 } counter accept
+    udp dport { 53, 67, 68, 443, 546, 547 } counter accept
+    meta l4proto {tcp, udp} th sport 53 counter accept
+    ip version 4 counter reject with icmp host-prohibited
+    ip version 6 counter reject with icmpv6 admin-prohibited
+  }
+
+  chain OUTPUT {
+    type filter hook output priority filter; policy accept;
+    oifname lo counter accept
+    ct state established accept
+    meta l4proto {tcp, udp} sport { 22, 53, 67, 68, 546, 547 } counter accept
+    meta l4proto {tcp, udp} dport { 22, 53, 67, 68, 546, 547 } counter accept
+    tcp dport 25 counter reject
+  }
+
+  chain FORWARD {
+    type filter hook forward priority 0; policy drop;
+  }
+}
+
+include "/etc/nftables-docker.conf"
 EOF
 
-cat <<'EOF' > /etc/sysconfig/ip6tables
-*filter
-:INPUT ACCEPT [0:0]
-:OUTPUT ACCEPT [0:0]
-:FORWARD ACCEPT [0:0]
--A INPUT -p ipv6-icmp -j ACCEPT
--A INPUT -i lo -j ACCEPT
--A INPUT -p tcp -m multiport --dports 22,80,443,3306,5432 -j ACCEPT
--A INPUT -p tcp -m multiport --dports 2443:2453,32000:65535 -j ACCEPT
--A INPUT -p udp -m multiport --dports 443,546,547 -j ACCEPT
--A INPUT -p tcp -m multiport --ports 53 -j ACCEPT
--A INPUT -p udp -m multiport --ports 53 -j ACCEPT
--A INPUT -j REJECT --reject-with icmp6-adm-prohibited
--A FORWARD -j REJECT --reject-with icmp6-adm-prohibited
--A OUTPUT -o lo -j ACCEPT
--A OUTPUT -m conntrack --ctstate ESTABLISHED -j ACCEPT
--A OUTPUT -p tcp -m multiport --ports 22,53 -j ACCEPT
--A OUTPUT -p udp -m multiport --ports 53,546,547 -j ACCEPT
--A OUTPUT -p tcp -m tcp --dport 25 -j REJECT
--A OUTPUT -m set --match-set whitelist-v6 dst -j ACCEPT
-COMMIT
-EOF
+# https://gist.github.com/goll/bdd6b43c2023f82d15729e9b0067de60
+cat <<'EOF' > /etc/nftables-docker.conf
+#!/usr/sbin/nft -f
 
-ipset create whitelist hash:ip
-ipset create whitelist-v6 hash:ip family inet6
-ipset save whitelist > /etc/ipset
-ipset save whitelist-v6 > /etc/ipset6
+table ip filter {
+	chain INPUT {
+		type filter hook input priority 0; policy accept;
+	}
+
+	chain FORWARD {
+		type filter hook forward priority 0; policy accept;
+		counter jump DOCKER-USER
+		counter jump DOCKER-ISOLATION-STAGE-1
+		oifname "docker0" ct state established,related counter accept
+		oifname "docker0" counter jump DOCKER
+		iifname "docker0" oifname != "docker0" counter accept
+		iifname "docker0" oifname "docker0" counter accept
+	}
+
+	chain OUTPUT {
+		type filter hook output priority 0; policy accept;
+	}
+
+	chain DOCKER {
+	}
+
+	chain DOCKER-ISOLATION-STAGE-1 {
+		iifname "docker0" oifname != "docker0" counter jump DOCKER-ISOLATION-STAGE-2
+		counter return
+	}
+
+	chain DOCKER-ISOLATION-STAGE-2 {
+		oifname "docker0" counter drop
+		counter return
+	}
+
+	chain DOCKER-USER {
+		counter return
+	}
+}
+table ip nat {
+	chain PREROUTING {
+		type nat hook prerouting priority -100; policy accept;
+		fib daddr type local counter jump DOCKER
+	}
+
+	chain INPUT {
+		type nat hook input priority 100; policy accept;
+	}
+
+	chain POSTROUTING {
+		type nat hook postrouting priority 100; policy accept;
+		oifname != "docker0" ip saddr 172.17.0.0/16 counter masquerade
+	}
+
+	chain OUTPUT {
+		type nat hook output priority -100; policy accept;
+		ip daddr != 127.0.0.0/8 fib daddr type local counter jump DOCKER
+	}
+
+	chain DOCKER {
+		iifname "docker0" counter return
+	}
+}
+EOF
 
 sed -i '/allow-query/d' /etc/named.conf
 sed -i '/allow-recursive/d' /etc/named.conf

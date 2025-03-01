@@ -7,7 +7,7 @@ export GPGDIR=/usr/share/keyrings
 
 # Repository
 apt-get update
-apt-get -y install ca-certificates curl libterm-readline-gnu-perl software-properties-common
+apt-get -y install ca-certificates curl libterm-readline-gnu-perl software-properties-common apt-transport-https
 curl -fsSL https://deb.nodesource.com/setup_22.x | bash - 
 curl -fsSL https://dl.yarnpkg.com/debian/pubkey.gpg | gpg --dearmor -o $GPGDIR/yarn.gpg
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o $GPGDIR/docker.gpg
@@ -23,7 +23,7 @@ add-apt-repository ppa:ondrej/php
 apt-get update
 apt-get -y install bzip2 bison btop clang certbot cmake git ncdu htop iftop ipset jq lsof make nano ninja-build ncurses-bin nodejs patch ripgrep ruby rsync screen socat strace tar time tmux vim wget whois xz-utils zstd \
         libcurl4-openssl-dev libffi-dev libsqlite3-dev libtool libssl-dev libyaml-dev brotli libbz2-dev libgl1-mesa-dev libldap2-dev libpcre2-dev python3-dev libreadline-dev redis-server libxmlsec1-dev python3-pip ruby-json ruby-rack \
-        language-pack-en libc-bin libdbd-pg-perl libdbd-mysql-perl liblwp-protocol-https-perl libdatetime-perl libcrypt-ssleay-perl libtext-asciitable-perl libio-tty-perl libxml-simple-perl libpq-dev pgdg-keyring
+        language-pack-en libc-bin libdbd-pg-perl libdbd-mysql-perl liblwp-protocol-https-perl libdatetime-perl libcrypt-ssleay-perl libtext-asciitable-perl libio-tty-perl libxml-simple-perl libpq-dev
 apt-get -y install webmin valkey-server earlyoom fail2ban nftables postfix bind9 sudo openssh-server systemd-container
 
 # Docker
