@@ -6,15 +6,15 @@ if [ -f /etc/lsb-release ]; then OS=ubuntu; elif [ -f /etc/redhat-release ]; the
 PASSWD=$OS
 
 # Contents
-wget -O /usr/local/bin/restart https://raw.githubusercontent.com/domcloud/bridge/main/userkill.sh && chmod 755 /usr/local/bin/restart
+curl -sSLo /usr/local/bin/restart https://raw.githubusercontent.com/domcloud/bridge/main/userkill.sh && chmod 755 /usr/local/bin/restart
 WWW=/usr/local/share/www && WWWSOURCE=https://raw.githubusercontent.com/domcloud/domcloud/master/share && mkdir -p $WWW
-wget -O $WWW/deceptive.html $WWWSOURCE/deceptive.html
-wget -O $WWW/nosite.html $WWWSOURCE/nosite.html
+curl -sSLo $WWW/deceptive.html $WWWSOURCE/deceptive.html
+curl -sSLo $WWW/nosite.html $WWWSOURCE/nosite.html
 chmod 0755 -R $WWW
 
 SKEL=/etc/skel/public_html
 mkdir -p $SKEL/.well-known && touch $SKEL/favicon.ico
-wget -O $SKEL/index.html $WWWSOURCE/index.html
+curl -sSLo $SKEL/index.html $WWWSOURCE/index.html
 
 mkdir -p /etc/ssl/default/
 wget https://raw.githubusercontent.com/willnode/forward-domain/refs/heads/main/test/certs/localhost/key.pem -P /etc/ssl/default/

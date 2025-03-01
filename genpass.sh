@@ -5,7 +5,8 @@ if [ -z "$(echo $BASH_VERSION$ZSH_VERSION)" ]; then
     exit 1
 fi
 
-SHARED_PASS=rocky
+if [ -f /etc/lsb-release ]; then OS=ubuntu; elif [ -f /etc/redhat-release ]; then OS=rocky; else OS=unknown; fi
+SHARED_PASS="${SHARED_PASS:-$OS}"
 WEBMIN_USERS_FILE="/etc/webmin/miniserv.users"
 BRIDGE_ENV_FILE="/home/bridge/public_html/.env"
 WEBMIN_CHANGEPASS=""
@@ -110,7 +111,7 @@ if test_bridge_unix; then
 fi
 
 echo "[ 5 / 5 ] Checking your API bridge password..."
-if test_bridge_unix; then
+if test_bridge_api; then
     echo "Insecure! Changing your API bridge password..."
     NEW_PASS=$(generate_password)
     if [[ -f $BRIDGE_ENV_FILE && -w $BRIDGE_ENV_FILE ]]; then
