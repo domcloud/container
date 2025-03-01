@@ -637,7 +637,7 @@ table inet filter {
     iifname lo accept
   
     tcp dport { 22, 53, 80, 443, 3306, 5432, 2443-2453, 32000-65535 } counter accept
-    udp dport { 53, 67, 68, 443, 546, 547 } counter accept
+    udp dport { 53, 67, 68, 443, 546, 547, 32000-65535 } counter accept
     meta l4proto {tcp, udp} th sport 53 counter accept
     ip version 4 counter reject with icmp host-prohibited
     ip version 6 counter reject with icmpv6 admin-prohibited
