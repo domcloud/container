@@ -91,14 +91,14 @@ echo "[ 3 / 5 ] Checking your valkey root password..."
 if test_valkey; then
     echo "Insecure! Changing your valkey root password..."
     NEW_PASS=$(generate_password)
-    if echo -e "AUTH root $SHARED_PASS\nACL SETUSER root >$NEW_PASS\nACL SAVE\nPING" | valkey-cli | grep PONG &>/dev/null; then
+    if echo -e "AUTH root $SHARED_PASS\nACL SETUSER root resetpass >$NEW_PASS\nACL SAVE\nPING" | valkey-cli | grep PONG &>/dev/null; then
         echo "Password changed successfully."
         echo "New valkey root password: $NEW_PASS"
         if [[ -f $BRIDGE_ENV_FILE && -w $BRIDGE_ENV_FILE ]]; then
             sed -i '/^REDIS_URL=/d' "$BRIDGE_ENV_FILE"
             echo "REDIS_URL=\"redis://root:$NEW_PASS@localhost:6379\"" >> "$BRIDGE_ENV_FILE"
             echo "Valkey root password has been written to bridge env file"
-            systemctl restart bridge || true
+            NEED_RESTART_BRIDGE=1
         fi
     else
         echo "Failed to change valkey root password."
@@ -128,8 +128,13 @@ if test_bridge_api; then
         echo "SECRET=$NEW_PASS" >> "$BRIDGE_ENV_FILE"
         echo "Password changed successfully."
         echo "New API bridge password: $NEW_PASS"
-        systemctl restart bridge || true
+        NEED_RESTART_BRIDGE=1
     else
         echo "Failed to change API bridge password."
     fi
+fi
+
+if [[ "$NEED_RESTART_BRIDGE" == "1" ]]; then
+    echo "Restarting bridge service..."
+    systemctl restart bridge || true
 fi
