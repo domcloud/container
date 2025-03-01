@@ -2,6 +2,8 @@
 set -e
 cd /root
 
+if [ -f /etc/lsb-release ]; then OS=ubuntu; elif [ -f /etc/redhat-release ]; then OS=rocky; else OS=unknown; fi
+
 # Contents
 wget -O /usr/local/bin/restart https://raw.githubusercontent.com/domcloud/bridge/main/userkill.sh && chmod 755 /usr/local/bin/restart
 WWW=/usr/local/share/www && WWWSOURCE=https://raw.githubusercontent.com/domcloud/domcloud/master/share && mkdir -p $WWW
@@ -97,8 +99,21 @@ root             soft    nofile          65535
 @nginx           hard    nproc           64
 @nginx           hard    priority        5
 EOF
+
+# Services config
 PG=17
-mkdir -p /etc/systemd/system/{nginx,earlyoom,mariadb,postgresql-$PG,valkey}.service.d
+PGDATA=/var/lib/pgsql/$PG/data
+PGDAEMON=postgresql-$PG
+PGCONFIG=$PGDATA
+PGBIN=/usr/pgsql-$PG/bin
+if [[ "$OS" == "ubuntu" ]]; then
+  PGDATA=/usr/share/postgresql/$PG/data
+  PGDAEMON=postgresql
+  PGCONFIG=/etc/postgresql/$PG/main
+  PGBIN=/usr/lib/postgresql/$PG/bin
+fi
+
+mkdir -p /etc/systemd/system/{nginx,earlyoom,fail2ban,mariadb,$PGDAEMON,valkey}.service.d
 cat <<'EOF' > /etc/systemd/system/nginx.service.d/override.conf
 [Service]
 LimitNOFILE=65535
@@ -107,11 +122,19 @@ cat <<'EOF' > /etc/systemd/system/earlyoom.service.d/override.conf
 [Service]
 SupplementaryGroups=adm
 EOF
+cat <<'EOF' > /etc/systemd/system/fail2ban.service.d/override.conf
+[Unit]
+Requires=nftables.service
+PartOf=nftables.service
+
+[Install]
+WantedBy=multi-user.target nftables.service
+EOF
 cat <<'EOF' > /etc/systemd/system/mariadb.service.d/override.conf
 [Service]
 Restart=on-failure
 EOF
-cat <<'EOF' > /etc/systemd/system/postgresql-$PG.service.d/override.conf
+cat <<'EOF' > /etc/systemd/system/$PGDAEMON.service.d/override.conf
 [Service]
 Restart=on-failure
 EOF
@@ -119,12 +142,15 @@ cat <<'EOF' > /etc/systemd/system/valkey.service.d/override.conf
 [Service]
 Restart=on-failure
 EOF
-SLICEDIR=/etc/systemd/system/user.slice.d; mkdir -p $SLICEDIR
-# You may want to set limit
-# CPULIMIT=$(echo $(( $(nproc) * 70 ))%)
-# MEMLIMIT=$(echo $(( $(grep MemTotal /proc/meminfo | awk '{print $2}') * 80 / 100 / 1024 ))M)
-echo -e "[Slice]\nCPUAccounting=yes\nCPUQuota=$CPULIMIT" > $SLICEDIR/50-cpu-limit.conf
-echo -e "[Slice]\nMemoryAccounting=yes\nMemoryMax=$MEMLIMIT\nMemorySwapMax=0" > $SLICEDIR/50-mem-limit.conf
+SLICEDIR=/etc/systemd/system/user.slice.d; 
+if [ ! -d "$SLICEDIR" ]; then
+  mkdir -p $SLICEDIR
+  # You may want to set limit
+  # CPULIMIT=$(echo $(( $(nproc) * 70 ))%)
+  # MEMLIMIT=$(echo $(( $(grep MemTotal /proc/meminfo | awk '{print $2}') * 80 / 100 / 1024 ))M)
+  echo -e "[Slice]\nCPUAccounting=yes\nCPUQuota=$CPULIMIT" > $SLICEDIR/50-cpu-limit.conf
+  echo -e "[Slice]\nMemoryAccounting=yes\nMemoryMax=$MEMLIMIT\nMemorySwapMax=0" > $SLICEDIR/50-mem-limit.conf
+fi
 
 # Docker (we use nftables)
 cat <<EOF > /etc/docker/daemon.json
@@ -134,12 +160,14 @@ cat <<EOF > /etc/docker/daemon.json
 EOF
 
 # DB
-cat <<'EOF' > /etc/my.cnf.d/mariadb-server.cnf
+if [[ "$OS" == "ubuntu" ]]; then
+  MARIA_CONF=/etc/mysql/mariadb.conf.d/50-server.cnf
+  cat <<'EOF' > $MARIA_CONF
 [mysqld]
 datadir=/var/lib/mysql
 socket=/var/lib/mysql/mysql.sock
-log-error=/var/log/mariadb/mariadb.log
-pid-file=/run/mariadb/mariadb.pid
+pid-file=/run/mysqld/mysqld.pid
+log-error=/var/log/mariadb/mysqld.log
 innodb_file_per_table = 1
 innodb_buffer_pool_size = 128MB
 myisam_sort_buffer_size = 8M
@@ -152,13 +180,35 @@ max_allowed_packet = 64M
 key_buffer_size = 16M
 max_connections = 4096
 EOF
+else
+  MARIA_CONF=/etc/my.cnf.d/mariadb-server.cnf
+  cat <<'EOF' > $MARIA_CONF
+[mysqld]
+datadir=/var/lib/mysql
+socket=/var/lib/mysql/mysql.sock
+pid-file=/run/mariadb/mariadb.pid
+log-error=/var/log/mariadb/mariadb.log
+innodb_file_per_table = 1
+innodb_buffer_pool_size = 128MB
+myisam_sort_buffer_size = 8M
+read_rnd_buffer_size = 512K
+net_buffer_length = 8K
+read_buffer_size = 256K
+sort_buffer_size = 512K
+table_open_cache = 64
+max_allowed_packet = 64M
+key_buffer_size = 16M
+max_connections = 4096
+EOF
+fi
+
 systemctl start mariadb # init db
 
-PGDATA=/var/lib/pgsql/$PG/data
-sudo -u postgres /usr/pgsql-$PG/bin/initdb -D $PGDATA || true
-sed -i "s/#listen_addresses = .*/listen_addresses = '*'/g" $PGDATA/postgresql.conf
-sed -i "s/max_connections = 100/max_connections = 4096/g" $PGDATA/postgresql.conf
-cat <<'EOF' > $PGDATA/pg_hba.conf
+
+sudo -u postgres $PGBIN/initdb -D $PGDATA || true
+sed -i "s/#listen_addresses = .*/listen_addresses = '*'/g" $PGCONFIG/postgresql.conf
+sed -i "s/max_connections = 100/max_connections = 4096/g" $PGCONFIG/postgresql.conf
+cat <<'EOF' > $PGCONFIG/pg_hba.conf
 local   all             all                                     peer
 host    all             all             0.0.0.0/0               md5
 host    all             all             ::/0                    md5
@@ -320,21 +370,38 @@ realdomslimit=
 scripts=
 EOF
 
-cat <<'EOF' > /etc/webmin/virtualmin-nginx/config
+if [[ "$OS" == "ubuntu" ]]; then
+  cat <<'EOF' > /etc/webmin/virtualmin-nginx/config
+add_to=/etc/nginx/sites-available
+apply_cmd=systemctl reload nginx
+stop_cmd=systemctl stop nginx
+start_cmd=systemctl start nginx
+nginx_cmd=/usr/sbin/nginx
+rotate_cmd=nginx -s reload
+http2=0
+php_socket=1
+child_procs=4
+add_link=/etc/nginx/sites-enabled
+nginx_config=/etc/nginx/nginx.conf
+listen_mode=0
+EOF
+else
+  cat <<'EOF' > /etc/webmin/virtualmin-nginx/config
+add_to=/etc/nginx/conf.d
+apply_cmd=systemctl reload nginx
+stop_cmd=systemctl stop nginx
+start_cmd=systemctl start nginx
 php_socket=1
 nginx_cmd=/usr/sbin/nginx
-add_to=/etc/nginx/conf.d
 http2=0
 listen_mode=0
 child_procs=4
 extra_dirs=
 rotate_cmd=nginx -s reload
-apply_cmd=systemctl reload nginx
-stop_cmd=systemctl stop nginx
-start_cmd=systemctl start nginx
 add_link=
 nginx_config=/etc/nginx/nginx.conf
 EOF
+fi
 
 
 cat <<'EOF' > /etc/nginx/fastcgi.conf
@@ -488,6 +555,7 @@ http {
 }
 EOF
 
+
 cat <<'EOF' > /etc/logrotate.d/nginx
 /var/log/nginx/*.log /var/log/virtualmin/*_log {
     create 0640 nginx root
@@ -526,6 +594,8 @@ cat <<'EOF' > /etc/fail2ban/jail.local
 maxretry = 10
 bantime = 86400 ; 24h
 ignoreip = 127.0.0.1/8 ::1
+banaction = nftables-multiport
+banaction_allports = nftables-allports 
 
 [sshd]
 enabled = true
@@ -588,6 +658,7 @@ table inet filter {
 }
 
 include "/etc/nftables-docker.conf"
+include "/etc/nftables-whitelist.conf"
 EOF
 
 # https://gist.github.com/goll/bdd6b43c2023f82d15729e9b0067de60
@@ -654,6 +725,10 @@ table ip nat {
 		iifname "docker0" counter return
 	}
 }
+EOF
+
+cat <<'EOF' > /etc/nftables-whitelist.conf
+#!/usr/sbin/nft -f
 EOF
 
 sed -i '/allow-query/d' /etc/named.conf

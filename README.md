@@ -33,19 +33,20 @@ Here's feature comparison:
 
 The most recent one built on 2024-12-06:
 
-+ [domcloud-x86_64.qcow2](https://domcloud-images.fra1.cdn.digitaloceanspaces.com/2412/domcloud-x86_64.qcow2) 4.5 GB
-+ [domcloud-x86_64.vmdk](https://domcloud-images.fra1.cdn.digitaloceanspaces.com/2412/domcloud-x86_64.vmdk) 2.6 GB
-+ [domcloud-aarch64.qcow2](https://domcloud-images.fra1.cdn.digitaloceanspaces.com/2412/domcloud-aarch64.qcow2) 4.3 GB
-+ [domcloud-aarch64.vmdk](https://domcloud-images.fra1.cdn.digitaloceanspaces.com/2412/domcloud-aarch64.vmdk) 2.5 GB
++ [domcloud-rocky-x86_64.qcow2](https://domcloud-images.fra1.cdn.digitaloceanspaces.com/2412/domcloud-x86_64.qcow2) 4.5 GB
++ [domcloud-rocky-x86_64.vmdk](https://domcloud-images.fra1.cdn.digitaloceanspaces.com/2412/domcloud-x86_64.vmdk) 2.6 GB
++ [domcloud-rocky-aarch64.qcow2](https://domcloud-images.fra1.cdn.digitaloceanspaces.com/2412/domcloud-aarch64.qcow2) 4.3 GB
++ [domcloud-rocky-aarch64.vmdk](https://domcloud-images.fra1.cdn.digitaloceanspaces.com/2412/domcloud-aarch64.vmdk) 2.5 GB
 + [checksum](https://domcloud-images.fra1.cdn.digitaloceanspaces.com/2411/checksums.txt)
 
 Select based on Virtualization platform e.g. Proxmox and QEMU uses `QCOW2` while VMWare and VirtualBox uses `VMDK`.
 
-If you don't want to download our custom prebuilt images, you can run these from freshly installed [Rocky Linux Minimal ISO](https://rockylinux.org/download) instead:
+If you don't want to download our custom prebuilt images, you can run these from freshly installed [Rocky Linux Minimal ISO](https://rockylinux.org/download) or [Ubuntu Server ISO](https://ubuntu.com/download/server) instead:
 
 ```sh
 # make sure to run this using root:
-curl -sSL https://github.com/domcloud/container/raw/refs/heads/master/install-rocky.sh | bash
+if [ -f /etc/lsb-release ]; then OS=ubuntu; elif [ -f /etc/redhat-release ]; then OS=rocky; else OS=unknown; fi
+curl -sSL https://github.com/domcloud/container/raw/refs/heads/master/install-$OS.sh | bash
 curl -sSL https://github.com/domcloud/container/raw/refs/heads/master/preset.sh | bash
 ```
 

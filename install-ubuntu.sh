@@ -25,7 +25,7 @@ apt-get update
 apt-get -y install bzip2 bison btop clang certbot cmake git ncdu htop iftop ipset jq lsof make nano ninja-build ncurses-bin nodejs patch ripgrep ruby rsync screen socat strace tar time tmux vim wget whois xz-utils zstd \
         libcurl4-openssl-dev libffi-dev libsqlite3-dev libtool libssl-dev libyaml-dev brotli libbz2-dev libgl1-mesa-dev libldap2-dev libpcre2-dev python3-dev libreadline-dev redis-server libxmlsec1-dev python3-pip ruby-json ruby-rack \
         language-pack-en libc-bin libdbd-pg-perl libdbd-mysql-perl liblwp-protocol-https-perl libdatetime-perl libcrypt-ssleay-perl libtext-asciitable-perl libio-tty-perl libxml-simple-perl libpq-dev
-apt-get -y install webmin webmin-{virtual-server,virtualmin-nginx,virtualmin-nginx-ssl,ruby-gems} valkey-server earlyoom fail2ban nftables postfix bind9 sudo openssh-server systemd-container
+apt-get -y install webmin webmin-{virtual-server,virtualmin-nginx,virtualmin-nginx-ssl,ruby-gems} valkey-server earlyoom fail2ban mariadb-server nftables postfix bind9 sudo openssh-server systemd-container
 
 # NGINX
 BUILDER_DIR=/usr/local/lib/nginx-builder
@@ -35,7 +35,6 @@ else; git -C $BUILDER_DIR pull; fi
 cd $BUILDER_DIR/ && make install DOWNLOAD_V=1.1.1 && make clean && cd /root
 ln -fs /usr/local/sbin/nginx /usr/sbin/nginx # nginx compatibility
 
-
 # Docker
 apt-get -y install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
@@ -44,7 +43,6 @@ apt-get -y install php{7.4,8.4}-{bcmath,cli,common,dev,fpm,gd,imap,igbinary,intl
 curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 find /etc/php/ -maxdepth 1 -mindepth 1 -exec sed -i "s/upload_max_filesize = 2M/upload_max_filesize = 512M/g" {}/fpm/php.ini \; -exec sed -i "s/post_max_size = 8M/post_max_size = 512M/g" {}/fpm/php.ini \; 
 find /etc/php/ -type f -name www.conf -print0 | xargs -0 sed -i 's/pm = dynamic/pm = ondemand/g'
-
 
 # Proxyfix
 PROXYFIX=proxy-fix-linux-$( [ "$(uname -m)" = "aarch64" ] && echo "arm64" || echo "amd64" )
