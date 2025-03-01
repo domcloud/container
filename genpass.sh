@@ -45,8 +45,8 @@ test_webmin() { test_password "root" "$WEBMIN_USERS_FILE"; }
 test_bridge_unix() { test_password "bridge" "$SHADOW_FILE"; }
 
 test_bridge_api() {
-    curl -sS 'http://localhost:2223/status/ip' --connect-timeout 5 \
-        --header 'Authorization: Bearer rocky' \
+    curl -sS 'http://127.0.0.1:2223/status/ip' --connect-timeout 5 \
+        --header "Authorization: Bearer $SHARED_PASS" \
         | jq -e '.granted == true' > /dev/null
 }
 
