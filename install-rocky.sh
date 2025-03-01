@@ -28,10 +28,8 @@ ln -s /usr/bin/gcc /usr/bin/$(uname -m)-linux-gnu-gcc || true # fix pip install 
 ln -s /usr/bin/valkey-cli /usr/local/bin/redis-cli || true # redis compatibility
 
 # NGINX
-BUILDER_DIR=/usr/local/lib/nginx-builder
-if [ ! -d "$BUILDER_DIR" ]; then
-  git clone https://github.com/domcloud/nginx-builder/ $BUILDER_DIR
-else; git -C $BUILDER_DIR pull; fi
+BUILDER_DIR=/usr/local/lib/nginx-builder; [ ! -d "$BUILDER_DIR" ] && \
+git clone https://github.com/domcloud/nginx-builder/ $BUILDER_DIR || git -C $BUILDER_DIR pull
 cd $BUILDER_DIR/ && make install DOWNLOAD_V=1.1.1 && make clean && cd /root
 ln -fs /usr/local/sbin/nginx /usr/sbin/nginx # nginx compatibility
 
