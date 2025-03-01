@@ -222,9 +222,9 @@ sed -i "s/# aclfile /aclfile /g" $VALKEY/valkey.conf
 sed -i "s/# maxmemory <bytes>/maxmemory 256mb/g" $VALKEY/valkey.conf
 sed -i "s/# maxmemory-policy noeviction/maxmemory-policy allkeys-lru/g" $VALKEY/valkey.conf
 sed -i "s/# maxmemory-samples 5/maxmemory-samples 3/g" $VALKEY/valkey.conf
-[ -f $VALKEY/users.acl ] || cat <<'EOF' > $VALKEY/users.acl
+[ -f $VALKEY/users.acl ] || cat <<EOF > $VALKEY/users.acl
 user default off nopass sanitize-payload resetchannels +@all
-user root on sanitize-payload >rocky ~* &* +@all
+user root on sanitize-payload >$PASSWD ~* &* +@all
 EOF
 touch $VALKEY/usermap.acl
 chmod 0700 $VALKEY/*
