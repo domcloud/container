@@ -638,17 +638,20 @@ table inet filter {
   
     tcp dport { 22, 53, 80, 443, 3306, 5432, 2443-2453, 32000-65535 } counter accept
     udp dport { 53, 67, 68, 443, 546, 547, 32000-65535 } counter accept
-    meta l4proto {tcp, udp} th sport 53 counter accept
-    ip version 4 counter reject with icmp host-prohibited
-    ip version 6 counter reject with icmpv6 admin-prohibited
+    tcp sport 53 counter accept
+    udp sport 53 counter accept
+    counter reject with icmp type host-prohibited
+    counter reject with icmpv6 type admin-prohibited
   }
 
   chain OUTPUT {
     type filter hook output priority filter; policy accept;
     oifname lo counter accept
     ct state established accept
-    meta l4proto {tcp, udp} sport { 22, 53, 67, 68, 546, 547 } counter accept
-    meta l4proto {tcp, udp} dport { 22, 53, 67, 68, 546, 547 } counter accept
+    tcp sport { 22, 53 } counter accept
+    tcp dport { 22, 53 } counter accept
+    udp sport { 53, 67, 68, 546, 547 } counter accept
+    udp dport { 53, 67, 68, 546, 547 } counter accept
     tcp dport 25 counter reject
   }
 

@@ -95,5 +95,8 @@ curl -sSL https://rdfind.pauldreik.se/$RDFIND.tar.gz | tar -xzf -
 cd $RDFIND; ./configure --disable-debug ; make install; cd .. ; rm -rf $RDFIND*
 
 # Misc
+apt -y remove ufw
 apt -y upgrade
 apt -y autoremove
+systemctl enable webmin mariadb postgresql nftables fail2ban named php{7.4,8.4}-fpm earlyoom valkey-server || true
+chmod +x /usr/local/bin/* && chown root:root /usr/local/bin/*
