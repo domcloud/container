@@ -731,9 +731,11 @@ cat <<'EOF' > /etc/nftables-whitelist.conf
 #!/usr/sbin/nft -f
 EOF
 
-sed -i '/allow-query/d' /etc/named.conf
-sed -i '/allow-recursive/d' /etc/named.conf
-sed -i 's/recursion no/recursion yes/g' /etc/named.conf
+if [[ "$OS" == "rocky" ]]; then
+  sed -i '/allow-query/d' /etc/named.conf
+  sed -i '/allow-recursive/d' /etc/named.conf
+  sed -i 's/recursion no/recursion yes/g' /etc/named.conf
+fi
 mkdir -p /etc/cloud && touch /etc/cloud/cloud-init.disabled
 cat <<'EOF' > /etc/resolv.conf
 nameserver 127.0.0.1
