@@ -3,6 +3,7 @@ set -e
 cd /root
 
 if [ -f /etc/lsb-release ]; then OS=ubuntu; elif [ -f /etc/redhat-release ]; then OS=rocky; else OS=unknown; fi
+PASSWD=$OS
 
 # Contents
 wget -O /usr/local/bin/restart https://raw.githubusercontent.com/domcloud/bridge/main/userkill.sh && chmod 755 /usr/local/bin/restart
@@ -764,14 +765,14 @@ EOF
 # Bridge
 if [ ! -e "/lib/systemd/system/bridge.service" ]; then
 if [[ "$OS" == "ubuntu" ]]; then
-  /usr/share/webmin/changepass.pl /etc/webmin root "rocky"
+  /usr/share/webmin/changepass.pl /etc/webmin root $PASSWD
 else
-  /usr/libexec/webmin/changepass.pl /etc/webmin root "rocky"
+  /usr/libexec/webmin/changepass.pl /etc/webmin root $PASSWD
 fi
 git clone https://github.com/domcloud/Virtualmin-Config
 cd Virtualmin-Config && sh patch.sh && cd .. && rm -rf Virtualmin-Config
 timeout 900 virtualmin config-system --bundle DomCloud
-virtualmin create-domain --domain localhost --user bridge --pass "rocky" --dir --unix --virtualmin-nginx --virtualmin-nginx-ssl
+virtualmin create-domain --domain localhost --user bridge --pass $PASSWD --dir --unix --virtualmin-nginx --virtualmin-nginx-ssl
 cat <<'EOF' | EDITOR='tee' visudo /etc/sudoers.d/bridge
 bridge ALL = (root) NOPASSWD: /home/bridge/public_html/sudoutil.js
 bridge ALL = (root) NOPASSWD: /bin/systemctl restart bridge
