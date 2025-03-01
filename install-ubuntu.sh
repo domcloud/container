@@ -3,18 +3,19 @@ set -e
 cd /root
 export TERM=xterm-256color
 export CODENAME=$(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}")
+export GPGDIR=/etc/apt/trusted.gpg.d
 
 # Repository
-
-apt-get update; apt-get -y install ca-certificates curl
+apt-get update
+apt-get -y install ca-certificates curl libterm-readline-gnu-perl software-properties-common
 curl -fsSL https://deb.nodesource.com/setup_22.x | bash - 
-curl -fsSL https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
-curl -fsSL http://apt.postgresql.org/pub/repos/apt/ACCC4CF8.asc | apt-key add -
+curl -fsSL https://dl.yarnpkg.com/debian/pubkey.gpg | gpg --dearmor -o $GPGDIR/yarn.gpg
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o $GPGDIR/docker.gpg
+curl -fsSL http://apt.postgresql.org/pub/repos/apt/ACCC4CF8.asc | gpg --dearmor -o $GPGDIR/pgdg.gpg
 
-echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list
-echo "deb https://download.docker.com/linux/ubuntu $CODENAME stable" | tee /etc/apt/sources.list.d/docker.list
-echo "deb http://apt.postgresql.org/pub/repos/apt/ $CODENAME-pgdg main" | tee /etc/apt/sources.list.d/pgdg.list
+echo "deb [signed-by=$GPGDIR/yarn.gpg] https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list
+echo "deb [signed-by=$GPGDIR/docker.gpg] https://download.docker.com/linux/ubuntu $CODENAME stable" | tee /etc/apt/sources.list.d/docker.list
+echo "deb [signed-by=$GPGDIR/pgdg.gpg] http://apt.postgresql.org/pub/repos/apt/ $CODENAME-pgdg main" | tee /etc/apt/sources.list.d/pgdg.list
 curl -fsSL https://software.virtualmin.com/gpl/scripts/virtualmin-install.sh | sh -s -- --setup --verbose
 add-apt-repository ppa:ondrej/php
 
