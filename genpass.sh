@@ -96,7 +96,7 @@ if test_valkey; then
         echo "New valkey root password: $NEW_PASS"
         if [[ -f $BRIDGE_ENV_FILE && -w $BRIDGE_ENV_FILE ]]; then
             sed -i '/^REDIS_URL=/d' "$BRIDGE_ENV_FILE"
-            echo "REDIS_URL=\"redis://root:$NEWPASS@localhost:6379\"" >> "$BRIDGE_ENV_FILE"
+            echo "REDIS_URL=\"redis://root:$NEW_PASS@localhost:6379\"" >> "$BRIDGE_ENV_FILE"
             echo "Valkey root password has been written to bridge env file"
             systemctl restart bridge || true
         fi
