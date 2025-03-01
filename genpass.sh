@@ -5,6 +5,11 @@ if [ -z "$(echo $BASH_VERSION$ZSH_VERSION)" ]; then
     exit 1
 fi
 
+if [[ "$(id -u)" -ne 0 ]]; then
+    echo "❌ This script must be run as root!" >&2
+    exit 1
+fi
+
 if [ -f /etc/lsb-release ]; then OS=ubuntu; elif [ -f /etc/redhat-release ]; then OS=rocky; else OS=unknown; fi
 SHARED_PASS="${SHARED_PASS:-$OS}"
 WEBMIN_USERS_FILE="/etc/webmin/miniserv.users"
