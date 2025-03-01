@@ -760,7 +760,11 @@ EOF
 
 # Bridge
 if [ ! -e "/lib/systemd/system/bridge.service" ]; then
-/usr/libexec/webmin/changepass.pl /etc/webmin root "rocky"
+if [[ "$OS" == "ubuntu" ]]; then
+  /usr/share/webmin/changepass.pl /etc/webmin root "rocky"
+else
+  /usr/libexec/webmin/changepass.pl /etc/webmin root "rocky"
+fi
 git clone https://github.com/domcloud/Virtualmin-Config
 cd Virtualmin-Config && sh patch.sh && cd .. && rm -rf Virtualmin-Config
 timeout 900 virtualmin config-system --bundle DomCloud
