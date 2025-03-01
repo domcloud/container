@@ -8,6 +8,7 @@ fi
 if [ -f /etc/lsb-release ]; then OS=ubuntu; elif [ -f /etc/redhat-release ]; then OS=rocky; else OS=unknown; fi
 SHARED_PASS="${SHARED_PASS:-$OS}"
 WEBMIN_USERS_FILE="/etc/webmin/miniserv.users"
+SHADOW_FILE="/etc/shadow"
 BRIDGE_ENV_FILE="/home/bridge/public_html/.env"
 WEBMIN_CHANGEPASS=""
 for path in /usr/{share,libexec}/webmin/changepass.pl; do
@@ -18,23 +19,25 @@ generate_password() {
     openssl rand -base64 24 | tr -dc 'A-Za-z0-9' | head -c 24
 }
 
-test_linux() {
-    echo $SHARED_PASS | sudo -S true 2>/dev/null
-    [ $? -eq 0 ]
-}
+test_password() {
+    local user="$1"
+    local file="$2"
 
-test_webmin() {
-    [[ -f "$WEBMIN_USERS_FILE" ]] || return 1
-    WEBMIN_HASH=$(grep "^root:" "$WEBMIN_USERS_FILE" | cut -d: -f2)
-    SALT=$(echo "$WEBMIN_HASH" | cut -d'$' -f3)
+    [[ -f "$file" ]] || return 1  # Exit if file does not exist
+
+    PASSHASH=$(grep "^$user:" "$file" | cut -d: -f2)
+    [[ -n "$PASSHASH" ]] || return 1  # Exit if no hash found
+
+    SALT=$(echo "$PASSHASH" | cut -d'$' -f3)
     GENERATED_HASH=$(openssl passwd -6 -salt "$SALT" "$SHARED_PASS")
-    [[ "$WEBMIN_HASH" == "$GENERATED_HASH" ]]
+
+    [[ "$PASSHASH" == "$GENERATED_HASH" ]]
 }
 
-test_bridge_unix() {
-    echo "$SHARED_PASS" | sudo -S -u bridge true 2>/dev/null
-    [ $? -eq 0 ]
-}
+# Reuse function for each case
+test_linux() { test_password "root" "$SHADOW_FILE"; }
+test_webmin() { test_password "root" "$WEBMIN_USERS_FILE"; }
+test_bridge_unix() { test_password "bridge" "$SHADOW_FILE"; }
 
 test_bridge_api() {
     curl -sS 'http://localhost:2223/status/ip'  --connect-timeout 5 \
@@ -44,6 +47,7 @@ test_bridge_api() {
 
 test_valkey() {
     echo "AUTH root $SHARED_PASS" | valkey-cli &>/dev/null;
+    [ $? -eq 0 ]
 }
 
 echo This script detect if you haven\'t change any password in this OS then perform changes it for you.
@@ -84,7 +88,7 @@ if test_valkey; then
     NEW_PASS=$(generate_password)
     if echo -e "AUTH root $SHARED_PASS\nACL SETUSER root >$NEW_PASS\nACL SAVE" | valkey-cli; then
         echo "Password changed successfully."
-        echo "New valkey root password: $SHARED_PASS"
+        echo "New valkey root password: $NEW_PASS"
         if [[ -f $BRIDGE_ENV_FILE && -w $BRIDGE_ENV_FILE ]]; then
             sed -i '/^REDIS_URL=/d' "$BRIDGE_ENV_FILE"
             echo "REDIS_URL=\"redis://root:$NEWPASS@localhost:6379\"" >> "$BRIDGE_ENV_FILE"
