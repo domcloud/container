@@ -631,6 +631,16 @@ cat <<'EOF' > /etc/nftables.conf
 flush ruleset
 
 table inet filter {
+	set whitelist {
+		type ipv4_addr
+		size 65536
+	}
+
+	set whitelist-v6 {
+		type ipv6_addr
+		size 65536
+	}
+
   chain INPUT {
     type filter hook input priority filter; policy accept;
     ct state established,related accept
@@ -648,7 +658,7 @@ table inet filter {
   }
 
   chain OUTPUT {
-    type filter hook output priority filter; policy accept;
+    type filter hook output priority 0; policy accept;
     oifname lo counter accept
     ct state established accept
     tcp sport { 22, 53 } counter accept
@@ -656,15 +666,22 @@ table inet filter {
     udp sport { 53, 67, 68, 546, 547 } counter accept
     udp dport { 53, 67, 68, 546, 547 } counter accept
     tcp dport 25 counter reject
+    ip daddr @whitelist accept
+    ip6 daddr @whitelist-v6 accept
   }
 
   chain FORWARD {
     type filter hook forward priority 0; policy drop;
   }
+
+  chain WHITELIST-SET {
+  }
 }
 
 include "/etc/nftables-docker.conf"
 include "/etc/nftables-whitelist.conf"
+include "/etc/nftables-firewall.conf"
+add rule inet filter OUTPUT jump WHITELIST-SET
 EOF
 
 # https://gist.github.com/goll/bdd6b43c2023f82d15729e9b0067de60
@@ -735,6 +752,15 @@ EOF
 
 cat <<'EOF' > /etc/nftables-whitelist.conf
 #!/usr/sbin/nft -f
+
+# add element inet filter whitelist { x.x.x.x }
+# add element inet filter whitelist-v6 { x:x:x::x:x }
+EOF
+
+cat <<'EOF' > /etc/nftables-firewall.conf
+#!/usr/sbin/nft -f
+
+# add rule inet filter WHITELIST-SET skuid <id> counter reject comment "<name>"
 EOF
 
 if [[ "$OS" == "rocky" ]]; then
