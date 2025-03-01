@@ -3,7 +3,7 @@ set -e
 cd /root
 export TERM=xterm-256color
 export CODENAME=$(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}")
-export GPGDIR=/etc/apt/trusted.gpg.d
+export GPGDIR=/usr/share/keyrings
 
 # Repository
 apt-get update
