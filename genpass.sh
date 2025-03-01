@@ -45,13 +45,13 @@ test_webmin() { test_password "root" "$WEBMIN_USERS_FILE"; }
 test_bridge_unix() { test_password "bridge" "$SHADOW_FILE"; }
 
 test_bridge_api() {
-    curl -sS 'http://localhost:2223/status/ip'  --connect-timeout 5 \
+    curl -sS 'http://localhost:2223/status/ip' --connect-timeout 5 \
         --header 'Authorization: Bearer rocky' \
         | jq -e '.granted == true' > /dev/null
 }
 
 test_valkey() {
-    echo "AUTH root $SHARED_PASS" | valkey-cli &>/dev/null;
+    echo -e "AUTH root $SHARED_PASS\nPING" | valkey-cli | grep PONG &>/dev/null;
     [ $? -eq 0 ]
 }
 
@@ -91,7 +91,7 @@ echo "[ 3 / 5 ] Checking your valkey root password..."
 if test_valkey; then
     echo "Insecure! Changing your valkey root password..."
     NEW_PASS=$(generate_password)
-    if echo -e "AUTH root $SHARED_PASS\nACL SETUSER root >$NEW_PASS\nACL SAVE" | valkey-cli; then
+    if echo -e "AUTH root $SHARED_PASS\nACL SETUSER root >$NEW_PASS\nACL SAVE\nPING" | valkey-cli | grep PONG &>/dev/null; then
         echo "Password changed successfully."
         echo "New valkey root password: $NEW_PASS"
         if [[ -f $BRIDGE_ENV_FILE && -w $BRIDGE_ENV_FILE ]]; then
