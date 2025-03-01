@@ -28,12 +28,11 @@ ln -s /usr/bin/gcc /usr/bin/$(uname -m)-linux-gnu-gcc || true # fix pip install 
 ln -s /usr/bin/valkey-cli /usr/local/bin/redis-cli || true # redis compatibility
 
 # NGINX
-if [ ! -d "/usr/local/lib/nginx-builder" ]; then
-  git clone https://github.com/domcloud/nginx-builder/ /usr/local/lib/nginx-builder
-else
-  git -C /usr/local/lib/nginx-builder pull
-fi
-cd /usr/local/lib/nginx-builder/ && make install DOWNLOAD_V=1.1.1 && make clean && cd /root
+BUILDER_DIR=/usr/local/lib/nginx-builder
+if [ ! -d "$BUILDER_DIR" ]; then
+  git clone https://github.com/domcloud/nginx-builder/ $BUILDER_DIR
+else; git -C $BUILDER_DIR pull; fi
+cd $BUILDER_DIR/ && make install DOWNLOAD_V=1.1.1 && make clean && cd /root
 ln -fs /usr/local/sbin/nginx /usr/sbin/nginx # nginx compatibility
 
 # PHP
@@ -74,17 +73,13 @@ if ! command -v pathman &> /dev/null; then
   wget -O pathman.tar.gz https://github.com/therootcompany/pathman/releases/download/v0.6.0/$PATHMAN.tar.gz
   tar -xf pathman.tar.gz && mv $PATHMAN /usr/local/bin/pathman && rm -f pathman.tar.gz
 fi
+
 # NVIM for NvChad
 NVIM_V=0.10.4
 if ! command -v neovim &> /dev/null; then
-  if [ "$(uname -m)" = "x86_64" ]; then
-    curl -sSLO https://github.com/neovim/neovim/releases/download/v$NVIM_V/nvim-linux64.tar.gz
-    tar -xf nvim-linux64.tar.gz && chown -R root:root nvim-linux64 && rsync -a nvim-linux64/ /usr/local/ && rm -rf nvim-linux64*
-  else
-    curl -sSLO https://github.com/neovim/neovim/archive/refs/tags/v$NVIM_V.tar.gz
-    tar -xf v$NVIM_V.tar.gz && mv neovim-$NVIM_V neovim && rm -f v$NVIM_V.tar.gz
-    cd neovim && make CMAKE_BUILD_TYPE=Release && make install && cd .. && rm -rf neovim
-  fi
+  NVIM_F=nvim-linux-$( [ "$(uname -m)" = "aarch64" ] && echo "arm64" || echo "x86_64" )
+  curl -sSLO https://github.com/neovim/neovim/releases/download/v$NVIM_V/$NVIM_F.tar.gz
+  tar -xf $NVIM_F.tar.gz && chown -R root:root $NVIM_F && rsync -a $NVIM_F/ /usr/local/ && rm -rf $NVIM_F*
 fi
 
 # Lazygit for NVIM
@@ -95,13 +90,13 @@ if ! command -v lazygit &> /dev/null; then
 fi
 
 # Neofetch (Forked)
-wget -O /usr/local/bin/neofetch https://github.com/hykilpikonna/hyfetch/raw/1.4.11/neofetch
+curl -sSLo /usr/local/bin/neofetch https://github.com/hykilpikonna/hyfetch/raw/1.99.0/neofetch
+
 # Rdfind
 RDFIND=rdfind-1.6.0
-wget https://rdfind.pauldreik.se/$RDFIND.tar.gz
-tar -xf $RDFIND.tar.gz ; cd $RDFIND
-./configure --disable-debug ; make install
-cd .. ; rm -rf $RDFIND*
+curl -sSL https://rdfind.pauldreik.se/$RDFIND.tar.gz | tar -xzf -
+cd $RDFIND; ./configure --disable-debug ; make install; cd .. ; rm -rf $RDFIND*
+
 # Misc
 pip3 install pipenv
 dnf -y remove lynx gcc-toolset-13-* nodejs-docs clang flatpak open-sans-fonts rubygem-rdoc gl-manpages
@@ -113,4 +108,3 @@ chmod +x /usr/local/bin/* && chown root:root /usr/local/bin/*
 # nobest since sometimes broken like https://cloudlinux.zendesk.com/hc/en-us/articles/15731606500124
 dnf -y update --nobest
 dnf -y clean all
-rm -rf /usr/share/{locale,doc,man}

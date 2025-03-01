@@ -4,10 +4,11 @@ cd /root
 export TERM=xterm-256color
 export CODENAME=$(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}")
 export GPGDIR=/usr/share/keyrings
+export DEBIAN_FRONTEND=noninteractive
 
 # Repository
 apt-get update
-apt-get -y install ca-certificates curl libterm-readline-gnu-perl software-properties-common apt-transport-https
+apt-get -y install ca-certificates curl libterm-readline-gnu-perl software-properties-common apt-transport-https apt-utils
 curl -fsSL https://deb.nodesource.com/setup_22.x | bash - 
 curl -fsSL https://dl.yarnpkg.com/debian/pubkey.gpg | gpg --dearmor -o $GPGDIR/yarn.gpg
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o $GPGDIR/docker.gpg
@@ -24,7 +25,64 @@ apt-get update
 apt-get -y install bzip2 bison btop clang certbot cmake git ncdu htop iftop ipset jq lsof make nano ninja-build ncurses-bin nodejs patch ripgrep ruby rsync screen socat strace tar time tmux vim wget whois xz-utils zstd \
         libcurl4-openssl-dev libffi-dev libsqlite3-dev libtool libssl-dev libyaml-dev brotli libbz2-dev libgl1-mesa-dev libldap2-dev libpcre2-dev python3-dev libreadline-dev redis-server libxmlsec1-dev python3-pip ruby-json ruby-rack \
         language-pack-en libc-bin libdbd-pg-perl libdbd-mysql-perl liblwp-protocol-https-perl libdatetime-perl libcrypt-ssleay-perl libtext-asciitable-perl libio-tty-perl libxml-simple-perl libpq-dev
-apt-get -y install webmin valkey-server earlyoom fail2ban nftables postfix bind9 sudo openssh-server systemd-container
+apt-get -y install webmin webmin-{virtual-server,virtualmin-nginx,virtualmin-nginx-ssl,ruby-gems} valkey-server earlyoom fail2ban nftables postfix bind9 sudo openssh-server systemd-container
+
+# NGINX
+BUILDER_DIR=/usr/local/lib/nginx-builder
+if [ ! -d "$BUILDER_DIR" ]; then
+  git clone https://github.com/domcloud/nginx-builder/ $BUILDER_DIR
+else; git -C $BUILDER_DIR pull; fi
+cd $BUILDER_DIR/ && make install DOWNLOAD_V=1.1.1 && make clean && cd /root
+ln -fs /usr/local/sbin/nginx /usr/sbin/nginx # nginx compatibility
+
 
 # Docker
 apt-get -y install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+# PHP
+apt-get -y install php{7.4,8.4}-{bcmath,cli,common,dev,fpm,gd,imap,igbinary,intl,mbstring,mysql,opcache,mongodb,readline,redis,zip,pgsql,soap,xml}
+curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+find /etc/php/ -maxdepth 1 -mindepth 1 -exec sed -i "s/upload_max_filesize = 2M/upload_max_filesize = 512M/g" {}/fpm/php.ini \; -exec sed -i "s/post_max_size = 8M/post_max_size = 512M/g" {}/fpm/php.ini \; 
+find /etc/php/ -type f -name www.conf -print0 | xargs -0 sed -i 's/pm = dynamic/pm = ondemand/g'
+
+
+# Proxyfix
+PROXYFIX=proxy-fix-linux-$( [ "$(uname -m)" = "aarch64" ] && echo "arm64" || echo "amd64" )
+if ! command -v proxfix &> /dev/null; then
+  wget https://github.com/domcloud/proxy-fix/releases/download/v0.2.5/$PROXYFIX.tar.gz
+  tar -xf $PROXYFIX.tar.gz && mv $PROXYFIX /usr/local/bin/proxfix && rm -rf $PROXYFIX*
+fi
+
+# Pathman
+PATHMAN=pathman-v0.6.0-linux-$( [ "$(uname -m)" = "aarch64" ] && echo "arm64" || echo "amd64_v1" )
+if ! command -v pathman &> /dev/null; then
+  wget -O pathman.tar.gz https://github.com/therootcompany/pathman/releases/download/v0.6.0/$PATHMAN.tar.gz
+  tar -xf pathman.tar.gz && mv $PATHMAN /usr/local/bin/pathman && rm -f pathman.tar.gz
+fi
+
+# NVIM for NvChad
+NVIM_V=0.10.4
+if ! command -v neovim &> /dev/null; then
+  NVIM_F=nvim-linux-$( [ "$(uname -m)" = "aarch64" ] && echo "arm64" || echo "x86_64" )
+  curl -sSLO https://github.com/neovim/neovim/releases/download/v$NVIM_V/$NVIM_F.tar.gz
+  tar -xf $NVIM_F.tar.gz && chown -R root:root $NVIM_F && rsync -a $NVIM_F/ /usr/local/ && rm -rf $NVIM_F*
+fi
+
+# Lazygit for NVIM
+LAZYGIT=lazygit_0.46.0_Linux_$( [ "$(uname -m)" = "aarch64" ] && echo "arm64" || echo "x86_64" )
+if ! command -v lazygit &> /dev/null; then
+  curl -sSLO https://github.com/jesseduffield/lazygit/releases/download/v0.46.0/$LAZYGIT.tar.gz
+  tar -xf $LAZYGIT.tar.gz && mv lazygit /usr/local/bin/ && rm -f $LAZYGIT.tar.gz
+fi
+
+# Neofetch (Forked)
+curl -sSLo /usr/local/bin/neofetch https://github.com/hykilpikonna/hyfetch/raw/1.4.11/neofetch
+
+# Rdfind
+RDFIND=rdfind-1.6.0
+curl -sSL https://rdfind.pauldreik.se/$RDFIND.tar.gz | tar -xzf -
+cd $RDFIND; ./configure --disable-debug ; make install; cd .. ; rm -rf $RDFIND*
+
+# Misc
+apt -y upgrade
+apt -y autoremove
