@@ -107,14 +107,16 @@ PGDATA=/var/lib/pgsql/$PG/data
 PGDAEMON=postgresql-$PG
 PGCONFIG=$PGDATA
 PGBIN=/usr/pgsql-$PG/bin
+VALKEYDAEMON=valkey
 if [[ "$OS" == "ubuntu" ]]; then
   PGDATA=/usr/share/postgresql/$PG/data
   PGDAEMON=postgresql
   PGCONFIG=/etc/postgresql/$PG/main
   PGBIN=/usr/lib/postgresql/$PG/bin
+  VALKEYDAEMON=valkey-server
 fi
 
-mkdir -p /etc/systemd/system/{nginx,earlyoom,fail2ban,mariadb,$PGDAEMON,valkey}.service.d
+mkdir -p /etc/systemd/system/{nginx,earlyoom,fail2ban,mariadb,$PGDAEMON,$VALKEYDAEMON}.service.d
 cat <<'EOF' > /etc/systemd/system/nginx.service.d/override.conf
 [Service]
 LimitNOFILE=65535
@@ -139,7 +141,7 @@ cat <<'EOF' > /etc/systemd/system/$PGDAEMON.service.d/override.conf
 [Service]
 Restart=on-failure
 EOF
-cat <<'EOF' > /etc/systemd/system/valkey.service.d/override.conf
+cat <<'EOF' > /etc/systemd/system/$VALKEYDAEMON.service.d/override.conf
 [Service]
 Restart=on-failure
 EOF
