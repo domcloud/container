@@ -23,7 +23,7 @@ PG=17
 dnf -y install awscli bison btop bzip2 certbot clang cmake gcc-c++ git ncdu htop iftop ipset jq lsof make nano ninja-build ncurses npm nodejs patch ripgrep ruby rsync screen socat strace tar time tmux vim wget whois xz yarn zstd \
   lib{curl,ffi,sqlite3x,tool-ltdl,md,yaml}-devel {brotli,bzip2,mesa-libGL,nettle,openldap,pcre2,perl,python,readline,redis,ruby,xmlsec1,xmlsec1-openssl,valkey}-devel python3-pip rubygem-{json,rack,rake} \
   libreport-filesystem {langpacks,glibc-langpack}-en perl-{DBD-Pg,DBD-mysql,LWP-Protocol-https,macros,DateTime,Crypt-SSLeay,Text-ASCIITable,IO-Tty,XML-Simple} \
-  earlyoom fail2ban-server iptables-services postfix mariadb-server valkey wbm-virtual-server wbm-virtualmin-{nginx,nginx-ssl} virtualmin-config bind sudo \
+  earlyoom fail2ban-server nftables postfix mariadb-server valkey wbm-virtual-server wbm-virtualmin-{nginx,nginx-ssl} virtualmin-config bind sudo \
   openssh-server systemd-container libpq5-$PG* --skip-broken --nobest
 ln -s /usr/bin/gcc /usr/bin/$(uname -m)-linux-gnu-gcc || true # fix pip install with native libs for aarch64
 ln -s /usr/bin/valkey-cli /usr/local/bin/redis-cli || true # redis compatibility
@@ -34,7 +34,7 @@ if [ ! -d "/usr/local/lib/nginx-builder" ]; then
 else
   git -C /usr/local/lib/nginx-builder pull
 fi
-cd /usr/local/lib/nginx-builder/ && make install && make clean && cd /root
+cd /usr/local/lib/nginx-builder/ && make install DOWNLOAD_V=1.1.1 && make clean && cd /root
 ln -fs /usr/local/sbin/nginx /usr/sbin/nginx # nginx compatibility
 
 # PHP
@@ -89,9 +89,9 @@ if ! command -v neovim &> /dev/null; then
 fi
 
 # Lazygit for NVIM
-LAZYGIT=lazygit_0.45.2_Linux_$( [ "$(uname -m)" = "aarch64" ] && echo "arm64" || echo "x86_64" )
+LAZYGIT=lazygit_0.46.0_Linux_$( [ "$(uname -m)" = "aarch64" ] && echo "arm64" || echo "x86_64" )
 if ! command -v lazygit &> /dev/null; then
-  curl -sSLO https://github.com/jesseduffield/lazygit/releases/download/v0.45.2/$LAZYGIT.tar.gz
+  curl -sSLO https://github.com/jesseduffield/lazygit/releases/download/v0.46.0/$LAZYGIT.tar.gz
   tar -xf $LAZYGIT.tar.gz && mv lazygit /usr/local/bin/ && rm -f $LAZYGIT.tar.gz
 fi
 
@@ -108,7 +108,7 @@ pip3 install pipenv
 dnf -y mark install ipset
 dnf -y remove lynx gcc-toolset-13-* nodejs-docs clang flatpak open-sans-fonts rubygem-rdoc gl-manpages
 ln -s /usr/lib/systemd/system/postgresql-$PG.service /usr/lib/systemd/system/postgresql.service
-systemctl enable webmin mariadb postgresql-$PG {ip,ip6}tables fail2ban named php{74,84}-php-fpm earlyoom valkey
+systemctl enable webmin mariadb postgresql-$PG nftables fail2ban named php{74,84}-php-fpm earlyoom valkey
 chmod +x /usr/local/bin/* && chown root:root /usr/local/bin/*
 
 # Cleanup

@@ -45,7 +45,7 @@ If you don't want to download our custom prebuilt images, you can run these from
 
 ```sh
 # make sure to run this using root:
-curl -sSL https://github.com/domcloud/container/raw/refs/heads/master/install.sh | bash
+curl -sSL https://github.com/domcloud/container/raw/refs/heads/master/install-rocky.sh | bash
 curl -sSL https://github.com/domcloud/container/raw/refs/heads/master/preset.sh | bash
 ```
 
