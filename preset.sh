@@ -134,6 +134,13 @@ SLICEDIR=/etc/systemd/system/user.slice.d; mkdir -p $SLICEDIR
 echo -e "[Slice]\nCPUAccounting=yes\nCPUQuota=$CPULIMIT" > $SLICEDIR/50-cpu-limit.conf
 echo -e "[Slice]\nMemoryAccounting=yes\nMemoryMax=$MEMLIMIT\nMemorySwapMax=0" > $SLICEDIR/50-mem-limit.conf
 
+# Docker (we use nftables)
+cat <<EOF > /etc/docker/daemon.json
+{
+  "iptables": false
+}
+EOF
+
 # DB
 cat <<'EOF' > /etc/my.cnf.d/mariadb-server.cnf
 [mysqld]

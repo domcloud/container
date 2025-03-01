@@ -8,8 +8,7 @@ apt-get update
 apt-get -y install libdbd-{pg,mysql}-perl libcrypt-ssleay-perl libxml-simple-perl libtext-asciitable-perl liblwp-protocol-https-perl
 
 #Repos
-curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
-echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list
+
 apt update && apt install yarn -y
 apt update && apt install npm -y
 #Docker
@@ -21,13 +20,10 @@ apt update && apt install npm -y
         chmod a+r /etc/apt/keyrings/docker.asc
 
     # Add the repository to Apt sources:
-        echo \
-        "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
-        $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}") stable" | \
-        tee /etc/apt/sources.list.d/docker.list > /dev/null
+         > /dev/null
         apt-get update
     #Docker Install
-        apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin -y
+        
 #Postgresql
     apt-get update
     install -d /usr/share/postgresql-common/pgdg
@@ -51,44 +47,8 @@ apt update && apt install npm -y
 #Tools
     #ALL
         apt-get update
-        apt-get install bzip2 valkey-server bison btop clang certbot cmake git ncdu htop iftop ipset jq lsof make nano ninja-build ncurses-bin patch ripgrep ruby rsync screen socat strace tar time tmux vim wget whois xz-utils zstd libcurl4-openssl-dev \
-                libffi-dev \
-                libsqlite3-dev \
-                libtool \
-                libssl-dev \
-                libyaml-dev \
-                brotli \
-                libbz2-dev \
-                libgl1-mesa-dev \
-                libldap2-dev \
-                libpcre2-dev \
-                python3-dev \
-                libreadline-dev \
-                redis-server \
-                libxmlsec1-dev \
-                python3-pip \
-                ruby-json \
-                ruby-rack \
-                language-pack-en \
-                libc-bin \
-                libdbd-pg-perl \
-                libdbd-mysql-perl \
-                liblwp-protocol-https-perl \
-                libdatetime-perl \
-                libcrypt-ssleay-perl \
-                libtext-asciitable-perl \
-                libio-tty-perl \
-                libxml-simple-perl \
-                earlyoom \
-                fail2ban \
-                iptables \
-                postfix \
-                bind9 \
-                sudo \
-                openssh-server \
-                systemd-container \
-                libpq-dev \
-                -y
+        apt-get install bzip2 valkey-server bison btop clang certbot cmake git ncdu htop iftop ipset jq lsof make nano ninja-build ncurses-bin patch ripgrep ruby rsync screen socat strace tar time tmux vim wget whois xz-utils zstd \
+        libcurl4-openssl-dev libffi-dev libsqlite3-dev libtool libssl-dev libyaml-dev brotli libbz2-dev libgl1-mesa-dev libldap2-dev libpcre2-dev python3-dev libreadline-dev redis-server libxmlsec1-dev python3-pip ruby-json ruby-rack language-pack-en libc-bin libdbd-pg-perl libdbd-mysql-perl liblwp-protocol-https-perl libdatetime-perl libcrypt-ssleay-perl libtext-asciitable-perl libio-tty-perl libxml-simple-perl earlyoom fail2ban iptables postfix bind9 sudo openssh-server systemd-container libpq-dev -y
 
 curl -fsSL https://software.virtualmin.com/gpl/scripts/virtualmin-install.sh | sh -s -- --setup --verbose
 
