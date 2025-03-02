@@ -874,6 +874,14 @@ flush chain inet filter WHITELIST-SET
 EOF
 
 if [[ "$OS" == "rocky" ]]; then
+  cat <<'EOF' > /etc/sysconfig/nftables.conf
+#!/usr/sbin/nft -f
+
+include "/etc/nftables.conf"
+EOF
+fi
+
+if [[ "$OS" == "rocky" ]]; then
   sed -i '/allow-query/d' /etc/named.conf
   sed -i '/allow-recursive/d' /etc/named.conf
   sed -i 's/recursion no/recursion yes/g' /etc/named.conf
