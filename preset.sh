@@ -437,6 +437,7 @@ EOF
 
 cat <<'EOF' > /etc/nginx/passenger.conf
 passenger_root /usr/local/lib/nginx-builder/passenger;
+passenger_data_buffer_dir /var/lib/nginx/tmp/passenger;
 passenger_ruby /usr/bin/ruby;
 passenger_instance_registry_dir /var/run/passenger-instreg;
 passenger_python /usr/bin/python3;
@@ -450,6 +451,8 @@ passenger_max_pool_size 32;
 passenger_pool_idle_time 18000;
 passenger_max_instances_per_app 1;
 EOF
+
+[[ "$OS" == "ubuntu" ]] && sed -i "s|/tmp/passenger|/passenger|g" /etc/nginx/passenger.conf
 
 cat <<'EOF' > /etc/nginx/proxy.conf
 proxy_set_header Upgrade           $http_upgrade;
