@@ -555,6 +555,7 @@ http {
 }
 EOF
 
+[[ "$OS" == "ubuntu" ]] && sed -i "s/conf.d/sites-enabled/g" /etc/nginx/nginx.conf
 
 cat <<'EOF' > /etc/logrotate.d/nginx
 /var/log/nginx/*.log /var/log/virtualmin/*_log {
