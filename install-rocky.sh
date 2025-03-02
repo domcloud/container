@@ -28,17 +28,15 @@ ln -s /usr/bin/gcc /usr/bin/$(uname -m)-linux-gnu-gcc || true # fix pip install 
 ln -s /usr/bin/valkey-cli /usr/local/bin/redis-cli || true # redis compatibility
 
 # NGINX
-BUILDER_DIR=/usr/local/lib/nginx-builder
-if [ ! -d "$BUILDER_DIR" ]; then
-  git clone https://github.com/domcloud/nginx-builder/ $BUILDER_DIR
-else; git -C $BUILDER_DIR pull; fi
+BUILDER_DIR=/usr/local/lib/nginx-builder; [ ! -d "$BUILDER_DIR" ] && \
+git clone https://github.com/domcloud/nginx-builder/ $BUILDER_DIR || git -C $BUILDER_DIR pull
 cd $BUILDER_DIR/ && make install DOWNLOAD_V=1.1.1 && make clean && cd /root
 ln -fs /usr/local/sbin/nginx /usr/sbin/nginx # nginx compatibility
 
 # PHP
-dnf -y install php{74,84}-php-{bcmath,cli,common,devel,fpm,gd,imap,intl,mbstring,mysqlnd,opcache,pdo,pecl-mongodb,pecl-redis,pecl-zip,pgsql,process,sodium,soap,xml}
+dnf -y install php{74,84}-php-{bcmath,cli,common,devel,ffi,fpm,gd,imap,intl,mbstring,mysqlnd,opcache,pdo,pecl-memcached,pecl-mongodb,pecl-redis,pecl-zip,pgsql,process,sodium,soap,xml,tidy}
 # curl https://packages.microsoft.com/config/rhel/9/prod.repo | tee /etc/yum.repos.d/mssql-release.repo
-# dnf -y install php74-php-ioncube-loader php{74,81,82,83,84}-php-{pecl-imagick-im7,sqlsrv} msodbcsql17 # optional, installed in cloud
+# dnf -y install php{74,81,82}-php-ioncube-loader php{74,81,82,83,84}-php-{brotli,ldap,pecl-decimal,pecl-imagick-im7,pecl-rdkafka,pecl-simdjson,pecl-uuid,sqlsrv,xz,zstd} msodbcsql17 # optional, installed in cloud
 dnf -y remove php-* && ln -fs `which php84` /usr/bin/php || true
 curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 find /etc/opt/remi/ -maxdepth 1 -name 'php*' -exec sed -i "s/upload_max_filesize = 2M/upload_max_filesize = 512M/g" {}/php.ini \; -exec sed -i "s/post_max_size = 8M/post_max_size = 512M/g" {}/php.ini \; 

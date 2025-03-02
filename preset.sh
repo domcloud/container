@@ -3,17 +3,18 @@ set -e
 cd /root
 
 if [ -f /etc/lsb-release ]; then OS=ubuntu; elif [ -f /etc/redhat-release ]; then OS=rocky; else OS=unknown; fi
+PASSWD=$OS
 
 # Contents
-wget -O /usr/local/bin/restart https://raw.githubusercontent.com/domcloud/bridge/main/userkill.sh && chmod 755 /usr/local/bin/restart
+curl -sSLo /usr/local/bin/restart https://raw.githubusercontent.com/domcloud/bridge/main/userkill.sh && chmod 755 /usr/local/bin/restart
 WWW=/usr/local/share/www && WWWSOURCE=https://raw.githubusercontent.com/domcloud/domcloud/master/share && mkdir -p $WWW
-wget -O $WWW/deceptive.html $WWWSOURCE/deceptive.html
-wget -O $WWW/nosite.html $WWWSOURCE/nosite.html
+curl -sSLo $WWW/deceptive.html $WWWSOURCE/deceptive.html
+curl -sSLo $WWW/nosite.html $WWWSOURCE/nosite.html
 chmod 0755 -R $WWW
 
 SKEL=/etc/skel/public_html
 mkdir -p $SKEL/.well-known && touch $SKEL/favicon.ico
-wget -O $SKEL/index.html $WWWSOURCE/index.html
+curl -sSLo $SKEL/index.html $WWWSOURCE/index.html
 
 mkdir -p /etc/ssl/default/
 wget https://raw.githubusercontent.com/willnode/forward-domain/refs/heads/main/test/certs/localhost/key.pem -P /etc/ssl/default/
@@ -106,14 +107,16 @@ PGDATA=/var/lib/pgsql/$PG/data
 PGDAEMON=postgresql-$PG
 PGCONFIG=$PGDATA
 PGBIN=/usr/pgsql-$PG/bin
+VALKEYDAEMON=valkey
 if [[ "$OS" == "ubuntu" ]]; then
   PGDATA=/usr/share/postgresql/$PG/data
   PGDAEMON=postgresql
   PGCONFIG=/etc/postgresql/$PG/main
   PGBIN=/usr/lib/postgresql/$PG/bin
+  VALKEYDAEMON=valkey-server
 fi
 
-mkdir -p /etc/systemd/system/{nginx,earlyoom,fail2ban,mariadb,$PGDAEMON,valkey}.service.d
+mkdir -p /etc/systemd/system/{nginx,earlyoom,fail2ban,mariadb,$PGDAEMON,$VALKEYDAEMON}.service.d
 cat <<'EOF' > /etc/systemd/system/nginx.service.d/override.conf
 [Service]
 LimitNOFILE=65535
@@ -138,7 +141,7 @@ cat <<'EOF' > /etc/systemd/system/$PGDAEMON.service.d/override.conf
 [Service]
 Restart=on-failure
 EOF
-cat <<'EOF' > /etc/systemd/system/valkey.service.d/override.conf
+cat <<'EOF' > /etc/systemd/system/$VALKEYDAEMON.service.d/override.conf
 [Service]
 Restart=on-failure
 EOF
@@ -221,9 +224,9 @@ sed -i "s/# aclfile /aclfile /g" $VALKEY/valkey.conf
 sed -i "s/# maxmemory <bytes>/maxmemory 256mb/g" $VALKEY/valkey.conf
 sed -i "s/# maxmemory-policy noeviction/maxmemory-policy allkeys-lru/g" $VALKEY/valkey.conf
 sed -i "s/# maxmemory-samples 5/maxmemory-samples 3/g" $VALKEY/valkey.conf
-[ -f $VALKEY/users.acl ] || cat <<'EOF' > $VALKEY/users.acl
+[ -f $VALKEY/users.acl ] || cat <<EOF > $VALKEY/users.acl
 user default off nopass sanitize-payload resetchannels +@all
-user root on sanitize-payload >rocky ~* &* +@all
+user root on sanitize-payload >$PASSWD ~* &* +@all
 EOF
 touch $VALKEY/usermap.acl
 chmod 0700 $VALKEY/*
@@ -377,7 +380,7 @@ apply_cmd=systemctl reload nginx
 stop_cmd=systemctl stop nginx
 start_cmd=systemctl start nginx
 nginx_cmd=/usr/sbin/nginx
-rotate_cmd=nginx -s reload
+rotate_cmd=nginx -s reopen
 http2=0
 php_socket=1
 child_procs=4
@@ -397,7 +400,7 @@ http2=0
 listen_mode=0
 child_procs=4
 extra_dirs=
-rotate_cmd=nginx -s reload
+rotate_cmd=nginx -s reopen
 add_link=
 nginx_config=/etc/nginx/nginx.conf
 EOF
@@ -557,6 +560,110 @@ EOF
 
 [[ "$OS" == "ubuntu" ]] && sed -i "s/conf.d/sites-enabled/g" /etc/nginx/nginx.conf
 
+cat <<'EOF' > /etc/nginx/mime.types
+types {
+    text/html                                        html htm shtml;
+    text/css                                         css;
+    application/xml                                  xml;
+    image/gif                                        gif;
+    image/jpeg                                       jpeg jpg;
+    application/javascript                           js;
+    application/atom+xml                             atom;
+    application/rss+xml                              rss;
+
+    text/mathml                                      mml;
+    text/plain                                       txt;
+    text/vnd.sun.j2me.app-descriptor                 jad;
+    text/vnd.wap.wml                                 wml;
+    text/x-component                                 htc;
+
+    image/avif                                       avif;
+    image/png                                        png;
+    image/svg+xml                                    svg svgz;
+    image/tiff                                       tif tiff;
+    image/vnd.wap.wbmp                               wbmp;
+    image/webp                                       webp;
+    image/x-icon                                     ico;
+    image/x-jng                                      jng;
+    image/x-ms-bmp                                   bmp;
+
+    font/woff                                        woff;
+    font/woff2                                       woff2;
+    application/x-font-ttf                           ttf;
+    application/x-font-opentype                      otf;
+
+    application/java-archive                         jar war ear;
+    application/json                                 json;
+    application/mac-binhex40                         hqx;
+    application/msword                               doc;
+    application/pdf                                  pdf;
+    application/postscript                           ps eps ai;
+    application/rtf                                  rtf;
+    application/vnd.apple.mpegurl                    m3u8;
+    application/vnd.google-earth.kml+xml             kml;
+    application/vnd.google-earth.kmz                 kmz;
+    application/vnd.ms-excel                         xls;
+    application/vnd.ms-fontobject                    eot;
+    application/vnd.ms-powerpoint                    ppt;
+    application/vnd.oasis.opendocument.graphics      odg;
+    application/vnd.oasis.opendocument.presentation  odp;
+    application/vnd.oasis.opendocument.spreadsheet   ods;
+    application/vnd.oasis.opendocument.text          odt;
+    application/vnd.openxmlformats-officedocument.presentationml.presentation
+                                                     pptx;
+    application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+                                                     xlsx;
+    application/vnd.openxmlformats-officedocument.wordprocessingml.document
+                                                     docx;
+    application/vnd.wap.wmlc                         wmlc;
+    application/wasm                                 wasm;
+    application/x-7z-compressed                      7z;
+    application/x-cocoa                              cco;
+    application/x-java-archive-diff                  jardiff;
+    application/x-java-jnlp-file                     jnlp;
+    application/x-makeself                           run;
+    application/x-perl                               pl pm;
+    application/x-pilot                              prc pdb;
+    application/x-rar-compressed                     rar;
+    application/x-redhat-package-manager             rpm;
+    application/x-sea                                sea;
+    application/x-shockwave-flash                    swf;
+    application/x-stuffit                            sit;
+    application/x-tcl                                tcl tk;
+    application/x-x509-ca-cert                       der pem crt;
+    application/x-xpinstall                          xpi;
+    application/xhtml+xml                            xhtml;
+    application/xspf+xml                             xspf;
+    application/zip                                  zip;
+
+    application/octet-stream                         bin exe dll;
+    application/octet-stream                         deb;
+    application/octet-stream                         dmg;
+    application/octet-stream                         iso img;
+    application/octet-stream                         msi msp msm;
+
+    audio/midi                                       mid midi kar;
+    audio/mpeg                                       mp3;
+    audio/ogg                                        ogg;
+    audio/x-m4a                                      m4a;
+    audio/x-realaudio                                ra;
+
+    video/3gpp                                       3gpp 3gp;
+    video/mp2t                                       ts;
+    video/mp4                                        mp4;
+    video/mpeg                                       mpeg mpg;
+    video/quicktime                                  mov;
+    video/webm                                       webm;
+    video/x-flv                                      flv;
+    video/x-m4v                                      m4v;
+    video/x-mng                                      mng;
+    video/x-ms-asf                                   asx asf;
+    video/x-ms-wmv                                   wmv;
+    video/x-msvideo                                  avi;
+}
+EOF
+
+
 cat <<'EOF' > /etc/logrotate.d/nginx
 /var/log/nginx/*.log /var/log/virtualmin/*_log {
     create 0640 nginx root
@@ -629,6 +736,16 @@ cat <<'EOF' > /etc/nftables.conf
 flush ruleset
 
 table inet filter {
+	set whitelist {
+		type ipv4_addr
+		size 65536
+	}
+
+	set whitelist-v6 {
+		type ipv6_addr
+		size 65536
+	}
+
   chain INPUT {
     type filter hook input priority filter; policy accept;
     ct state established,related accept
@@ -638,28 +755,38 @@ table inet filter {
     iifname lo accept
   
     tcp dport { 22, 53, 80, 443, 3306, 5432, 2443-2453, 32000-65535 } counter accept
-    udp dport { 53, 67, 68, 443, 546, 547 } counter accept
-    meta l4proto {tcp, udp} th sport 53 counter accept
-    ip version 4 counter reject with icmp host-prohibited
-    ip version 6 counter reject with icmpv6 admin-prohibited
+    udp dport { 53, 67, 68, 443, 546, 547, 32000-65535 } counter accept
+    tcp sport 53 counter accept
+    udp sport 53 counter accept
+    counter reject with icmp type host-prohibited
+    counter reject with icmpv6 type admin-prohibited
   }
 
   chain OUTPUT {
-    type filter hook output priority filter; policy accept;
+    type filter hook output priority 0; policy accept;
     oifname lo counter accept
     ct state established accept
-    meta l4proto {tcp, udp} sport { 22, 53, 67, 68, 546, 547 } counter accept
-    meta l4proto {tcp, udp} dport { 22, 53, 67, 68, 546, 547 } counter accept
+    tcp sport { 22, 53 } counter accept
+    tcp dport { 22, 53 } counter accept
+    udp sport { 53, 67, 68, 546, 547 } counter accept
+    udp dport { 53, 67, 68, 546, 547 } counter accept
     tcp dport 25 counter reject
+    ip daddr @whitelist accept
+    ip6 daddr @whitelist-v6 accept
   }
 
   chain FORWARD {
     type filter hook forward priority 0; policy drop;
   }
+
+  chain WHITELIST-SET {
+  }
 }
 
 include "/etc/nftables-docker.conf"
 include "/etc/nftables-whitelist.conf"
+include "/etc/nftables-firewall.conf"
+add rule inet filter OUTPUT jump WHITELIST-SET
 EOF
 
 # https://gist.github.com/goll/bdd6b43c2023f82d15729e9b0067de60
@@ -730,11 +857,22 @@ EOF
 
 cat <<'EOF' > /etc/nftables-whitelist.conf
 #!/usr/sbin/nft -f
+
+# add element inet filter whitelist { x.x.x.x }
+# add element inet filter whitelist-v6 { x:x:x::x:x }
 EOF
 
-sed -i '/allow-query/d' /etc/named.conf
-sed -i '/allow-recursive/d' /etc/named.conf
-sed -i 's/recursion no/recursion yes/g' /etc/named.conf
+cat <<'EOF' > /etc/nftables-firewall.conf
+#!/usr/sbin/nft -f
+
+# add rule inet filter WHITELIST-SET skuid <id> counter reject comment "<name>"
+EOF
+
+if [[ "$OS" == "rocky" ]]; then
+  sed -i '/allow-query/d' /etc/named.conf
+  sed -i '/allow-recursive/d' /etc/named.conf
+  sed -i 's/recursion no/recursion yes/g' /etc/named.conf
+fi
 mkdir -p /etc/cloud && touch /etc/cloud/cloud-init.disabled
 cat <<'EOF' > /etc/resolv.conf
 nameserver 127.0.0.1
@@ -759,11 +897,15 @@ EOF
 
 # Bridge
 if [ ! -e "/lib/systemd/system/bridge.service" ]; then
-/usr/libexec/webmin/changepass.pl /etc/webmin root "rocky"
+if [[ "$OS" == "ubuntu" ]]; then
+  /usr/share/webmin/changepass.pl /etc/webmin root $PASSWD
+else
+  /usr/libexec/webmin/changepass.pl /etc/webmin root $PASSWD
+fi
 git clone https://github.com/domcloud/Virtualmin-Config
 cd Virtualmin-Config && sh patch.sh && cd .. && rm -rf Virtualmin-Config
 timeout 900 virtualmin config-system --bundle DomCloud
-virtualmin create-domain --domain localhost --user bridge --pass "rocky" --dir --unix --virtualmin-nginx --virtualmin-nginx-ssl
+virtualmin create-domain --domain localhost --user bridge --pass $PASSWD --dir --unix --virtualmin-nginx --virtualmin-nginx-ssl
 cat <<'EOF' | EDITOR='tee' visudo /etc/sudoers.d/bridge
 bridge ALL = (root) NOPASSWD: /home/bridge/public_html/sudoutil.js
 bridge ALL = (root) NOPASSWD: /bin/systemctl restart bridge

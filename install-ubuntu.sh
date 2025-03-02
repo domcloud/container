@@ -10,9 +10,9 @@ export DEBIAN_FRONTEND=noninteractive
 apt-get update
 apt-get -y install ca-certificates curl libterm-readline-gnu-perl software-properties-common apt-transport-https apt-utils
 curl -fsSL https://deb.nodesource.com/setup_22.x | bash - 
-curl -fsSL https://dl.yarnpkg.com/debian/pubkey.gpg | gpg --dearmor -o $GPGDIR/yarn.gpg
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o $GPGDIR/docker.gpg
-curl -fsSL http://apt.postgresql.org/pub/repos/apt/ACCC4CF8.asc | gpg --dearmor -o $GPGDIR/pgdg.gpg
+curl -fsSL https://dl.yarnpkg.com/debian/pubkey.gpg | gpg --dearmor > $GPGDIR/yarn.gpg
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor > $GPGDIR/docker.gpg
+curl -fsSL http://apt.postgresql.org/pub/repos/apt/ACCC4CF8.asc | gpg --dearmor > $GPGDIR/pgdg.gpg
 
 echo "deb [signed-by=$GPGDIR/yarn.gpg] https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list
 echo "deb [signed-by=$GPGDIR/docker.gpg] https://download.docker.com/linux/ubuntu $CODENAME stable" | tee /etc/apt/sources.list.d/docker.list
@@ -24,22 +24,35 @@ add-apt-repository ppa:ondrej/php
 apt-get update
 apt-get -y install bzip2 bison btop clang certbot cmake git ncdu htop iftop ipset jq lsof make nano ninja-build ncurses-bin nodejs patch ripgrep ruby rsync screen socat strace tar time tmux vim wget whois xz-utils zstd \
         libcurl4-openssl-dev libffi-dev libsqlite3-dev libtool libssl-dev libyaml-dev brotli libbz2-dev libgl1-mesa-dev libldap2-dev libpcre2-dev python3-dev libreadline-dev redis-server libxmlsec1-dev python3-pip ruby-json ruby-rack \
-        language-pack-en libc-bin libdbd-pg-perl libdbd-mysql-perl liblwp-protocol-https-perl libdatetime-perl libcrypt-ssleay-perl libtext-asciitable-perl libio-tty-perl libxml-simple-perl libpq-dev
-apt-get -y install webmin webmin-{virtual-server,virtualmin-nginx,virtualmin-nginx-ssl,ruby-gems} valkey-server earlyoom fail2ban mariadb-server nftables postfix bind9 sudo openssh-server systemd-container
+        language-pack-en libc-bin libdbd-pg-perl libdbd-mysql-perl liblwp-protocol-https-perl libdatetime-perl libcrypt-ssleay-perl libtext-asciitable-perl libio-tty-perl libxml-simple-perl libpq-dev webmin
+apt-get -y install webmin-{virtual-server,virtualmin-nginx,virtualmin-nginx-ssl,ruby-gems} virtualmin-config valkey-server earlyoom fail2ban mariadb-server nftables bind9 sudo openssh-server systemd-container
+
+# Postfix
+echo "postfix postfix/mailname string ubuntu.local" | debconf-set-selections
+echo "postfix postfix/main_mailer_type string 'Internet Site'" | debconf-set-selections
+apt-get -y install postfix
 
 # NGINX
-BUILDER_DIR=/usr/local/lib/nginx-builder
-if [ ! -d "$BUILDER_DIR" ]; then
-  git clone https://github.com/domcloud/nginx-builder/ $BUILDER_DIR
-else; git -C $BUILDER_DIR pull; fi
+BUILDER_DIR=/usr/local/lib/nginx-builder; [ ! -d "$BUILDER_DIR" ] && \
+git clone https://github.com/domcloud/nginx-builder/ $BUILDER_DIR || git -C $BUILDER_DIR pull
 cd $BUILDER_DIR/ && make install DOWNLOAD_V=1.1.1 && make clean && cd /root
 ln -fs /usr/local/sbin/nginx /usr/sbin/nginx # nginx compatibility
 
 # Docker
 apt-get -y install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
+# Postgres
+PG=17
+apt-get -y install postgresql-$PG
+
+# Not everyone needs this. Also, postgresql-server-dev install would also install clang n gcc toolset
+# apt -y install postgresql-$PG-{postgis,pgrouting,pgvector,timescaledb} postgresql-server-dev-$PG
+# for ext in "postgis-3" "postgis_raster" "postgis_sfcgal" "postgis_tiger_geocoders" "postgis_topology" "earthdistance" "address_standardizer" "address_standardizer_data_us" "pgrouting" "vector"; do
+#   echo "trusted = true" >> "/usr/share/postgresql/$PG/extension/$ext.control"
+# done
+
 # PHP
-apt-get -y install php{7.4,8.4}-{bcmath,cli,common,dev,fpm,gd,imap,igbinary,intl,mbstring,mysql,opcache,mongodb,readline,redis,zip,pgsql,soap,xml}
+apt-get -y install php{7.4,8.4}-{bcmath,cli,common,curl,dev,fpm,gd,imap,igbinary,intl,mbstring,mysql,opcache,mongodb,readline,redis,zip,pgsql,soap,xml}
 curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 find /etc/php/ -maxdepth 1 -mindepth 1 -exec sed -i "s/upload_max_filesize = 2M/upload_max_filesize = 512M/g" {}/fpm/php.ini \; -exec sed -i "s/post_max_size = 8M/post_max_size = 512M/g" {}/fpm/php.ini \; 
 find /etc/php/ -type f -name www.conf -print0 | xargs -0 sed -i 's/pm = dynamic/pm = ondemand/g'
@@ -82,5 +95,8 @@ curl -sSL https://rdfind.pauldreik.se/$RDFIND.tar.gz | tar -xzf -
 cd $RDFIND; ./configure --disable-debug ; make install; cd .. ; rm -rf $RDFIND*
 
 # Misc
+apt -y remove ufw redis-server
 apt -y upgrade
 apt -y autoremove
+systemctl enable webmin mariadb postgresql nftables fail2ban named php{7.4,8.4}-fpm earlyoom valkey-server || true
+chmod +x /usr/local/bin/* && chown root:root /usr/local/bin/*
