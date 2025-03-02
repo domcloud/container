@@ -62,7 +62,7 @@ if ! command -v proxfix &> /dev/null; then
 fi
 
 # Docker
-dnf -y install docker-ce docker-ce-cli containerd.io docker-compose-plugin fuse-overlayfs slirp4netns
+dnf -y install docker-ce docker-ce-cli containerd.io docker-compose-plugin fslirp4netns
 modprobe ip_tables && echo "ip_tables" > /etc/modules
 
 # Pathman
