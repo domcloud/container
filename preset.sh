@@ -856,6 +856,7 @@ EOF
 cat <<'EOF' > /etc/nftables-whitelist.conf
 #!/usr/sbin/nft -f
 
+flush set inet filter whitelist
 # add element inet filter whitelist { x.x.x.x }
 # add element inet filter whitelist-v6 { x:x:x::x:x }
 EOF
@@ -863,6 +864,7 @@ EOF
 cat <<'EOF' > /etc/nftables-firewall.conf
 #!/usr/sbin/nft -f
 
+flush chain inet filter WHITELIST-SET
 # add rule inet filter WHITELIST-SET skuid <id> counter reject comment "<name>"
 EOF
 
