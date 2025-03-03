@@ -87,7 +87,7 @@ if ! command -v lazygit &> /dev/null; then
 fi
 
 # Neofetch (Forked)
-curl -sSLo /usr/local/bin/neofetch https://github.com/hykilpikonna/hyfetch/raw/1.4.11/neofetch
+curl -sSLo /usr/local/bin/neofetch https://github.com/hykilpikonna/hyfetch/raw/1.99.0/neofetch
 
 # Rdfind
 RDFIND=rdfind-1.6.0
