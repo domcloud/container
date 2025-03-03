@@ -109,8 +109,8 @@ PGCONFIG=$PGDATA
 PGBIN=/usr/pgsql-$PG/bin
 VALKEYDAEMON=valkey
 if [[ "$OS" == "ubuntu" ]]; then
-  PGDATA=/usr/share/postgresql/$PG/data
-  PGDAEMON=postgresql
+  PGDATA=/var/lib/postgresql/$PG/main
+  PGDAEMON=postgresql@$PG-main
   PGCONFIG=/etc/postgresql/$PG/main
   PGBIN=/usr/lib/postgresql/$PG/bin
   VALKEYDAEMON=valkey-server
@@ -205,8 +205,7 @@ max_connections = 4096
 EOF
 fi
 
-systemctl start mariadb # init db
-
+systemctl start mariadb || true # init db
 
 sudo -u postgres $PGBIN/initdb -D $PGDATA || true
 sed -i "s/#listen_addresses = .*/listen_addresses = '*'/g" $PGCONFIG/postgresql.conf
@@ -303,6 +302,23 @@ EOF
     fi
 done
 
+cat <<'EOF' | while read -r line; do
+net.ipv4.ping_group_range=0 2147483647
+vm.overcommit_memory=1
+EOF
+    # Extract the key part (before '=') to use as a pattern for sed
+    key=$(echo "$line" | cut -d'=' -f1)
+    config_file=/etc/sysctl.conf
+
+    if grep -q "^$key=" "$config_file"; then
+        # If found, replace the line
+        sed -i "s|^$key=.*|$line|" "$config_file"
+    else
+        # If not found, append the line to the end of the file
+        echo "$line" >> "$config_file"
+    fi
+done
+
 cat <<EOF > /etc/webmin/webmincron/crons/173224301830730.cron
 months=*
 arg0=bw.pl
@@ -335,7 +351,7 @@ psql=/usr/bin/psql
 access_own=0
 stop_cmd=systemctl stop postgresql
 style=0
-hba_conf=$PGDATA/pg_hba.conf
+hba_conf=$PGCONFIG/pg_hba.conf
 setup_cmd=postgresql-setup --initdb
 max_text=1000
 access=*: *
@@ -858,20 +874,23 @@ table ip nat {
 }
 EOF
 
-cat <<'EOF' > /etc/nftables-whitelist.conf
+if [ ! -f /etc/nftables-whitelist.conf ]; then
+  cat <<'EOF' > /etc/nftables-whitelist.conf
 #!/usr/sbin/nft -f
 
 flush set inet filter whitelist
 # add element inet filter whitelist { x.x.x.x }
 # add element inet filter whitelist-v6 { x:x:x::x:x }
 EOF
-
-cat <<'EOF' > /etc/nftables-firewall.conf
+fi
+if [ ! -f /etc/nftables-whitelist.conf ]; then
+  cat <<'EOF' > /etc/nftables-firewall.conf
 #!/usr/sbin/nft -f
 
 flush chain inet filter WHITELIST-SET
 # add rule inet filter WHITELIST-SET skuid <id> counter reject comment "<name>"
 EOF
+fi
 
 if [[ "$OS" == "rocky" ]]; then
   cat <<'EOF' > /etc/sysconfig/nftables.conf
@@ -887,13 +906,14 @@ if [[ "$OS" == "rocky" ]]; then
   sed -i 's/recursion no/recursion yes/g' /etc/named.conf
 fi
 mkdir -p /etc/cloud && touch /etc/cloud/cloud-init.disabled
+
 cat <<'EOF' > /etc/resolv.conf
 nameserver 127.0.0.1
 nameserver 1.1.1.1
 nameserver 1.0.0.1
 EOF
 
-cat <<'EOF' > /var/spool/cron/root
+crontab -u root -l || cat <<'EOF' | crontab -u root -
 # Entry commented are safeguards implemented in DOM Cloud. You might not need them
 # 0 * * * * find '/var/spool/cron/' -not -name root -type f | xargs sed -ri '/^\s*(\*|[0-9]*,)/d'
 # */5 * * * * /usr/bin/node /home/bridge/public_html/sudokill.js -i bridge,do-agent,dbus,earlyoom,mysql,named,nobody,postgres,polkitd,rpc,valkey
@@ -1033,7 +1053,8 @@ fi
 echo "wizard_run=1" >> /etc/webmin/virtual-server/config
 
 # Sanity check
-cat /etc/passwd
+sysctl --system
+
 df -h
 
 sync

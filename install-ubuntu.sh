@@ -39,7 +39,7 @@ cd $BUILDER_DIR/ && make install DOWNLOAD_V=1.1.1 && make clean && cd /root
 ln -fs /usr/local/sbin/nginx /usr/sbin/nginx # nginx compatibility
 
 # Docker
-apt-get -y install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin dbus-user-session uidmap slirp4netns docker-ce-rootless-extras
+apt-get -y install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin dbus-user-session uidmap slirp4netns docker-ce-rootless-extras passt
 
 # Postgres
 PG=17
@@ -96,7 +96,9 @@ cd $RDFIND; ./configure --disable-debug ; make install; cd .. ; rm -rf $RDFIND*
 
 # Misc
 apt -y remove ufw redis-server
-apt -y upgrade
-apt -y autoremove
 systemctl enable webmin mariadb postgresql nftables fail2ban named php{7.4,8.4}-fpm earlyoom valkey-server || true
 chmod +x /usr/local/bin/* && chown root:root /usr/local/bin/*
+
+# Cleanup
+apt -y upgrade
+apt -y autoremove

@@ -62,8 +62,7 @@ if ! command -v proxfix &> /dev/null; then
 fi
 
 # Docker
-dnf -y install docker-ce docker-ce-cli containerd.io docker-compose-plugin fslirp4netns
-modprobe ip_tables && echo "ip_tables" > /etc/modules
+dnf -y install docker-ce docker-ce-cli containerd.io docker-compose-plugin slirp4netns passt
 
 # Pathman
 PATHMAN=pathman-v0.6.0-linux-$( [ "$(uname -m)" = "aarch64" ] && echo "arm64" || echo "amd64_v1" )
