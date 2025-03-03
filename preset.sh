@@ -17,8 +17,8 @@ mkdir -p $SKEL/.well-known && touch $SKEL/favicon.ico
 curl -sSLo $SKEL/index.html $WWWSOURCE/index.html
 
 mkdir -p /etc/ssl/default/
-wget https://raw.githubusercontent.com/willnode/forward-domain/refs/heads/main/test/certs/localhost/key.pem -P /etc/ssl/default/
-wget https://raw.githubusercontent.com/willnode/forward-domain/refs/heads/main/test/certs/localhost/cert.pem -P /etc/ssl/default/
+curl -sSLo /etc/ssl/default/key.pem https://raw.githubusercontent.com/willnode/forward-domain/refs/heads/main/test/certs/localhost/key.pem
+curl -sSLo /etc/ssl/default/cert.pem https://raw.githubusercontent.com/willnode/forward-domain/refs/heads/main/test/certs/localhost/cert.pem
 
 # Config
 echo "gem: --no-document" > /etc/gemrc
