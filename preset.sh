@@ -765,41 +765,41 @@ table inet filter {
 		size 65536
 	}
 
-  chain INPUT {
-    type filter hook input priority filter; policy accept;
-    ct state established,related accept
-    ip protocol icmp limit rate 4/second accept
-    ip6 nexthdr ipv6-icmp limit rate 4/second accept
-    ip protocol igmp limit rate 4/second accept
-    iifname lo accept
-  
-    tcp dport { 22, 53, 80, 443, 3306, 5432, 2443-2453, 32000-65535 } counter accept
-    udp dport { 53, 67, 68, 443, 546, 547, 32000-65535 } counter accept
-    tcp sport 53 counter accept
-    udp sport 53 counter accept
-    counter reject with icmp type host-prohibited
-    counter reject with icmpv6 type admin-prohibited
-  }
+	chain INPUT {
+		type filter hook input priority filter; policy accept;
+		ct state established,related accept
+		ip protocol icmp limit rate 4/second accept
+		ip6 nexthdr ipv6-icmp limit rate 4/second accept
+		ip protocol igmp limit rate 4/second accept
+		iifname lo accept
 
-  chain OUTPUT {
-    type filter hook output priority 0; policy accept;
-    oifname lo counter accept
-    ct state established accept
-    tcp sport { 22, 53 } counter accept
-    tcp dport { 22, 53 } counter accept
-    udp sport { 53, 67, 68, 546, 547 } counter accept
-    udp dport { 53, 67, 68, 546, 547 } counter accept
-    tcp dport 25 counter reject
-    ip daddr @whitelist accept
-    ip6 daddr @whitelist-v6 accept
-  }
+		tcp dport { 22, 53, 80, 443, 3306, 5432, 2443-2453, 32000-65535 } counter accept
+		udp dport { 53, 67, 68, 443, 546, 547, 32000-65535 } counter accept
+		tcp sport 53 counter accept
+		udp sport 53 counter accept
+		counter reject with icmp type host-prohibited
+		counter reject with icmpv6 type admin-prohibited
+	}
 
-  chain FORWARD {
-    type filter hook forward priority 0; policy drop;
-  }
+	chain OUTPUT {
+		type filter hook output priority 0; policy accept;
+		oifname lo counter accept
+		ct state established accept
+		tcp sport { 22, 53 } counter accept
+		tcp dport { 22, 53 } counter accept
+		udp sport { 53, 67, 68, 546, 547 } counter accept
+		udp dport { 53, 67, 68, 546, 547 } counter accept
+		tcp dport 25 counter reject
+		ip daddr @whitelist accept
+		ip6 daddr @whitelist-v6 accept
+	}
 
-  chain WHITELIST-SET {
-  }
+	chain FORWARD {
+		type filter hook forward priority 0; policy drop;
+	}
+
+	chain WHITELIST-SET {
+	}
 }
 
 include "/etc/nftables-docker.conf"
@@ -883,7 +883,7 @@ flush set inet filter whitelist
 # add element inet filter whitelist-v6 { x:x:x::x:x }
 EOF
 fi
-if [ ! -f /etc/nftables-whitelist.conf ]; then
+if [ ! -f /etc/nftables-firewall.conf ]; then
   cat <<'EOF' > /etc/nftables-firewall.conf
 #!/usr/sbin/nft -f
 
