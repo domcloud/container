@@ -96,9 +96,8 @@ WantedBy=multi-user.target
 EOF
 cat <<'EOF' > /etc/security/limits.conf
 root             soft    nofile          65535
-@nginx           hard    as              2048000
-@nginx           hard    nproc           64
-@nginx           hard    priority        5
+*                hard    nproc           256
+*                hard    priority        5
 EOF
 
 # Services config

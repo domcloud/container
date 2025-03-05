@@ -10,21 +10,21 @@ packer {
 }
 
 # Define the source image builder - for Docker
-source "docker" "rocky_linux" {
-  image      = "rockylinux:9"  # Use the official Rocky Linux image as a base
+source "docker" "ubuntu" {
+  image      = "ubuntu:24.04"  # Use the official Ubuntu image as a base
   commit     = true
 }
 
 # Provisioning script to install QEMU and dependencies
 build {
-  sources = ["source.docker.rocky_linux"]
+  sources = ["source.docker.ubuntu"]
 
   provisioner "shell" {
     script = "vcsysdaemon.sh" 
   }
 
   provisioner "shell" {
-    script = "install.sh" 
+    script = "install-ubuntu.sh" 
   }
   
   provisioner "shell" {
@@ -32,7 +32,7 @@ build {
   }
 
   post-processor "docker-tag" {
-    repository = "domcloud-container"
+    repository = "domcloud-ubuntu-container"
     tag        = ["latest"]
   }
 }

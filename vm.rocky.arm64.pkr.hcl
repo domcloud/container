@@ -62,7 +62,7 @@ build {
   sources = ["source.qemu.rocky_linux"]
 
   provisioner "shell" {
-    script = "install.sh" 
+    script = "install-rocky.sh" 
   }
   
   provisioner "shell" {
