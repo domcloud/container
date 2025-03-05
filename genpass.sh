@@ -62,7 +62,7 @@ echo "[ 1 / 5 ] Checking your linux root password..."
 if test_linux; then
     echo "Insecure! Changing your linux root password..."
     NEW_PASS=$(generate_password)
-    echo -e "$SHARED_PASS\n$NEW_PASS\n$NEW_PASS" | sudo passwd root >/dev/null 2>&1
+    echo -e "$NEW_PASS\n$NEW_PASS" | sudo passwd root >/dev/null 2>&1
     if [ $? -eq 0 ]; then
         echo "Password changed successfully."
         echo "New linux root password: $NEW_PASS"
@@ -109,7 +109,7 @@ echo "[ 4 / 5 ] Checking your linux bridge password..."
 if test_bridge_unix; then
     echo "Insecure! Changing your linux bridge password..."
     NEW_PASS=$(generate_password)
-    echo -e "$SHARED_PASS\n$NEW_PASS\n$NEW_PASS" | sudo passwd bridge >/dev/null 2>&1
+    echo -e "$NEW_PASS\n$NEW_PASS" | sudo passwd bridge >/dev/null 2>&1
     if [ $? -eq 0 ]; then
         echo "Password changed successfully."
         echo "New linux bridge password: $NEW_PASS"

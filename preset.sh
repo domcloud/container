@@ -217,7 +217,7 @@ EOF
 
 # valkey
 VALKEY=/etc/valkey
-cp $VALKEY/valkey.conf $VALKEY/valkey.conf.default
+[ -f $VALKEY/valkey.conf.default ] || cp $VALKEY/valkey.conf $VALKEY/valkey.conf.default
 sed -i "s/# aclfile /aclfile /g" $VALKEY/valkey.conf
 sed -i "s/# maxmemory <bytes>/maxmemory 256mb/g" $VALKEY/valkey.conf
 sed -i "s/# maxmemory-policy noeviction/maxmemory-policy allkeys-lru/g" $VALKEY/valkey.conf
