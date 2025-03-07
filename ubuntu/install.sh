@@ -44,6 +44,28 @@ apt update && apt install npm -y
     apt-get install php{7.4,8.4}-{bcmath,cli,common,dev,fpm,gd,imap,igbinary,intl,mbstring,mysql,opcache,mongodb,readline,redis,zip,pgsql,soap,xml} -y
     find /etc/php/ -maxdepth 1 -mindepth 1 -exec sed -i "s/upload_max_filesize = 2M/upload_max_filesize = 512M/g" {}/fpm/php.ini \; -exec sed -i "s/post_max_size = 8M/post_max_size = 512M/g" {}/fpm/php.ini \; 
 
+#React-Native  
+    sudo apt install openjdk-11-jdk
+    sudo npm install -g react-native-cli
+    sdkmanager "platform-tools" "platforms;android-31" "build-tools;31.0.0" "ndk;21.4.7075529"
+
+    mkdir -p ~/Android/Sdk
+    cd ~/Android/Sdk
+
+    wget https://dl.google.com/android/repository/commandlinetools-linux-8092744_latest.zip
+    unzip commandlinetools-linux-8092744_latest.zip
+    mkdir -p cmdline-tools/latest
+    mv cmdline-tools/* cmdline-tools/latest/
+    rmdir cmdline-tools
+    mv cmdline-tools latest
+
+    sudo apt install google-android-cmdline-tools-11.0-installer
+    sdkmanager --licenses -y
+    sdkmanager "platform-tools" "platforms;android-31" "build-tools;31.0.0"
+    echo 'export ANDROID_HOME=/usr/lib/android-sdk' >> ~/.bashrc
+    echo 'export PATH=$PATH:$ANDROID_HOME/platform-tools' >> ~/.bashrc
+    source ~/.bashrc
+
 #Tools
     #ALL
         apt-get update
