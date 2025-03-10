@@ -700,7 +700,8 @@ EOF
 
 cat <<'EOF' > /etc/fail2ban/filter.d/ratelimit.conf
 [Definition]
-failregex = ^.+ \[error\] .+limiting requests, excess: \d+.\d+ by zone "\w+", client: <HOST>, .+$
+failregex = ^.+limiting requests, excess: \d+.\d+ by zone ".+", client: <ADDR>, .+$
+            ^.+limiting connections by zone ".+" while initializing session, client: <ADDR>, .+$
 
 ignoreregex =
 EOF
@@ -740,7 +741,7 @@ enabled = true
 [ratelimit]
 enabled = true
 port = http,https
-logpath = /var/log/virtualmin/*error_log
+logpath = /var/log/virtualmin/*error_log /var/log/nginx/error.log
 
 [php]
 enabled = true
