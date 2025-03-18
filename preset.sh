@@ -71,6 +71,46 @@ EOF
 # NTP
 timedatectl set-local-rtc 0
 
+# PHP
+PHPDIR=/etc/opt/remi
+PHPFPMINI=php.ini
+PHPFPMWWW=php-fpm.d/www.conf
+PHPOPCACHE=php.d/10-opcache.ini
+PHPOPCACHESTAT=/usr/local/share/www/opcache_status.php
+WWWUSER=apache
+
+if [[ "$OS" == "ubuntu" ]]; then
+  PHPDIR=/etc/php
+  PHPFPMINI=fpm/php.ini
+  PHPFPMWWW=fpm/pool.d/www.conf
+  PHPOPCACHE=mods-available/opcache.ini
+  WWWUSER=www-data
+fi
+
+find $PHPDIR/ -maxdepth 1 -mindepth 1 \
+ -exec sed -i "s/upload_max_filesize = 2M/upload_max_filesize = 512M/g" {}/$PHPFPMINI \; \
+ -exec sed -i "s/post_max_size = 8M/post_max_size = 512M/g" {}/$PHPFPMINI \; \
+ -exec sed -i 's/pm = dynamic/pm = ondemand/g' {}/$PHPFPMWWW \; \
+ -exec sh -c "echo 'zend_extension=opcache.so' > {}/$PHPOPCACHE" \; \
+ -exec sh -c "echo 'opcache.enable=1' >> {}/$PHPOPCACHE" \; \
+ -exec sh -c "echo 'opcache.enable_cli=0' >> {}/$PHPOPCACHE" \; \
+ -exec sh -c "echo 'opcache.jit=disable' >> {}/$PHPOPCACHE" \; \
+ -exec sh -c "echo 'opcache.memory_consumption=256' >> {}/$PHPOPCACHE" \; \
+ -exec sh -c "echo 'opcache.max_accelerated_files=32531' >> {}/$PHPOPCACHE" \; \
+ -exec sh -c "echo 'opcache.interned_strings_buffer=32' >> {}/$PHPOPCACHE" \; \
+ -exec sh -c "echo 'opcache.revalidate_freq=60' >> {}/$PHPOPCACHE" \; \
+ -exec sh -c "echo 'opcache.enable_file_override=1' >> {}/$PHPOPCACHE" \; \
+ -exec sh -c "echo 'opcache.validate_permission=1' >> {}/$PHPOPCACHE" \; \
+ -exec sh -c "echo 'opcache.save_comments=0' >> {}/$PHPOPCACHE" \;
+# Let's comeback if https://github.com/php/php-src/issues?q=JIT+label%3A%22Extension%3A+opcache%22 is gone
+# -exec printf "opcache.jit=on\nopcache.jit_buffer_size=32M\n" > {}/php.d/10-opcache-jit.ini
+
+# For opcache monitoring
+echo '<?php print(json_encode(opcache_get_status(false))); ?>' > $PHPOPCACHESTAT
+chmod 644 $PHPOPCACHESTAT; chown $WWWUSER:$WWWUSER $PHPOPCACHESTAT
+# SCRIPT_FILENAME=/usr/local/share/www/opcache_status.php REQUEST_METHOD=GET \
+#  cgi-fcgi -bind -connect /var/opt/remi/php74/run/php-fpm/www.sock | tail -1
+
 # SystemD
 cat <<'EOF' > /usr/lib/systemd/system/nginx.service
 [Unit]
