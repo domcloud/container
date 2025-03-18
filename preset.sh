@@ -10,6 +10,8 @@ curl -sSLo /usr/local/bin/restart https://raw.githubusercontent.com/domcloud/bri
 WWW=/usr/local/share/www && WWWSOURCE=https://raw.githubusercontent.com/domcloud/domcloud/master/share && mkdir -p $WWW
 curl -sSLo $WWW/deceptive.html $WWWSOURCE/deceptive.html
 curl -sSLo $WWW/nosite.html $WWWSOURCE/nosite.html
+curl -sSLo $WWW/opcache.php $WWWSOURCE/opcache.php
+curl -sSLo $WWW/opcache_status.php $WWWSOURCE/opcache_status.php
 chmod 0755 -R $WWW
 
 SKEL=/etc/skel/public_html
@@ -96,12 +98,15 @@ find $PHPDIR/ -maxdepth 1 -mindepth 1 \
  -exec sh -c "echo 'opcache.enable_cli=0' >> {}/$PHPOPCACHE" \; \
  -exec sh -c "echo 'opcache.jit=disable' >> {}/$PHPOPCACHE" \; \
  -exec sh -c "echo 'opcache.memory_consumption=256' >> {}/$PHPOPCACHE" \; \
- -exec sh -c "echo 'opcache.max_accelerated_files=32531' >> {}/$PHPOPCACHE" \; \
+ -exec sh -c "echo 'opcache.max_accelerated_files=65407' >> {}/$PHPOPCACHE" \; \
  -exec sh -c "echo 'opcache.interned_strings_buffer=32' >> {}/$PHPOPCACHE" \; \
  -exec sh -c "echo 'opcache.revalidate_freq=60' >> {}/$PHPOPCACHE" \; \
  -exec sh -c "echo 'opcache.enable_file_override=1' >> {}/$PHPOPCACHE" \; \
  -exec sh -c "echo 'opcache.validate_permission=1' >> {}/$PHPOPCACHE" \; \
  -exec sh -c "echo 'opcache.save_comments=0' >> {}/$PHPOPCACHE" \;
+
+# OPCACHEMEM=$(free -m | awk '/^Mem:/ {val=int($2 * 0.15); print (val > 256 ? val : 256)}')
+# find $PHPDIR/ -maxdepth 1 -mindepth 1 -exec sed -i "s/256/$OPCACHEMEM/g" {}/$PHPOPCACHE \;
 # Let's comeback if https://github.com/php/php-src/issues?q=JIT+label%3A%22Extension%3A+opcache%22 is gone
 # -exec printf "opcache.jit=on\nopcache.jit_buffer_size=32M\n" > {}/php.d/10-opcache-jit.ini
 
