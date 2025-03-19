@@ -78,7 +78,6 @@ PHPDIR=/etc/opt/remi
 PHPFPMINI=php.ini
 PHPFPMWWW=php-fpm.d/www.conf
 PHPOPCACHE=php.d/10-opcache.ini
-PHPOPCACHESTAT=/usr/local/share/www/opcache_status.php
 WWWUSER=apache
 
 if [[ "$OS" == "ubuntu" ]]; then
@@ -110,10 +109,7 @@ find $PHPDIR/ -maxdepth 1 -mindepth 1 \
 # Let's comeback if https://github.com/php/php-src/issues?q=JIT+label%3A%22Extension%3A+opcache%22 is gone
 # -exec printf "opcache.jit=on\nopcache.jit_buffer_size=32M\n" > {}/php.d/10-opcache-jit.ini
 
-# For opcache monitoring
-echo '<?php print(json_encode(opcache_get_status(false))); ?>' > $PHPOPCACHESTAT
-chmod 644 $PHPOPCACHESTAT; chown $WWWUSER:$WWWUSER $PHPOPCACHESTAT
-# SCRIPT_FILENAME=/usr/local/share/www/opcache_status.php REQUEST_METHOD=GET \
+# SCRIPT_FILENAME=$WWW/opcache_status.php REQUEST_METHOD=GET \
 #  cgi-fcgi -bind -connect /var/opt/remi/php74/run/php-fpm/www.sock | tail -1
 
 # SystemD
