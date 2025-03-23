@@ -247,7 +247,7 @@ else
   cat <<'EOF' > $MARIA_CONF
 [mysqld]
 datadir=/var/lib/mysql
-socket=/var/lib/mysql/mysql.sock
+socket=/run/mysqld/mysqld.sock
 pid-file=/run/mariadb/mariadb.pid
 log-error=/var/log/mariadb/mariadb.log
 innodb_file_per_table = 1
@@ -1034,6 +1034,7 @@ rm -rf ~/.cache ~/.npm ~/public_html/phpmyadmin/node_modules
 EOF
 
 systemctl daemon-reload
+systemctl enable rdproxy nginx
 systemctl enable bridge --now
 
 while ! curl -sS http://localhost:2223/status/about; do

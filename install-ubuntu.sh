@@ -52,7 +52,7 @@ apt-get -y install postgresql-$PG
 # done
 
 # PHP
-apt-get -y install php{7.4,8.4}-{bcmath,cli,common,curl,dev,fpm,gd,imap,igbinary,intl,mbstring,mysql,opcache,mongodb,readline,redis,zip,pgsql,soap,xml}
+apt-get -y install php{7.4,8.4}-{bcmath,cli,common,curl,dev,fpm,gd,imap,igbinary,intl,mbstring,mysql,opcache,memcached,mongodb,pgsql,readline,redis,soap,xml,tidy,zip}
 curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
 # Proxyfix
