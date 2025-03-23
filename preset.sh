@@ -135,6 +135,7 @@ PrivateTmp=true
 [Install]
 WantedBy=multi-user.target
 EOF
+
 cat <<'EOF' > /etc/security/limits.conf
 root             soft    nofile          65535
 *                hard    nproc           256
@@ -155,6 +156,24 @@ if [[ "$OS" == "ubuntu" ]]; then
   PGBIN=/usr/lib/postgresql/$PG/bin
   VALKEYDAEMON=valkey-server
 fi
+
+cat <<EOF > /usr/lib/systemd/system/rdproxy.service
+[Unit]
+Description=The ACL proxy compat for redis
+After=network-online.target remote-fs.target nss-lookup.target
+Wants=network-online.target
+Requires=$VALKEYDAEMON.service
+PartOf=$VALKEYDAEMON.service
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/rdproxy
+TimeoutStopSec=5
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+EOF
 
 mkdir -p /etc/systemd/system/{nginx,earlyoom,fail2ban,mariadb,$PGDAEMON,$VALKEYDAEMON}.service.d
 cat <<'EOF' > /etc/systemd/system/nginx.service.d/override.conf

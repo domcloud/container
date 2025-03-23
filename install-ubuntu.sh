@@ -58,15 +58,22 @@ curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin
 # Proxyfix
 PROXYFIX=proxy-fix-linux-$( [ "$(uname -m)" = "aarch64" ] && echo "arm64" || echo "amd64" )
 if ! command -v proxfix &> /dev/null; then
-  wget https://github.com/domcloud/proxy-fix/releases/download/v0.2.5/$PROXYFIX.tar.gz
-  tar -xf $PROXYFIX.tar.gz && mv $PROXYFIX /usr/local/bin/proxfix && rm -rf $PROXYFIX*
+  curl -sSLO https://github.com/domcloud/proxy-fix/releases/download/v0.2.5/$PROXYFIX.tar.gz
+  tar -xf $PROXYFIX.tar.gz && mv -f $PROXYFIX /usr/local/bin/proxfix && rm -rf $PROXYFIX*
+fi
+
+# Rdproxy
+RDPROXY=rdproxy-linux-$( [ "$(uname -m)" = "aarch64" ] && echo "arm64" || echo "amd64" )
+if ! command -v rdproxy &> /dev/null; then
+  curl -sSLO https://github.com/domcloud/rdproxy/releases/download/v0.3.1/$RDPROXY.tar.gz
+  tar -xf $RDPROXY.tar.gz && mv -f $RDPROXY /usr/local/bin/rdproxy && rm -rf $RDPROXY*
 fi
 
 # Pathman
 PATHMAN=pathman-v0.6.0-linux-$( [ "$(uname -m)" = "aarch64" ] && echo "arm64" || echo "amd64_v1" )
 if ! command -v pathman &> /dev/null; then
-  wget -O pathman.tar.gz https://github.com/therootcompany/pathman/releases/download/v0.6.0/$PATHMAN.tar.gz
-  tar -xf pathman.tar.gz && mv $PATHMAN /usr/local/bin/pathman && rm -f pathman.tar.gz
+  curl -sSLO https://github.com/therootcompany/pathman/releases/download/v0.6.0/$PATHMAN.tar.gz
+  tar -xf $PATHMAN.tar.gz && mv -f $PATHMAN /usr/local/bin/pathman && rm -f $PATHMAN.tar.gz
 fi
 
 # NVIM for NvChad
