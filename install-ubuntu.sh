@@ -70,11 +70,13 @@ if ! command -v rdproxy &> /dev/null; then
 fi
 
 # Pathman
-PATHMAN=pathman-v0.6.0-linux-$( [ "$(uname -m)" = "aarch64" ] && echo "arm64" || echo "amd64_v1" )
+PATHMAN_V=0.6.0
 if ! command -v pathman &> /dev/null; then
-  curl -sSLO https://github.com/therootcompany/pathman/releases/download/v0.6.0/$PATHMAN.tar.gz
+  PATHMAN=pathman-v${PATHMAN_V}-linux-$( [ "$(uname -m)" = "aarch64" ] && echo "arm64" || echo "amd64_v1" )
+  curl -sSLO https://github.com/therootcompany/pathman/releases/download/v$PATHMAN_V/$PATHMAN.tar.gz
   tar -xf $PATHMAN.tar.gz && mv -f $PATHMAN /usr/local/bin/pathman && rm -f $PATHMAN.tar.gz
 fi
+
 
 # NVIM for NvChad
 NVIM_V=0.10.4
@@ -85,10 +87,19 @@ if ! command -v neovim &> /dev/null; then
 fi
 
 # Lazygit for NVIM
-LAZYGIT=lazygit_0.46.0_Linux_$( [ "$(uname -m)" = "aarch64" ] && echo "arm64" || echo "x86_64" )
+LAZYGIT_V=0.48.0
 if ! command -v lazygit &> /dev/null; then
-  curl -sSLO https://github.com/jesseduffield/lazygit/releases/download/v0.46.0/$LAZYGIT.tar.gz
+  LAZYGIT=lazygit_${LAZYGIT_V}_Linux_$( [ "$(uname -m)" = "aarch64" ] && echo "arm64" || echo "x86_64" )
+  curl -sSLO https://github.com/jesseduffield/lazygit/releases/download/v$LAZYGIT_V/$LAZYGIT.tar.gz
   tar -xf $LAZYGIT.tar.gz && mv lazygit /usr/local/bin/ && rm -f $LAZYGIT.tar.gz
+fi
+
+# Lazydocker
+LAZYDOCK_V=0.24.1
+if ! command -v lazydocker &> /dev/null; then
+  LAZYDOCK=lazydocker_${LAZYDOCK_V}_Linux_$( [ "$(uname -m)" = "aarch64" ] && echo "arm64" || echo "x86_64" )
+  curl -sSLO https://github.com/jesseduffield/lazydocker/releases/download/v$LAZYDOCK_V/$LAZYDOCK.tar.gz
+  tar -xf $LAZYGIT.tar.gz && mv lazydocker /usr/local/bin/ && rm -f $LAZYGIT.tar.gz
 fi
 
 # Neofetch (Forked)
