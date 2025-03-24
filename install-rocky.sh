@@ -98,7 +98,7 @@ LAZYDOCK_V=0.24.1
 if ! command -v lazydocker &> /dev/null; then
   LAZYDOCK=lazydocker_${LAZYDOCK_V}_Linux_$( [ "$(uname -m)" = "aarch64" ] && echo "arm64" || echo "x86_64" )
   curl -sSLO https://github.com/jesseduffield/lazydocker/releases/download/v$LAZYDOCK_V/$LAZYDOCK.tar.gz
-  tar -xf $LAZYGIT.tar.gz && mv lazydocker /usr/local/bin/ && rm -f $LAZYGIT.tar.gz
+  tar -xf $LAZYDOCK.tar.gz && mv lazydocker /usr/local/bin/ && rm -f $LAZYDOCK.tar.gz
 fi
 
 # Neofetch (Forked)
