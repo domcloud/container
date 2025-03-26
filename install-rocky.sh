@@ -65,7 +65,7 @@ fi
 # Rdproxy
 RDPROXY=rdproxy-linux-$( [ "$(uname -m)" = "aarch64" ] && echo "arm64" || echo "amd64" )
 if ! command -v rdproxy &> /dev/null; then
-  curl -sSLO https://github.com/domcloud/rdproxy/releases/download/v0.3.1/$RDPROXY.tar.gz
+  curl -sSLO https://github.com/domcloud/rdproxy/releases/download/v0.3.2/$RDPROXY.tar.gz
   tar -xf $RDPROXY.tar.gz && mv -f $RDPROXY /usr/local/bin/rdproxy && rm -rf $RDPROXY*
 fi
 
