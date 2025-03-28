@@ -513,6 +513,7 @@ EOF
 cat <<'EOF' > /etc/nginx/passenger.conf
 passenger_root /usr/local/lib/nginx-builder/passenger;
 passenger_data_buffer_dir /var/lib/nginx/tmp/passenger;
+passenger_temp_path /var/lib/nginx/tmp/passenger;
 passenger_ruby /usr/bin/ruby;
 passenger_instance_registry_dir /var/run/passenger-instreg;
 passenger_python /usr/bin/python3;
