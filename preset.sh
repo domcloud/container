@@ -561,7 +561,7 @@ keepalive_timeout 60;
 keepalive_requests 1000;
 output_buffers 3 512k;
 client_body_buffer_size 256k;
-client_max_body_size 512m;
+client_max_body_size 4g;
 disable_symlinks if_not_owner;
 proxy_http_version 1.1;
 ssl_protocols TLSv1.2 TLSv1.3;
