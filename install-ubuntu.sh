@@ -35,7 +35,7 @@ apt-get -y install postfix
 # NGINX
 BUILDER_DIR=/usr/local/lib/nginx-builder; [ ! -d "$BUILDER_DIR" ] && \
 git clone https://github.com/domcloud/nginx-builder/ $BUILDER_DIR || git -C $BUILDER_DIR pull
-cd $BUILDER_DIR/ && make install DOWNLOAD_V=1.1.1 && make clean && cd /root
+cd $BUILDER_DIR/ && make install DOWNLOAD_V=1.2.0 && make clean && cd /root
 ln -fs /usr/local/sbin/nginx /usr/sbin/nginx # nginx compatibility
 
 # Docker
