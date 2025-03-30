@@ -138,7 +138,7 @@ EOF
 
 cat <<'EOF' > /etc/security/limits.conf
 root             soft    nofile          65535
-*                hard    nproc           256
+*                hard    nproc           512
 *                hard    priority        5
 EOF
 
