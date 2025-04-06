@@ -35,6 +35,9 @@ LC_ALL="en_US.UTF-8"
 LC_CTYPE="en_US.UTF-8"
 LANGUAGE="en_US.UTF-8"
 EOF
+
+# Earlyoom
+loginctl enable-linger earlyoom # related to sudokill
 cat <<'EOF' > /etc/default/earlyoom
 EARLYOOM_ARGS="-r 0 -m 4 -M 409600 -g --prefer '^(node|python|ruby|java)' --avoid '^(dnf|mariadbd|named|nginx|polkitd|postmaster|sshd|php-fpm|valkey-server)$'"
 EOF
@@ -975,18 +978,23 @@ nameserver 1.1.1.1
 nameserver 1.0.0.1
 EOF
 
+# Daily backup db
+useradd -m -d /home/dumper -s /bin/bash dumper
+git clone https://github.com/domcloud/db-dumper /home/dumper/db
+
 crontab -u root -l || cat <<'EOF' | crontab -u root -
 # Entry commented are safeguards implemented in DOM Cloud. You might not need them
-# 0 * * * * find '/var/spool/cron/' -not -name root -type f | xargs sed -ri '/^\s*(\*|[0-9]*,)/d'
-# */5 * * * * /usr/bin/node /home/bridge/public_html/sudokill.js -i bridge,do-agent,dbus,earlyoom,mysql,named,nobody,postgres,polkitd,rpc,valkey
+# @hourly find '/var/spool/cron/' -not -name root -type f | xargs sed -ri '/^\s*(\*|[0-9]*,)/d'
+# @hourly node /home/bridge/public_html/sudokill.js
 
-*/5 * * * * /usr/local/lib/nginx-builder/cleanup.sh
-@daily passenger-config reopen-logs
-@weekly /usr/bin/node /home/bridge/public_html/sudocleanssl.js
+@hourly bash /usr/local/lib/nginx-builder/cleanup.sh
+@daily bash /home/dumper/db/main.sh
+@daily /usr/local/bin/passenger-config reopen-logs
+@weekly node /home/bridge/public_html/sudocleanssl.js
 @weekly find /var/spool/clientmqueue /var/webmin/diffs -mindepth 1 -delete
 @weekly find /home -maxdepth 1 -type d -ctime +1 -exec rm -rf {}/{.cache,.npm,Downloads,public_html/.yarn/cache,public_html/node_modules/.cache,.composer/cache} \;
-@weekly find /home -maxdepth 1 -type d -ctime +1 -exec rdfind -minsize 100000 -makehardlinks true -makeresultsfile false {}/{.vscode-server,.pyenv,.rvm,.cargo,.local,go,.rustup,public_html/node_modules} \;
-@weekly /usr/bin/bash /home/bridge/public_html/src/whitelist/refresh.sh
+@weekly find /home -maxdepth 1 -type d -ctime +1 -exec rdfind -minsize 100000 -makehardlinks true -makeresultsfile false {}/{.vscode-server,.pyenv,.rvm,.nvm,.cargo,.local,go,.rustup} \;
+@weekly bash /home/bridge/public_html/src/whitelist/refresh.sh
 @monthly find /etc/letsencrypt/{csr,keys} -name *.pem -type f -mtime +180 -exec rm -f {} ';'
 EOF
 
