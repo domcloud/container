@@ -549,14 +549,28 @@ cat <<'EOF' > /etc/nginx/finetuning.conf
 server_names_hash_bucket_size 128;
 server_names_hash_max_size 131072;
 limit_req_status 429;
-limit_req zone=basic_limit burst=6000 nodelay;
-limit_req_zone $server_name zone=basic_limit:50m rate=100r/s;
-gzip_types application/atom+xml application/javascript application/json application/rss+xml
-           application/vnd.ms-fontobject application/x-font-opentype application/x-font-ttf
-           image/svg+xml image/x-icon image/x-ms-bmp text/css text/plain text/xml;
+limit_req_zone $server_name zone=basic_limit:50m rate=120r/s;
+limit_req zone=basic_limit burst=1800 nodelay;
+
+default_type application/octet-stream;
+map $sent_http_content_type $expires {
+    default off;
+    text/html epoch;
+    text/css 7d;
+    application/javascript 7d;
+    application/wasm 7d;
+    ~image/ 7d;
+    ~font/ 7d;
+    ~audio/ 7d;
+    ~video/ 7d;
+}
+expires $expires;
+gzip_types application/javascript application/json application/wasm application/xml
+    font/otf font/ttf image/svg+xml image/x-icon image/x-ms-bmp text/css text/plain;
 gzip_min_length 256;
 gzip_comp_level 3;
 gzip on;
+
 sendfile on;
 aio threads;
 directio 16m;
@@ -565,16 +579,18 @@ keepalive_timeout 60;
 keepalive_requests 1000;
 output_buffers 3 512k;
 client_body_buffer_size 256k;
-client_max_body_size 4g;
+client_max_body_size 1g;
 disable_symlinks if_not_owner;
 proxy_http_version 1.1;
-ssl_protocols TLSv1.2 TLSv1.3;
 server_tokens off;
 merge_slashes off;
 msie_padding off;
+
 quic_gso on;
 quic_retry on;
-ssl_prefer_server_ciphers on;
+ssl_protocols TLSv1.3;
+ssl_ecdh_curve X25519:prime256v1:secp384r1;
+ssl_prefer_server_ciphers off;
 ssl_session_cache shared:SSL:16m;
 ssl_session_timeout 1h;
 ssl_session_tickets off;
@@ -602,18 +618,6 @@ http {
     include /etc/nginx/fastcgi.conf;
     include /etc/nginx/proxy.conf;
     include /etc/nginx/passenger.conf;
-    default_type application/octet-stream;
-    map $sent_http_content_type $expires {
-        default off;
-        text/html epoch;
-        text/css 7d;
-        application/javascript 7d;
-        ~image/ 7d;
-        ~font/ 7d;
-        ~audio/ 7d;
-        ~video/ 7d;
-    }
-    expires $expires;
     server {
         server_name _;
         listen 80;
@@ -671,8 +675,8 @@ types {
 
     font/woff                                        woff;
     font/woff2                                       woff2;
-    application/x-font-ttf                           ttf;
-    application/x-font-opentype                      otf;
+    font/ttf                                         ttf;
+    font/otf                                         otf;
 
     application/java-archive                         jar war ear;
     application/json                                 json;
@@ -692,11 +696,11 @@ types {
     application/vnd.oasis.opendocument.spreadsheet   ods;
     application/vnd.oasis.opendocument.text          odt;
     application/vnd.openxmlformats-officedocument.presentationml.presentation
-                                                     pptx;
+                                                    pptx;
     application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
-                                                     xlsx;
+                                                    xlsx;
     application/vnd.openxmlformats-officedocument.wordprocessingml.document
-                                                     docx;
+                                                    docx;
     application/vnd.wap.wmlc                         wmlc;
     application/wasm                                 wasm;
     application/x-7z-compressed                      7z;
