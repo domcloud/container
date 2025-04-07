@@ -274,8 +274,8 @@ sed -i "s/#listen_addresses = .*/listen_addresses = '*'/g" $PGCONFIG/postgresql.
 sed -i "s/max_connections = 100/max_connections = 4096/g" $PGCONFIG/postgresql.conf
 cat <<'EOF' > $PGCONFIG/pg_hba.conf
 local   all             all                                     peer
-host    all             all             0.0.0.0/0               md5
-host    all             all             ::/0                    md5
+host    all             all             0.0.0.0/0               scram-sha-256
+host    all             all             ::/0                    scram-sha-256
 EOF
 
 # valkey
