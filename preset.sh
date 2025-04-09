@@ -7,7 +7,7 @@ PASSWD=$OS
 
 # Contents
 curl -sSLo /usr/local/bin/restart https://raw.githubusercontent.com/domcloud/bridge/main/userkill.sh && chmod 755 /usr/local/bin/restart
-curl -sSLo /usr/local/bin/envload https://raw.githubusercontent.com/domcloud/bridge/main/userenvload.sh && chmod 755 /usr/local/bin/envload
+curl -sSLo /usr/local/bin/loadenv https://raw.githubusercontent.com/domcloud/bridge/main/userloadenv.sh && chmod 755 /usr/local/bin/loadenv
 WWW=/usr/local/share/www && WWWSOURCE=https://raw.githubusercontent.com/domcloud/domcloud/master/share && mkdir -p $WWW
 curl -sSLo $WWW/deceptive.html $WWWSOURCE/deceptive.html
 curl -sSLo $WWW/nosite.html $WWWSOURCE/nosite.html
