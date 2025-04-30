@@ -106,7 +106,8 @@ find $PHPDIR/ -maxdepth 1 -mindepth 1 \
  -exec sh -c "echo 'opcache.revalidate_freq=60' >> {}/$PHPOPCACHE" \; \
  -exec sh -c "echo 'opcache.enable_file_override=1' >> {}/$PHPOPCACHE" \; \
  -exec sh -c "echo 'opcache.validate_permission=1' >> {}/$PHPOPCACHE" \; \
- -exec sh -c "echo 'opcache.save_comments=0' >> {}/$PHPOPCACHE" \;
+ -exec sh -c "echo 'opcache.validate_root=1' >> {}/$PHPOPCACHE" \; \
+ -exec sh -c "echo 'opcache.save_comments=1' >> {}/$PHPOPCACHE" \;
 
 # OPCACHEMEM=$(free -m | awk '/^Mem:/ {val=int($2 * 0.15); print (val > 256 ? val : 256)}')
 # find $PHPDIR/ -maxdepth 1 -mindepth 1 -exec sed -i "s/256/$OPCACHEMEM/g" {}/$PHPOPCACHE \;
