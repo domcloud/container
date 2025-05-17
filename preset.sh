@@ -38,7 +38,8 @@ LANGUAGE="en_US.UTF-8"
 EOF
 
 # Earlyoom
-loginctl enable-linger earlyoom # related to sudokill
+systemctl start earlyoom || true
+loginctl enable-linger earlyoom || true # related to sudokill
 cat <<'EOF' > /etc/default/earlyoom
 EARLYOOM_ARGS="-r 0 -m 4 -M 409600 -g --prefer '^(node|python|ruby|java)' --avoid '^(dnf|mariadbd|named|nginx|polkitd|postmaster|sshd|php-fpm|valkey-server)$'"
 EOF
