@@ -9,7 +9,7 @@ dnf -y install https://download.postgresql.org/pub/repos/yum/reporpms/EL-9-$(una
 curl -fsSL https://software.virtualmin.com/gpl/scripts/virtualmin-install.sh | sh -s -- --setup --verbose
 curl -sSL https://dl.yarnpkg.com/rpm/yarn.repo > /etc/yum.repos.d/yarn.repo
 dnf config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
-dnf config-manager --disable virtualmin pgdg{16,15,14,13,12}
+dnf config-manager --disable virtualmin pgdg{16,15,14,13}
 
 # Modules
 dnf -y module reset nodejs
@@ -22,8 +22,8 @@ PG=17
 # Tools
 dnf -y install awscli bison btop bzip2 certbot clang cmake gcc-c++ git ncdu htop iftop jq lsof make nano ninja-build ncurses npm nodejs patch ripgrep ruby rsync screen socat strace tar time tmux vim wget whois xz yarn zstd \
   lib{curl,ffi,sqlite3x,tool-ltdl,md,yaml}-devel {brotli,bzip2,mesa-libGL,nettle,openldap,pcre2,perl,python,readline,redis,ruby,xmlsec1,xmlsec1-openssl,valkey}-devel python3-pip rubygem-{json,rack,rake} \
-  libreport-filesystem {langpacks,glibc-langpack}-en perl-{DBD-Pg,DBD-mysql,LWP-Protocol-https,macros,DateTime,Crypt-SSLeay,Text-ASCIITable,IO-Tty,XML-Simple} sudolibpq5-$PG* fcgi chromium --nobest
-dnf -y wbm-virtual-server wbm-virtualmin-{nginx,nginx-ssl} virtualmin-config earlyoom fail2ban-server nftables postfix mariadb-server valkey openssh-server systemd-container bind
+  libreport-filesystem {langpacks,glibc-langpack}-en perl-{DBD-Pg,DBD-mysql,LWP-Protocol-https,macros,DateTime,Crypt-SSLeay,Text-ASCIITable,IO-Tty,XML-Simple} sudo libpq5-$PG* fcgi chromium --nobest
+dnf -y install wbm-virtual-server wbm-virtualmin-{nginx,nginx-ssl} virtualmin-config earlyoom fail2ban-server nftables postfix mariadb-server valkey openssh-server systemd-container bind
 ln -s /usr/bin/gcc /usr/bin/$(uname -m)-linux-gnu-gcc || true # fix pip install with native libs for aarch64
 ln -s /usr/bin/valkey-cli /usr/local/bin/redis-cli || true # redis compatibility
 
@@ -78,7 +78,7 @@ if ! command -v pathman &> /dev/null; then
 fi
 
 # NVIM for NvChad
-NVIM_V=0.10.4
+NVIM_V=0.11.1
 if ! command -v neovim &> /dev/null; then
   NVIM_F=nvim-linux-$( [ "$(uname -m)" = "aarch64" ] && echo "arm64" || echo "x86_64" )
   curl -sSLO https://github.com/neovim/neovim/releases/download/v$NVIM_V/$NVIM_F.tar.gz
@@ -86,7 +86,7 @@ if ! command -v neovim &> /dev/null; then
 fi
 
 # Lazygit for NVIM
-LAZYGIT_V=0.48.0
+LAZYGIT_V=0.50.0
 if ! command -v lazygit &> /dev/null; then
   LAZYGIT=lazygit_${LAZYGIT_V}_Linux_$( [ "$(uname -m)" = "aarch64" ] && echo "arm64" || echo "x86_64" )
   curl -sSLO https://github.com/jesseduffield/lazygit/releases/download/v$LAZYGIT_V/$LAZYGIT.tar.gz

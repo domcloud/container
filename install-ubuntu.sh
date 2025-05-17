@@ -79,7 +79,7 @@ fi
 
 
 # NVIM for NvChad
-NVIM_V=0.10.4
+NVIM_V=0.11.1
 if ! command -v neovim &> /dev/null; then
   NVIM_F=nvim-linux-$( [ "$(uname -m)" = "aarch64" ] && echo "arm64" || echo "x86_64" )
   curl -sSLO https://github.com/neovim/neovim/releases/download/v$NVIM_V/$NVIM_F.tar.gz
@@ -87,7 +87,7 @@ if ! command -v neovim &> /dev/null; then
 fi
 
 # Lazygit for NVIM
-LAZYGIT_V=0.48.0
+LAZYGIT_V=0.50.0
 if ! command -v lazygit &> /dev/null; then
   LAZYGIT=lazygit_${LAZYGIT_V}_Linux_$( [ "$(uname -m)" = "aarch64" ] && echo "arm64" || echo "x86_64" )
   curl -sSLO https://github.com/jesseduffield/lazygit/releases/download/v$LAZYGIT_V/$LAZYGIT.tar.gz
