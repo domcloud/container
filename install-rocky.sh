@@ -34,9 +34,9 @@ cd $BUILDER_DIR/ && make install DOWNLOAD_V=1.2.0 && make clean && cd /root
 ln -fs /usr/local/sbin/nginx /usr/sbin/nginx # nginx compatibility
 
 # PHP
-dnf -y install php{74,84}-php-{bcmath,cli,common,devel,ffi,fpm,gd,imap,intl,mbstring,mysqlnd,opcache,pdo,pecl-memcached,pecl-mongodb,pecl-redis,pecl-zip,pgsql,process,sodium,soap,xml,tidy}
+dnf -y install php{74,81,82,83,84}-php-{bcmath,cli,common,devel,ffi,fpm,gd,imap,intl,mbstring,mysqlnd,opcache,pdo,pecl-memcached,pecl-mongodb,pecl-redis,pecl-zip,pgsql,process,sodium,soap,xml,tidy}
 # curl https://packages.microsoft.com/config/rhel/9/prod.repo | tee /etc/yum.repos.d/mssql-release.repo
-# dnf -y install php{74,81,82}-php-ioncube-loader php{74,81,82,83,84}-php-{brotli,ldap,pecl-decimal,pecl-imagick-im7,pecl-rdkafka,pecl-simdjson,pecl-uuid,sqlsrv,xz,zstd} msodbcsql17 # optional, installed in cloud
+dnf -y install php{74,81,82}-php-ioncube-loader php{74,81,82,83,84}-php-{brotli,ldap,pecl-decimal,pecl-imagick-im7,pecl-rdkafka,pecl-simdjson,pecl-uuid,sqlsrv,xz,zstd} msodbcsql17 # optional, installed in cloud
 dnf -y remove php-* && ln -fs `which php84` /usr/bin/php || true
 curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
@@ -47,10 +47,10 @@ for bin in "psql" "pg_ctl" "pg_dump" "pg_dumpall" "pg_restore" "pg_config" "pg_i
 done
 
 # Not everyone needs this. Also, postgresql-devel install would also install clang n gcc toolset
-# dnf -y install {postgis35,pgrouting,pgvector,pg_uuidv7,timescaledb}_$PG postgresql$PG-devel
-# for ext in "postgis" "postgis_raster" "postgis_sfcgal" "postgis_tiger_geocoders" "postgis_topology" "earthdistance" "address_standardizer" "address_standardizer_data_us" "pgrouting" "pg_uuidv7" "vector"; do
-#   echo "trusted = true" >> "/usr/pgsql-$PG/share/extension/$ext.control"
-# done
+dnf -y install {postgis35,pgrouting,pgvector,pg_uuidv7,timescaledb}_$PG postgresql$PG-devel
+for ext in "postgis" "postgis_raster" "postgis_sfcgal" "postgis_tiger_geocoders" "postgis_topology" "earthdistance" "address_standardizer" "address_standardizer_data_us" "pgrouting" "pg_uuidv7" "vector"; do
+  echo "trusted = true" >> "/usr/pgsql-$PG/share/extension/$ext.control"
+done
 
 # Docker
 dnf -y install docker-ce docker-ce-cli containerd.io docker-compose-plugin slirp4netns passt
@@ -111,7 +111,7 @@ cd $RDFIND; ./configure --disable-debug ; make install; cd .. ; rm -rf $RDFIND*
 
 # Misc
 pip3 install pipenv
-dnf -y remove lynx gcc-toolset-13-* nodejs-docs clang flatpak open-sans-fonts rubygem-rdoc gl-manpages
+dnf -y remove lynx gcc-toolset-13-* nodejs-docs flatpak open-sans-fonts rubygem-rdoc gl-manpages
 ln -s /usr/lib/systemd/system/postgresql-$PG.service /usr/lib/systemd/system/postgresql.service
 systemctl enable webmin mariadb postgresql-$PG nftables fail2ban named php{74,84}-php-fpm earlyoom valkey || true
 chmod +x /usr/local/bin/* && chown root:root /usr/local/bin/*
