@@ -253,7 +253,7 @@ else
   cat <<'EOF' > $MARIA_CONF
 [mysqld]
 datadir=/var/lib/mysql
-socket=/run/mysqld/mysqld.sock
+socket=/var/lib/mysql/mysql.sock
 pid-file=/run/mariadb/mariadb.pid
 log-error=/var/log/mariadb/mariadb.log
 innodb_file_per_table = 1
