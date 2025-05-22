@@ -1031,6 +1031,7 @@ Type=simple
 User=bridge
 WorkingDirectory=/home/bridge/public_html
 ExecStart=/usr/bin/node /home/bridge/public_html/app.js
+Environment="NODE_ENV=production"
 TimeoutStopSec=5
 Restart=always
 
