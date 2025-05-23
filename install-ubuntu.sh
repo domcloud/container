@@ -45,11 +45,13 @@ apt-get -y install docker-ce docker-ce-cli containerd.io docker-buildx-plugin do
 PG=17
 apt-get -y install postgresql-$PG
 
-# Not everyone needs this. Also, postgresql-server-dev install would also install clang n gcc toolset
-# apt -y install postgresql-$PG-{postgis,pgrouting,pgvector,timescaledb} postgresql-server-dev-$PG
-# for ext in "postgis-3" "postgis_raster" "postgis_sfcgal" "postgis_tiger_geocoders" "postgis_topology" "earthdistance" "address_standardizer" "address_standardizer_data_us" "pgrouting" "vector"; do
-#   echo "trusted = true" >> "/usr/share/postgresql/$PG/extension/$ext.control"
-# done
+if [[ -n "$OPTIONAL_INSTALL" ]]; then
+  # Not everyone needs this. Also, postgresql-server-dev install would also install clang n gcc toolset
+  apt -y install postgresql-$PG-{postgis,pgrouting,pgvector,timescaledb} postgresql-server-dev-$PG
+  for ext in "postgis-3" "postgis_raster" "postgis_sfcgal" "postgis_tiger_geocoders" "postgis_topology" "earthdistance" "address_standardizer" "address_standardizer_data_us" "pgrouting" "vector"; do
+    echo "trusted = true" >> "/usr/share/postgresql/$PG/extension/$ext.control"
+  done
+fi
 
 # PHP
 apt-get -y install php{7.4,8.4}-{bcmath,cli,common,curl,dev,fpm,gd,imap,igbinary,intl,mbstring,mysql,opcache,memcached,mongodb,pgsql,readline,redis,soap,xml,tidy,zip}
