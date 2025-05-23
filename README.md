@@ -29,7 +29,7 @@ Here's feature comparison:
 | Can have `root` Access   | ❌ | ✅ |
 | Self-hosted email  | ❌ | Possible [but discouraged](https://cfenollosa.com/blog/after-self-hosting-my-email-for-twenty-three-years-i-have-thrown-in-the-towel-the-oligopoly-has-won.html) |
 
-# Installing 
+## Installing 
 
 You can run these from freshly installed [Rocky Linux Minimal ISO](https://rockylinux.org/download) or [Ubuntu Server ISO](https://ubuntu.com/download/server) instead:
 
@@ -38,13 +38,17 @@ You can run these from freshly installed [Rocky Linux Minimal ISO](https://rocky
 if [ -f /etc/lsb-release ]; then OS=ubuntu; elif [ -f /etc/redhat-release ]; then OS=rocky; else OS=unknown; fi
 curl -sSL https://github.com/domcloud/container/raw/refs/heads/master/install-$OS.sh | bash
 curl -sSL https://github.com/domcloud/container/raw/refs/heads/master/preset.sh | bash
+# Then change passwords (note the passwords generated)
+curl -sSL https://github.com/domcloud/container/raw/refs/heads/master/genpass.sh | bash
 ```
 
-## About the image
+More information about installing and integrating this to DOM Cloud Portal can be read [in the documentation](https://domcloud.co/docs/intro/self-hosting).
+
+## Building disk image
 
 We use [Hashicorp Packer](https://developer.hashicorp.com/packer/docs/install) to build images. We ran it inside privilenged docker. Simply run `make build-image`. With KVM acceleration the build should be done around one hour.
 
-The image consist of [Rocky Linux Minimal ISO](https://rockylinux.org/download) + Some scripts that installs Virtualmin and additional services to make it exactly like how a DOM Cloud server works. See [install.sh](./install.sh) and [preset.sh](./preset.sh) to see the install scripts.
+The image consist of [Rocky Linux Minimal ISO](https://rockylinux.org/download) + Some scripts that installs Virtualmin and additional services to make it exactly like how a DOM Cloud server works.
 
 To run the final image using [QEMU](https://www.qemu.org):
 
@@ -70,27 +74,7 @@ The root password includes the `root` webmin access is `rocky`. The `bridge` HTT
 
 ## Things to do after your VM Running
 
-### Have A Static Public IP
-
-Please assign your `80` and `443` to your static public IP address.
-
-If you don't have a public IP address or you're just running the whole VM behind NAT or your personal laptop, please **have a domain** and install [Cloudfare Zero Trust HTTP Tunnel](https://medium.com/@tomer.klein/cloudflare-zero-trust-setting-up-my-first-tunnel-1276ae4b61a4) to port `80` inside the VM. 
-
-### Change your VM passwords
-
-You have 5 passwords to change. To change it, run this script:
-
-```sh
-# make sure to run this using root:
-curl -sSL https://github.com/domcloud/container/raw/refs/heads/master/genpass.sh | bash
-```
-
-### Check Virtualmin Configuration
-
-Go to `https://localhost:2443` and log in with user `root`. 
-
-1. Finish the post installation wizard
-2. Go to `Virtualmin` -> `System Settings` -> `Re-Check Configuration`
+Most post installation steps [is already documented](https://domcloud.co/docs/intro/self-hosting#post-installation). Here are the rest specific for building from image disks.
 
 ### Install the correct IPv4 and IPv6 addresses
 
@@ -119,11 +103,7 @@ First, change your system hostname to the domain
 sudo hostnamectl set-hostname "mysystemdomain.com"
 ```
 
-Then go to Manage Virtual Server > Setup SSL Certificate > SSL Providers and click "Request Certificate"
-
-### Update Packages
-
-Run `yum update`.
+Then [read more in the separate documentation](https://domcloud.co/docs/intro/self-hosting#assign-to-a-domain)
 
 ### Expand Disk (Rocky / XFS)
 

@@ -467,7 +467,7 @@ php_socket=1
 child_procs=4
 add_link=/etc/nginx/sites-enabled
 nginx_config=/etc/nginx/nginx.conf
-listen_mode=0
+listen_mode=1
 EOF
 else
   cat <<'EOF' > /etc/webmin/virtualmin-nginx/config
@@ -478,7 +478,7 @@ start_cmd=systemctl start nginx
 php_socket=1
 nginx_cmd=/usr/sbin/nginx
 http2=0
-listen_mode=0
+listen_mode=1
 child_procs=4
 extra_dirs=
 rotate_cmd=nginx -s reopen
