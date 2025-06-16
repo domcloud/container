@@ -36,8 +36,6 @@ LANGUAGE="en_US.UTF-8"
 EOF
 
 # Earlyoom
-systemctl start earlyoom || true
-loginctl enable-linger earlyoom || true # related to sudokill
 cat <<'EOF' > /etc/default/earlyoom
 EARLYOOM_ARGS="-r 0 -m 4 -M 409600 -g --prefer '^(node|python|ruby|java)' --avoid '^(dnf|mariadbd|named|nginx|polkitd|postmaster|sshd|php-fpm|valkey-server)$'"
 EOF
@@ -224,6 +222,14 @@ cat <<EOF > /etc/docker/daemon.json
   "iptables": false
 }
 EOF
+
+# hidepid=4 (kernel >= 5.8)
+FSTAB="/etc/fstab"
+if ! grep -qE '^\s*proc\s+/proc\s+' "$FSTAB"; then
+  PROC_ENTRY="proc  /proc proc  defaults,nosuid,nodev,noexec,relatime,hidepid=4,gid=adm 0 0"
+  tail -c1 "$FSTAB" | read -r _ || echo >> "$FSTAB"
+  echo "$PROC_ENTRY" >> "$FSTAB"
+fi
 
 # DB
 if [[ "$OS" == "ubuntu" ]]; then
