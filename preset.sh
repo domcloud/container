@@ -952,7 +952,6 @@ if [ ! -f /etc/nftables-whitelist.conf ]; then
 
 flush set inet filter whitelist
 flush set inet filter whitelist-v6
-
 EOF
 fi
 if [ ! -f /etc/nftables-firewall.conf ]; then
@@ -1130,6 +1129,7 @@ curl -sSX POST \
 fi
 
 echo "wizard_run=1" >> /etc/webmin/virtual-server/config
+systemctl start valkey || true
 
 # Sanity check
 sysctl --system
