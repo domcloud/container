@@ -1129,7 +1129,7 @@ curl -sSX POST \
 fi
 
 echo "wizard_run=1" >> /etc/webmin/virtual-server/config
-systemctl start valkey || true
+systemctl start $VALKEYDAEMON || true
 
 # Sanity check
 sysctl --system
