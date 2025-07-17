@@ -151,3 +151,29 @@ Why still connecting to our cloud portal?
 + You get some cloud features like backups, domcloud.dev domain, team collab, etc
 + Can be connected for free
 
+## More Post Installation Checklist
+
+1. Check /home has been mounted properly
+2. Check SELinux disabled
+3. Check quota root and home working
+4. Check DNS IP correct
+5. Check IPv6 working
+6. Check DNS Slave servers
+7. Check S3 Backups
+8. Check Root password
+9. Check SSH login by password enabled
+10. Check bridge envars
+11. Create SSL_WILDCARDS domains and setup sync:
+
+```sh
+mkdir -p ~/.ssh
+SHARED_DOMAIN_OWNER=sga.domcloud.co
+cat <<EOF > .ssh/config
+Host $SHARED_DOMAIN_OWNER
+        StrictHostKeyChecking no
+        IdentityFile ~/.ssh/$SHARED_DOMAIN_OWNER
+EOF
+cat <<EOF | crontab -
+1 0 1 * * scp '$USER@$SHARED_DOMAIN_OWNER:$HOME/*' $HOME/
+EOF
+```
