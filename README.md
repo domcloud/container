@@ -34,6 +34,7 @@ Here's feature comparison:
 You can run these from freshly installed [Rocky Linux Minimal ISO](https://rockylinux.org/download) or [Ubuntu Server ISO](https://ubuntu.com/download/server) instead:
 
 ```sh
+# export OPTIONAL_INSTALL=1
 # make sure to run this using root:
 if [ -f /etc/lsb-release ]; then OS=ubuntu; elif [ -f /etc/redhat-release ]; then OS=rocky; else OS=unknown; fi
 curl -sSL https://github.com/domcloud/container/raw/refs/heads/master/install-$OS.sh | bash

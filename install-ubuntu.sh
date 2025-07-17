@@ -54,7 +54,13 @@ if [[ -n "$OPTIONAL_INSTALL" ]]; then
 fi
 
 # PHP
-apt-get -y install php{7.4,8.4}-{bcmath,cli,common,curl,dev,fpm,gd,imap,igbinary,intl,mbstring,mysql,opcache,memcached,mongodb,pgsql,readline,redis,soap,xml,tidy,zip}
+apt-get -y install php{7.4,8.1,8.2,8.3,8.4}-{bcmath,cli,common,curl,dev,fpm,gd,imap,igbinary,intl,mbstring,mysql,opcache,memcached,mongodb,pgsql,readline,redis,soap,xml,tidy,zip}
+if [[ -n "$OPTIONAL_INSTALL" ]]; then
+  apt-get -y install php{7.4,8.1,8.2,8.3,8.4}-{brotli,ldap,decimal,imagick,rdkafka,uuid,sqlsrv,lz4,zstd}
+  curl -fsSL https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > $GPGDIR/microsoft.gpg
+  echo "deb [signed-by=$GPGDIR/pgdg.gpg] https://packages.microsoft.com/ubuntu/$(lsb_release -rs)/prod $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/microsoft.list
+  apt-get update && ACCEPT_EULA=Y apt-get -y install msodbcsql17
+fi
 curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
 # Proxyfix

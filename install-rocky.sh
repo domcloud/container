@@ -37,7 +37,8 @@ ln -fs /usr/local/sbin/nginx /usr/sbin/nginx # nginx compatibility
 dnf -y install php{74,81,82,83,84}-php-{bcmath,cli,common,devel,ffi,fpm,gd,imap,intl,mbstring,mysqlnd,opcache,pdo,pecl-memcached,pecl-mongodb,pecl-redis,pecl-zip,pgsql,process,sodium,soap,xml,tidy}
 if [[ -n "$OPTIONAL_INSTALL" ]]; then
   curl https://packages.microsoft.com/config/rhel/9/prod.repo | tee /etc/yum.repos.d/mssql-release.repo
-  dnf -y install php{74,81,82}-php-ioncube-loader php{74,81,82,83,84}-php-{brotli,ldap,pecl-decimal,pecl-imagick-im7,pecl-rdkafka,pecl-simdjson,pecl-uuid,sqlsrv,xz,zstd} msodbcsql17 --skip-broken
+  dnf -y install php{74,81,82}-php-ioncube-loader php{74,81,82,83,84}-php-{brotli,ldap,pecl-decimal,pecl-imagick-im7,pecl-rdkafka,pecl-simdjson,pecl-uuid,sqlsrv,xz,zstd}
+  env ACCEPT_EULA=Y dnf -y install msodbcsql17 --skip-broken
 fi
 dnf -y remove php-* && ln -fs `which php84` /usr/bin/php || true
 curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
