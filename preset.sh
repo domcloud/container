@@ -186,7 +186,7 @@ LimitNOFILE=65535
 EOF
 cat <<'EOF' > /etc/systemd/system/earlyoom.service.d/override.conf
 [Service]
-SupplementaryGroups=adm
+DynamicUser=false
 EOF
 cat <<'EOF' > /etc/systemd/system/fail2ban.service.d/override.conf
 [Unit]
