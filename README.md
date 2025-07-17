@@ -38,6 +38,7 @@ You can run these from freshly installed [Rocky Linux Minimal ISO](https://rocky
 # make sure to run this using root:
 if [ -f /etc/lsb-release ]; then OS=ubuntu; elif [ -f /etc/redhat-release ]; then OS=rocky; else OS=unknown; fi
 curl -sSL https://github.com/domcloud/container/raw/refs/heads/master/install-$OS.sh | bash
+curl -sSL https://github.com/domcloud/container/raw/refs/heads/master/install-extra.sh | bash
 curl -sSL https://github.com/domcloud/container/raw/refs/heads/master/preset.sh | bash
 # Then change passwords (note the passwords generated)
 curl -sSL https://github.com/domcloud/container/raw/refs/heads/master/genpass.sh | bash
