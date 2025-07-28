@@ -25,9 +25,11 @@ curl -sSLo /etc/ssl/default/cert.pem https://raw.githubusercontent.com/willnode/
 echo "gem: --no-document" > /etc/gemrc
 cat <<'EOF' > /etc/gitconfig
 [pull]
-        rebase = false
+        rebase = true
 [init]
         defaultBranch = main
+[push]
+        default = current
 EOF
 cat <<'EOF' > /etc/environment
 LC_ALL="en_US.UTF-8"
