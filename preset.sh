@@ -991,8 +991,10 @@ nameserver 1.0.0.1
 EOF
 
 # Daily backup db
+if [ ! -d /home/dumper ]; then
 useradd -m -d /home/dumper -s /bin/bash dumper
 git clone https://github.com/domcloud/db-dumper /home/dumper/db
+fi
 
 crontab -u root -l || cat <<'EOF' | crontab -u root -
 # Entry commented are safeguards implemented in DOM Cloud. You might not need them
