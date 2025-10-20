@@ -239,7 +239,7 @@ if [[ "$OS" == "ubuntu" ]]; then
   cat <<'EOF' > $MARIA_CONF
 [mysqld]
 datadir=/var/lib/mysql
-socket=/var/lib/mysql/mysql.sock
+socket=/run/mysqld/mysqld.sock
 pid-file=/run/mysqld/mysqld.pid
 log-error=/var/log/mariadb/mysqld.log
 innodb_file_per_table = 1
