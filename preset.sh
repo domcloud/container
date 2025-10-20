@@ -1053,7 +1053,8 @@ rm -rf public_html
 git clone https://github.com/domcloud/bridge public_html
 cd public_html
 sh tools-init.sh
-echo "SECRET=rocky" > .env
+echo "SECRET=$PASSWD" > .env
+echo "FILESTASH_URL=https://filestash.mnz.domcloud.co" >> .env
 rm -rf ~/.cache ~/.npm ~/public_html/phpmyadmin/node_modules
 EOF
 
