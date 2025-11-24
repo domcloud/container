@@ -31,16 +31,18 @@ Here's feature comparison:
 
 ## Installing 
 
+Complete DOM Cloud services requires 2GB of RAM and 30GB of disk to work, more is recommended for production servers. 
+
 You can run these from freshly installed [Rocky Linux Minimal ISO](https://rockylinux.org/download) or [Ubuntu Server ISO](https://ubuntu.com/download/server) instead:
 
 ```sh
-# export OPTIONAL_INSTALL=1
+export OPTIONAL_INSTALL=1
 # make sure to run this using root:
 if [ -f /etc/lsb-release ]; then OS=ubuntu; elif [ -f /etc/redhat-release ]; then OS=rocky; else OS=unknown; fi
 curl -sSL https://github.com/domcloud/container/raw/refs/heads/master/install-$OS.sh | bash
 curl -sSL https://github.com/domcloud/container/raw/refs/heads/master/install-extra.sh | bash
 curl -sSL https://github.com/domcloud/container/raw/refs/heads/master/preset.sh | bash
-# Then change passwords (note the passwords generated)
+# Then change passwords (save and remember the passwords generated)
 curl -sSL https://github.com/domcloud/container/raw/refs/heads/master/genpass.sh | bash
 ```
 
