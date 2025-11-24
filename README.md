@@ -39,11 +39,11 @@ You can run these from freshly installed [Rocky Linux Minimal ISO](https://rocky
 export OPTIONAL_INSTALL=1
 # make sure to run this using root:
 if [ -f /etc/lsb-release ]; then OS=ubuntu; elif [ -f /etc/redhat-release ]; then OS=rocky; else OS=unknown; fi
-curl -sSL https://github.com/domcloud/container/raw/refs/heads/master/install-$OS.sh | bash
-curl -sSL https://github.com/domcloud/container/raw/refs/heads/master/install-extra.sh | bash
-curl -sSL https://github.com/domcloud/container/raw/refs/heads/master/preset.sh | bash
+curl -sSL https://raw.githubusercontent.com/domcloud/container/refs/heads/master/install-$OS.sh | bash
+curl -sSL https://raw.githubusercontent.com/domcloud/container/refs/heads/master/install-extra.sh | bash
+curl -sSL https://raw.githubusercontent.com/domcloud/container/refs/heads/master/preset.sh | bash
 # Then change passwords (save and remember the passwords generated)
-curl -sSL https://github.com/domcloud/container/raw/refs/heads/master/genpass.sh | bash
+curl -sSL https://raw.githubusercontent.com/domcloud/container/refs/heads/master/genpass.sh | bash
 ```
 
 More information about installing and integrating this to DOM Cloud Portal can be read [in the documentation](https://domcloud.co/docs/intro/self-hosting).
