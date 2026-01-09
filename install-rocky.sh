@@ -1,16 +1,17 @@
 #!/bin/bash
-set -e
+set -ex
 cd /root
 export TERM=xterm-256color
 
 # Repos
 dnf -y install epel-release http://rpms.remirepo.net/enterprise/remi-release-10.rpm && dnf config-manager --enable crb
 dnf -y install https://download.postgresql.org/pub/repos/yum/reporpms/EL-10-$(uname -m)/pgdg-redhat-repo-latest.noarch.rpm
+dnf config-manager --disable virtualmin pgdg{17,16,15,14}
+
 # virtualmin 8
 curl -fsSL https://raw.githubusercontent.com/virtualmin/virtualmin-install/refs/heads/master/virtualmin-install.sh | sh -s -- --setup --verbose
 curl -sSL https://dl.yarnpkg.com/rpm/yarn.repo > /etc/yum.repos.d/yarn.repo
 dnf config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
-dnf config-manager --disable virtualmin pgdg{17,16,15,14}
 
 # Modules
 

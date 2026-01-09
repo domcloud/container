@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e
+set -ex
 cd /root
 
 if [ -f /etc/lsb-release ]; then OS=ubuntu; elif [ -f /etc/redhat-release ]; then OS=rocky; else OS=unknown; fi
