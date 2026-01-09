@@ -4,14 +4,15 @@ cd /root
 export TERM=xterm-256color
 
 # Repos
+curl -sSL https://dl.yarnpkg.com/rpm/yarn.repo > /etc/yum.repos.d/yarn.repo
 dnf -y install epel-release http://rpms.remirepo.net/enterprise/remi-release-10.rpm && dnf config-manager --enable crb
 dnf -y install https://download.postgresql.org/pub/repos/yum/reporpms/EL-10-$(uname -m)/pgdg-redhat-repo-latest.noarch.rpm
-dnf config-manager --disable virtualmin pgdg{17,16,15,14}
+dnf config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+dnf config-manager --disable pgdg{17,16,15,14}
 
 # virtualmin 8
 curl -fsSL https://raw.githubusercontent.com/virtualmin/virtualmin-install/refs/heads/master/virtualmin-install.sh | sh -s -- --setup --verbose
-curl -sSL https://dl.yarnpkg.com/rpm/yarn.repo > /etc/yum.repos.d/yarn.repo
-dnf config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+dnf config-manager --disable virtualmin-stable
 
 # Modules
 
@@ -19,8 +20,8 @@ PG=18
 
 # Tools
 dnf -y install awscli bison btop bzip2 certbot clang cmake gcc-c++ git ncdu htop iftop jq lsof make nano ninja-build ncurses npm nodejs patch ripgrep ruby rsync screen socat strace tar time tmux vim wget whois xz yarn zstd \
-  lib{curl,ffi,sqlite3x,tool-ltdl,md,yaml}-devel {brotli,bzip2,fuse,mesa-libGL,nettle,openldap,pcre2,perl,python,readline,redis,ruby,xmlsec1,xmlsec1-openssl,valkey}-devel python3-pip rubygem-{json,rack,rake} \
-  libreport-filesystem {langpacks,glibc-langpack}-en perl-{DBD-Pg,DBD-mysql,LWP-Protocol-https,macros,DateTime,Crypt-SSLeay,Text-ASCIITable,IO-Tty,XML-Simple} sudo libpq5-$PG* fcgi chromium zsh --nobest
+  lib{curl,ffi,sqlite3x,tool-ltdl,md,yaml}-devel {brotli,bzip2,fuse,mesa-libGL,nettle,openldap,pcre2,perl,python,readline,ruby,xmlsec1,xmlsec1-openssl,valkey}-devel python3-pip rubygem-{json,rack,rake} \
+  {langpacks,glibc-langpack}-en perl-{DBD-Pg,DBD-mysql,LWP-Protocol-https,macros,DateTime,IO-Tty,XML-Simple} sudo libpq5-$PG* fcgi chromium zsh --nobest
 dnf -y install wbm-virtual-server wbm-virtualmin-{nginx,nginx-ssl} virtualmin-config earlyoom fail2ban-server nftables iptables-nft postfix mariadb-server valkey openssh-server systemd-container bind
 ln -s /usr/bin/gcc /usr/bin/$(uname -m)-linux-gnu-gcc || true # fix pip install with native libs for aarch64
 ln -s /usr/bin/valkey-cli /usr/local/bin/redis-cli || true # redis compatibility
