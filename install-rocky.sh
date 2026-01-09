@@ -4,20 +4,17 @@ cd /root
 export TERM=xterm-256color
 
 # Repos
-dnf -y install epel-release http://rpms.remirepo.net/enterprise/remi-release-9.rpm && dnf config-manager --enable crb
-dnf -y install https://download.postgresql.org/pub/repos/yum/reporpms/EL-9-$(uname -m)/pgdg-redhat-repo-latest.noarch.rpm
-curl -fsSL https://software.virtualmin.com/gpl/scripts/virtualmin-install.sh | sh -s -- --setup --verbose
+dnf -y install epel-release http://rpms.remirepo.net/enterprise/remi-release-10.rpm && dnf config-manager --enable crb
+dnf -y install https://download.postgresql.org/pub/repos/yum/reporpms/EL-10-$(uname -m)/pgdg-redhat-repo-latest.noarch.rpm
+# virtualmin 8
+curl -fsSL https://raw.githubusercontent.com/virtualmin/virtualmin-install/refs/heads/master/virtualmin-install.sh | sh -s -- --setup --verbose
 curl -sSL https://dl.yarnpkg.com/rpm/yarn.repo > /etc/yum.repos.d/yarn.repo
 dnf config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
-dnf config-manager --disable virtualmin pgdg{16,15,14,13}
+dnf config-manager --disable virtualmin pgdg{17,16,15,14}
 
 # Modules
-dnf -y module reset nodejs
-dnf -y module enable nodejs:22
-dnf -y module reset mariadb
-dnf -y module enable mariadb
 
-PG=17
+PG=18
 
 # Tools
 dnf -y install awscli bison btop bzip2 certbot clang cmake gcc-c++ git ncdu htop iftop jq lsof make nano ninja-build ncurses npm nodejs patch ripgrep ruby rsync screen socat strace tar time tmux vim wget whois xz yarn zstd \
@@ -28,10 +25,10 @@ ln -s /usr/bin/gcc /usr/bin/$(uname -m)-linux-gnu-gcc || true # fix pip install 
 ln -s /usr/bin/valkey-cli /usr/local/bin/redis-cli || true # redis compatibility
 
 # PHP
-dnf -y install php{74,81,82,83,84}-php-{bcmath,cli,common,devel,ffi,fpm,gd,imap,intl,mbstring,mysqlnd,opcache,pdo,pecl-memcached,pecl-mongodb,pecl-redis,pecl-zip,pgsql,process,sodium,soap,xml,tidy}
+dnf -y install php{74,82,83,84,85}-php-{bcmath,cli,common,devel,ffi,fpm,gd,imap,intl,mbstring,mysqlnd,opcache,pdo,pecl-memcached,pecl-mongodb,pecl-redis,pecl-zip,pgsql,process,sodium,soap,xml,tidy}
 if [[ -n "$OPTIONAL_INSTALL" ]]; then
-  curl https://packages.microsoft.com/config/rhel/9/prod.repo | tee /etc/yum.repos.d/mssql-release.repo
-  dnf -y install php{74,81,82}-php-ioncube-loader php{74,81,82,83,84}-php-{brotli,ldap,pecl-decimal,pecl-imagick-im7,pecl-rdkafka,pecl-simdjson,pecl-uuid,sqlsrv,xz,zstd}
+  curl https://packages.microsoft.com/config/rhel/10/prod.repo | tee /etc/yum.repos.d/mssql-release.repo
+  dnf -y install php{74,82,83}-php-ioncube-loader php{74,82,83,84,85}-php-{brotli,ldap,pecl-decimal,pecl-imagick-im7,pecl-rdkafka,pecl-simdjson,pecl-uuid,sqlsrv,xz,zstd}
   env ACCEPT_EULA=Y dnf -y install msodbcsql17 --skip-broken
 fi
 dnf -y remove php-* && ln -fs `which php84` /usr/bin/php || true
@@ -58,7 +55,7 @@ dnf -y install docker-ce docker-ce-cli containerd.io docker-compose-plugin slirp
 pip3 install pipenv
 dnf -y remove lynx gcc-toolset-13-* nodejs-docs flatpak open-sans-fonts rubygem-rdoc gl-manpages firewalld
 ln -s /usr/lib/systemd/system/postgresql-$PG.service /usr/lib/systemd/system/postgresql.service
-systemctl enable webmin mariadb postgresql-$PG nftables fail2ban named php{74,84}-php-fpm earlyoom valkey || true
+systemctl enable webmin mariadb postgresql-$PG nftables fail2ban named php{74,85}-php-fpm earlyoom valkey || true
 chmod +x /usr/local/bin/* && chown root:root /usr/local/bin/*
 update-alternatives --set iptables /usr/sbin/iptables-nft
 

@@ -44,7 +44,7 @@ if ! command -v neovim &> /dev/null; then
 fi
 
 # Lazygit for NVIM
-LAZYGIT_V=0.56.0
+LAZYGIT_V=0.58.0
 if ! command -v lazygit &> /dev/null; then
   LAZYGIT=lazygit_${LAZYGIT_V}_Linux_$( [ "$(uname -m)" = "aarch64" ] && echo "arm64" || echo "x86_64" )
   curl -sSLO https://github.com/jesseduffield/lazygit/releases/download/v$LAZYGIT_V/$LAZYGIT.tar.gz
@@ -52,7 +52,7 @@ if ! command -v lazygit &> /dev/null; then
 fi
 
 # Lazydocker
-LAZYDOCK_V=0.24.2
+LAZYDOCK_V=0.24.3
 if ! command -v lazydocker &> /dev/null; then
   LAZYDOCK=lazydocker_${LAZYDOCK_V}_Linux_$( [ "$(uname -m)" = "aarch64" ] && echo "arm64" || echo "x86_64" )
   curl -sSLO https://github.com/jesseduffield/lazydocker/releases/download/v$LAZYDOCK_V/$LAZYDOCK.tar.gz
