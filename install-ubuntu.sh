@@ -18,7 +18,8 @@ curl -fsSL http://apt.postgresql.org/pub/repos/apt/ACCC4CF8.asc | gpg --dearmor 
 echo "deb [signed-by=$GPGDIR/yarn.gpg] https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list
 echo "deb [signed-by=$GPGDIR/docker.gpg] https://download.docker.com/linux/ubuntu $CODENAME stable" | tee /etc/apt/sources.list.d/docker.list
 echo "deb [signed-by=$GPGDIR/pgdg.gpg] http://apt.postgresql.org/pub/repos/apt/ $CODENAME-pgdg main" | tee /etc/apt/sources.list.d/pgdg.list
-curl -fsSL https://software.virtualmin.com/gpl/scripts/virtualmin-install.sh | sh -s -- --setup --verbose
+# virtualmin 8
+curl -fsSL https://raw.githubusercontent.com/virtualmin/virtualmin-install/refs/heads/master/virtualmin-install.sh | sh -s -- --setup --verbose
 add-apt-repository ppa:ondrej/php
 
 # Installations
