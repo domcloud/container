@@ -12,7 +12,6 @@ dnf config-manager --disable pgdg{17,16,15,14}
 
 # virtualmin 8
 curl -fsSL https://raw.githubusercontent.com/virtualmin/virtualmin-install/refs/heads/master/virtualmin-install.sh | sh -s -- --setup --verbose
-dnf config-manager --disable virtualmin-stable
 
 # Modules
 
@@ -22,7 +21,7 @@ PG=18
 dnf -y install awscli bison btop bzip2 certbot clang cmake gcc-c++ git ncdu htop iftop jq lsof make nano ninja-build ncurses npm nodejs patch ripgrep ruby rsync screen socat strace tar time tmux vim wget whois xz yarn zstd \
   lib{curl,ffi,sqlite3x,tool-ltdl,md,yaml}-devel {brotli,bzip2,fuse,mesa-libGL,nettle,openldap,pcre2,perl,python,readline,ruby,xmlsec1,xmlsec1-openssl,valkey}-devel python3-pip rubygem-{json,rack,rake} \
   {langpacks,glibc-langpack}-en perl-{DBD-Pg,DBD-mysql,LWP-Protocol-https,macros,DateTime,IO-Tty,XML-Simple} sudo libpq5-$PG* fcgi chromium zsh --nobest
-dnf -y install wbm-virtual-server wbm-virtualmin-{nginx,nginx-ssl} virtualmin-config earlyoom fail2ban-server nftables iptables-nft postfix mariadb-server valkey openssh-server systemd-container bind
+dnf -y install wbm-virtual-server wbm-virtualmin-{nginx,nginx-ssl} virtualmin-config fail2ban-server nftables iptables-nft postfix mariadb-server valkey openssh-server systemd-container bind
 ln -s /usr/bin/gcc /usr/bin/$(uname -m)-linux-gnu-gcc || true # fix pip install with native libs for aarch64
 ln -s /usr/bin/valkey-cli /usr/local/bin/redis-cli || true # redis compatibility
 
@@ -33,7 +32,7 @@ if [[ -n "$OPTIONAL_INSTALL" ]]; then
   dnf -y install php{74,82,83}-php-ioncube-loader php{74,82,83,84,85}-php-{brotli,ldap,pecl-decimal,pecl-imagick-im7,pecl-rdkafka,pecl-simdjson,pecl-uuid,sqlsrv,xz,zstd}
   env ACCEPT_EULA=Y dnf -y install msodbcsql17 --skip-broken
 fi
-dnf -y remove php-* && ln -fs `which php84` /usr/bin/php || true
+dnf -y remove php-* && ln -fs `which php85` /usr/bin/php || true
 curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
 # Postgres
@@ -57,7 +56,7 @@ dnf -y install docker-ce docker-ce-cli containerd.io docker-compose-plugin slirp
 pip3 install pipenv
 dnf -y remove lynx gcc-toolset-13-* nodejs-docs flatpak open-sans-fonts rubygem-rdoc gl-manpages firewalld
 ln -s /usr/lib/systemd/system/postgresql-$PG.service /usr/lib/systemd/system/postgresql.service
-systemctl enable webmin mariadb postgresql-$PG nftables fail2ban named php{74,85}-php-fpm earlyoom valkey || true
+systemctl enable webmin mariadb postgresql-$PG nftables fail2ban named php{74,85}-php-fpm valkey || true
 chmod +x /usr/local/bin/* && chown root:root /usr/local/bin/*
 update-alternatives --set iptables /usr/sbin/iptables-nft
 

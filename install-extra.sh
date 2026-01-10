@@ -66,3 +66,8 @@ curl -sSLo /usr/local/bin/neofetch https://github.com/hykilpikonna/hyfetch/raw/1
 RDFIND=rdfind-1.6.0
 curl -sSL https://rdfind.pauldreik.se/$RDFIND.tar.gz | tar -xzf -
 cd $RDFIND; ./configure --disable-debug ; make install; cd .. ; rm -rf $RDFIND*
+
+# Earlyoom
+EARLYOOM=1.9.0
+git clone https://github.com/rfjakob/earlyoom --filter=blob:none
+cd earlyoom; make install; cd .. ; rm -rf earlyoom

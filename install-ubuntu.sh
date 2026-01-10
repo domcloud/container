@@ -25,7 +25,7 @@ apt-get update
 apt-get -y install bzip2 bison btop chromium clang certbot cmake git ncdu htop iftop ipset jq lsof make nano ninja-build ncurses-bin nodejs patch ripgrep ruby rsync screen socat strace tar time tmux vim wget whois xz-utils zstd \
         libcurl4-openssl-dev libffi-dev libfuse3-dev libsqlite3-dev libtool libssl-dev libyaml-dev brotli libbz2-dev libgl1-mesa-dev libldap2-dev libpcre2-dev python3-dev libreadline-dev redis-server libxmlsec1-dev python3-pip ruby-json ruby-rack \
         language-pack-en libc-bin libdbd-pg-perl libdbd-mysql-perl liblwp-protocol-https-perl libdatetime-perl libcrypt-ssleay-perl libtext-asciitable-perl libio-tty-perl libxml-simple-perl libpq-dev webmin zsh
-apt-get -y install webmin-{virtual-server,virtualmin-nginx,virtualmin-nginx-ssl,ruby-gems} virtualmin-config valkey-server earlyoom fail2ban mariadb-server nftables bind9 sudo openssh-server systemd-container
+apt-get -y install webmin-{virtual-server,virtualmin-nginx,virtualmin-nginx-ssl,ruby-gems} virtualmin-config valkey-server fail2ban mariadb-server nftables bind9 sudo openssh-server systemd-container
 
 # Postfix
 echo "postfix postfix/mailname string ubuntu.local" | debconf-set-selections
@@ -48,9 +48,9 @@ if [[ -n "$OPTIONAL_INSTALL" ]]; then
 fi
 
 # PHP
-apt-get -y install php{7.4,8.2,8.2,8.3,8.5}-{bcmath,cli,common,curl,dev,fpm,gd,imap,igbinary,intl,mbstring,mysql,opcache,memcached,mongodb,pgsql,readline,redis,soap,xml,tidy,zip}
+apt-get -y install php{7.4,8.2,8.3,8.4,8.5}-{bcmath,cli,common,curl,dev,fpm,gd,imap,igbinary,intl,mbstring,mysql,opcache,memcached,mongodb,pgsql,readline,redis,soap,xml,tidy,zip}
 if [[ -n "$OPTIONAL_INSTALL" ]]; then
-  apt-get -y install php{7.4,8.2,8.2,8.3,8.5}-{ldap,decimal,imagick,rdkafka,uuid,lz4,zstd}
+  apt-get -y install php{7.4,8.2,8.3,8.4,8.5}-{ldap,decimal,imagick,rdkafka,uuid,lz4,zstd}
   curl -fsSL https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > $GPGDIR/microsoft.gpg
   echo "deb [signed-by=$GPGDIR/pgdg.gpg] https://packages.microsoft.com/ubuntu/$(lsb_release -rs)/prod $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/microsoft.list
   apt-get update && ACCEPT_EULA=Y apt-get -y install msodbcsql17
@@ -58,7 +58,7 @@ fi
 
 # Misc
 apt -y remove ufw redis-server
-systemctl enable webmin mariadb postgresql nftables fail2ban named php{7.4,8.4}-fpm earlyoom valkey-server || true
+systemctl enable webmin mariadb postgresql nftables fail2ban named php{7.4,8.5}-fpm valkey-server || true
 chmod +x /usr/local/bin/* && chown root:root /usr/local/bin/*
 
 # Cleanup
