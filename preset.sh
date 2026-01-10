@@ -147,7 +147,7 @@ root             soft    nofile          65535
 EOF
 
 # Services config
-PG=17
+PG=18
 PGDATA=/var/lib/pgsql/$PG/data
 PGDAEMON=postgresql-$PG
 PGCONFIG=$PGDATA
