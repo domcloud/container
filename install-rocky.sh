@@ -1,6 +1,7 @@
 #!/bin/bash
 set -ex
 cd /root
+
 export TERM=xterm-256color
 
 # Repos

@@ -1,6 +1,7 @@
 #!/bin/bash
 set -ex
 cd /root
+
 export TERM=xterm-256color
 export CODENAME=$(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}")
 export GPGDIR=/usr/share/keyrings

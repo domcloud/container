@@ -1,4 +1,6 @@
 #!/bin/bash
+set -ex
+cd /root
 
 # NGINX
 BUILDER_DIR=/usr/local/lib/nginx-builder; [ ! -d "$BUILDER_DIR" ] && \
@@ -61,6 +63,7 @@ fi
 
 # Neofetch (Forked)
 curl -sSLo /usr/local/bin/neofetch https://github.com/hykilpikonna/hyfetch/raw/1.99.0/neofetch
+chmod +x /usr/local/bin/neofetch
 
 # Rdfind
 RDFIND=rdfind-1.6.0
