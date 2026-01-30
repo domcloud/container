@@ -4,6 +4,7 @@ cd /root
 
 if [ -f /etc/lsb-release ]; then OS=ubuntu; elif [ -f /etc/debian_version ]; then OS=debian; elif [ -f /etc/redhat-release ]; then OS=rocky; else OS=unknown; fi
 PASSWD=$OS
+HOSTNAME=`hostname`
 
 # Contents
 WWW=/usr/local/share/www && WWWSOURCE=https://raw.githubusercontent.com/domcloud/domcloud/master/share && mkdir -p $WWW
@@ -1023,7 +1024,7 @@ fi
 git clone https://github.com/domcloud/Virtualmin-Config
 cd Virtualmin-Config && sh patch.sh && cd .. && rm -rf Virtualmin-Config
 timeout 900 virtualmin config-system --bundle DomCloud
-virtualmin create-domain --domain localhost --user bridge --pass $PASSWD --dir --unix --virtualmin-nginx --virtualmin-nginx-ssl
+virtualmin create-domain --domain $HOSTNAME --user bridge --pass $PASSWD --dir --unix --virtualmin-nginx --virtualmin-nginx-ssl
 cat <<'EOF' | EDITOR='tee' visudo /etc/sudoers.d/bridge
 bridge ALL = (root) NOPASSWD: /home/bridge/public_html/sudoutil.js
 bridge ALL = (root) NOPASSWD: /bin/systemctl restart bridge
@@ -1069,12 +1070,13 @@ done
 echo ""
 
 curl -sSfX POST \
-  'http://localhost:2223/runner/?domain=localhost' \
+  "http://localhost:2223/runner/?domain=$HOSTNAME" \
   --header 'Accept: */*' \
   --header 'User-Agent: DOM Cloud' \
   --header "Authorization: Bearer $PASSWD" \
   --header 'Content-Type: application/json' \
   --data-raw '{
+  "debug": true,
   "nginx": {
     "locations": [
       {
