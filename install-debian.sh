@@ -15,7 +15,7 @@ curl -fsSL https://deb.nodesource.com/setup_24.x | bash -
 curl -fsSL https://dl.yarnpkg.com/debian/pubkey.gpg | gpg --dearmor > $GPGDIR/yarn.gpg
 curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --dearmor > $GPGDIR/docker.gpg
 curl -fsSL http://apt.postgresql.org/pub/repos/apt/ACCC4CF8.asc | gpg --dearmor > $GPGDIR/pgdg.gpg
-curl -fsSL https://packages.sury.org/php/apt.gpg | tee /usr/share/keyrings/deb.sury.org-php.gpg
+curl -fsSL https://packages.sury.org/php/apt.gpg > /usr/share/keyrings/deb.sury.org-php.gpg
 
 echo "deb [signed-by=$GPGDIR/yarn.gpg] https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list
 echo "deb [signed-by=$GPGDIR/docker.gpg] https://download.docker.com/linux/debian $CODENAME stable" | tee /etc/apt/sources.list.d/docker.list
