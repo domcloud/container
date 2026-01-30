@@ -15,13 +15,14 @@ curl -fsSL https://deb.nodesource.com/setup_24.x | bash -
 curl -fsSL https://dl.yarnpkg.com/debian/pubkey.gpg | gpg --dearmor > $GPGDIR/yarn.gpg
 curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --dearmor > $GPGDIR/docker.gpg
 curl -fsSL http://apt.postgresql.org/pub/repos/apt/ACCC4CF8.asc | gpg --dearmor > $GPGDIR/pgdg.gpg
+curl -fsSL https://packages.sury.org/php/apt.gpg | tee /usr/share/keyrings/deb.sury.org-php.gpg
 
 echo "deb [signed-by=$GPGDIR/yarn.gpg] https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list
 echo "deb [signed-by=$GPGDIR/docker.gpg] https://download.docker.com/linux/debian $CODENAME stable" | tee /etc/apt/sources.list.d/docker.list
 echo "deb [signed-by=$GPGDIR/pgdg.gpg] http://apt.postgresql.org/pub/repos/apt/ $CODENAME-pgdg main" | tee /etc/apt/sources.list.d/pgdg.list
+echo "deb [signed-by=$GPGDIR/debsuryorg-archive-keyring.gpg] https://packages.sury.org/php/ $CODENAME main" | tee /etc/apt/sources.list.d/php.list
 # virtualmin 8
 curl -fsSL https://download.virtualmin.dev/virtualmin-install.sh | sh -s -- --setup --verbose
-add-apt-repository ppa:ondrej/php
 # Installations
 apt-get update
 apt-get -y install bzip2 bison btop chromium clang certbot cmake git ncdu htop iftop ipset jq lsof make nano ninja-build ncurses-bin nodejs patch ripgrep ruby rsync screen socat strace tar time tmux vim wget whois xz-utils zstd \
