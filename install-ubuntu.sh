@@ -38,7 +38,7 @@ apt-get -y install postfix
 apt-get -y install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin dbus-user-session uidmap slirp4netns docker-ce-rootless-extras passt uidmap
 
 # Postgres
-PG=17
+PG=18
 apt-get -y install postgresql-$PG
 
 if [[ -n "$OPTIONAL_INSTALL" ]]; then
