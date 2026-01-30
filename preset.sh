@@ -1068,11 +1068,11 @@ while ! curl -sS http://localhost:2223/status/about; do
 done
 echo ""
 
-curl -sSX POST \
+curl -sSfX POST \
   'http://localhost:2223/runner/?domain=localhost' \
   --header 'Accept: */*' \
   --header 'User-Agent: DOM Cloud' \
-  --header 'Authorization: Bearer rocky' \
+  --header "Authorization: Bearer $PASSWD" \
   --header 'Content-Type: application/json' \
   --data-raw '{
   "nginx": {
