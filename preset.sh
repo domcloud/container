@@ -404,6 +404,7 @@ id=173224301830730
 weekdays=*
 EOF
 
+mkdir -p /etc/webmin/postgresql
 cat <<EOF > /etc/webmin/postgresql/config
 login=postgres
 repository=/home/db_repository
