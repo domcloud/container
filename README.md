@@ -46,6 +46,21 @@ curl -sSL https://raw.githubusercontent.com/domcloud/container/refs/heads/master
 curl -sSL https://raw.githubusercontent.com/domcloud/container/refs/heads/master/genpass.sh | bash
 ```
 
+Or if you want to make changes as well
+
+```sh
+export OPTIONAL_INSTALL=1
+# make sure to run this using root:
+if [ -f /etc/lsb-release ]; then OS=ubuntu; elif [ -f /etc/debian_version ]; then OS=debian; elif [ -f /etc/redhat-release ]; then OS=rocky; else OS=unknown; fi
+git clone https://github.com/domcloud/container && cd container
+./install-$OS.sh
+./install-extra.sh
+./preset.sh
+# Then change passwords (save and remember the passwords generated)
+./genpass.sh
+```
+
+
 More information about installing and integrating this to DOM Cloud Portal can be read [in the documentation](https://domcloud.co/docs/intro/self-hosting).
 
 ## Building disk image
