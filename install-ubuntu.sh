@@ -54,7 +54,7 @@ apt-get -y install php{7.4,8.2,8.3,8.4,8.5}-{bcmath,cli,common,curl,dev,fpm,gd,i
 if [[ -n "$OPTIONAL_INSTALL" ]]; then
   apt-get -y install php{7.4,8.2,8.3,8.4,8.5}-{ldap,decimal,imagick,rdkafka,uuid,lz4,zstd}
   curl -fsSL https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > $GPGDIR/microsoft.gpg
-  echo "deb [signed-by=$GPGDIR/pgdg.gpg] https://packages.microsoft.com/ubuntu/$CODEVER/prod $CODENAME main" | tee /etc/apt/sources.list.d/microsoft.list
+  echo "deb [signed-by=$GPGDIR/microsoft.gpg] https://packages.microsoft.com/ubuntu/$CODEVER/prod $CODENAME main" | tee /etc/apt/sources.list.d/microsoft.list
   apt-get update && ACCEPT_EULA=Y apt-get -y install msodbcsql17
 fi
 
