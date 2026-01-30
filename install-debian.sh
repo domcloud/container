@@ -59,7 +59,7 @@ if [[ -n "$OPTIONAL_INSTALL" ]]; then
   curl -fsSL https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > $GPGDIR/microsoft.gpg
   curl -fsSL https://packages.microsoft.com/keys/microsoft-2025.asc | gpg --dearmor > $GPGDIR/microsoft-2025.gpg
   echo "deb [signed-by=$GPGDIR/microsoft-2025.gpg] https://packages.microsoft.com/debian/$CODEVER/prod $CODENAME main" | tee /etc/apt/sources.list.d/microsoft.list
-  apt-get update && ACCEPT_EULA=Y apt-get -y install msodbcsql17
+  apt-get update && ACCEPT_EULA=Y apt-get -y install msodbcsql18
 fi
 
 # Misc

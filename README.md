@@ -33,7 +33,10 @@ Here's feature comparison:
 
 Complete DOM Cloud services requires 2GB of RAM and 30GB of disk to work, more is recommended for production servers. 
 
-You can run these from freshly installed [Rocky Linux Minimal ISO](https://rockylinux.org/download) or [Ubuntu Server ISO](https://ubuntu.com/download/server) instead:
+You can run these from freshly installed these operating system:
+- Rocky Linux 9 [Minimal ISO](https://rockylinux.org/download) 
+- Ubuntu 24 [Server ISO](https://ubuntu.com/download/server)
+- Debian 13 [Stable ISO](https://www.debian.org/CD/http-ftp/)
 
 ```sh
 export OPTIONAL_INSTALL=1
