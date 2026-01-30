@@ -12,7 +12,7 @@ dnf config-manager --add-repo https://download.docker.com/linux/centos/docker-ce
 dnf config-manager --disable pgdg{17,16,15,14}
 
 # virtualmin 8
-curl -fsSL https://raw.githubusercontent.com/virtualmin/virtualmin-install/refs/heads/master/virtualmin-install.sh | sh -s -- --setup --verbose
+curl -fsSL https://download.virtualmin.dev/virtualmin-install.sh | sh -s -- --setup --verbose
 
 # Modules
 

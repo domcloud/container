@@ -2,7 +2,7 @@
 set -ex
 cd /root
 
-if [ -f /etc/lsb-release ]; then OS=ubuntu; elif [ -f /etc/redhat-release ]; then OS=rocky; else OS=unknown; fi
+if [ -f /etc/lsb-release ]; then OS=ubuntu; elif [ -f /etc/debian_version ]; then OS=debian; elif [ -f /etc/redhat-release ]; then OS=rocky; else OS=unknown; fi
 PASSWD=$OS
 
 # Contents
@@ -83,7 +83,7 @@ PHPFPMWWW=php-fpm.d/www.conf
 PHPOPCACHE=php.d/10-opcache.ini
 WWWUSER=apache
 
-if [[ "$OS" == "ubuntu" ]]; then
+if [[ "$OS" != "rocky" ]]; then
   PHPDIR=/etc/php
   PHPFPMINI=fpm/php.ini
   PHPFPMWWW=fpm/pool.d/www.conf
@@ -153,7 +153,7 @@ PGDAEMON=postgresql-$PG
 PGCONFIG=$PGDATA
 PGBIN=/usr/pgsql-$PG/bin
 VALKEYDAEMON=valkey
-if [[ "$OS" == "ubuntu" ]]; then
+if [[ "$OS" != "rocky" ]]; then
   PGDATA=/var/lib/postgresql/$PG/main
   PGDAEMON=postgresql@$PG-main
   PGCONFIG=/etc/postgresql/$PG/main
@@ -234,7 +234,7 @@ if ! grep -qE '^\s*proc\s+/proc\s+' "$FSTAB"; then
 fi
 
 # DB
-if [[ "$OS" == "ubuntu" ]]; then
+if [[ "$OS" != "rocky" ]]; then
   MARIA_CONF=/etc/mysql/mariadb.conf.d/50-server.cnf
   cat <<'EOF' > $MARIA_CONF
 [mysqld]
@@ -460,7 +460,7 @@ realdomslimit=
 scripts=
 EOF
 
-if [[ "$OS" == "ubuntu" ]]; then
+if [[ "$OS" != "rocky" ]]; then
   cat <<'EOF' > /etc/webmin/virtualmin-nginx/config
 add_to=/etc/nginx/sites-available
 apply_cmd=systemctl reload nginx
@@ -540,7 +540,7 @@ passenger_pool_idle_time 18000;
 passenger_max_instances_per_app 1;
 EOF
 
-[[ "$OS" == "ubuntu" ]] && sed -i "s|/tmp/passenger|/passenger|g" /etc/nginx/passenger.conf
+[[ "$OS" != "rocky" ]] && sed -i "s|/tmp/passenger|/passenger|g" /etc/nginx/passenger.conf
 
 cat <<'EOF' > /etc/nginx/proxy.conf
 proxy_set_header Upgrade           $http_upgrade;
@@ -653,7 +653,7 @@ http {
 }
 EOF
 
-[[ "$OS" == "ubuntu" ]] && sed -i "s/conf.d/sites-enabled/g" /etc/nginx/nginx.conf
+[[ "$OS" != "rocky" ]] && sed -i "s/conf.d/sites-enabled/g" /etc/nginx/nginx.conf
 
 cat <<'EOF' > /etc/nginx/mime.types
 types {
@@ -1014,7 +1014,7 @@ EOF
 
 # Bridge
 if [ ! -e "/lib/systemd/system/bridge.service" ]; then
-if [[ "$OS" == "ubuntu" ]]; then
+if [[ "$OS" != "rocky" ]]; then
   /usr/share/webmin/changepass.pl /etc/webmin root $PASSWD
 else
   /usr/libexec/webmin/changepass.pl /etc/webmin root $PASSWD

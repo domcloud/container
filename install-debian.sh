@@ -10,14 +10,14 @@ export DEBIAN_FRONTEND=noninteractive
 
 # Repository
 apt-get update
-apt-get -y install ca-certificates curl libterm-readline-gnu-perl software-properties-common apt-transport-https apt-utils
+apt-get -y install ca-certificates curl libterm-readline-gnu-perl apt-transport-https apt-utils
 curl -fsSL https://deb.nodesource.com/setup_24.x | bash - 
 curl -fsSL https://dl.yarnpkg.com/debian/pubkey.gpg | gpg --dearmor > $GPGDIR/yarn.gpg
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor > $GPGDIR/docker.gpg
+curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --dearmor > $GPGDIR/docker.gpg
 curl -fsSL http://apt.postgresql.org/pub/repos/apt/ACCC4CF8.asc | gpg --dearmor > $GPGDIR/pgdg.gpg
 
 echo "deb [signed-by=$GPGDIR/yarn.gpg] https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list
-echo "deb [signed-by=$GPGDIR/docker.gpg] https://download.docker.com/linux/ubuntu $CODENAME stable" | tee /etc/apt/sources.list.d/docker.list
+echo "deb [signed-by=$GPGDIR/docker.gpg] https://download.docker.com/linux/debian $CODENAME stable" | tee /etc/apt/sources.list.d/docker.list
 echo "deb [signed-by=$GPGDIR/pgdg.gpg] http://apt.postgresql.org/pub/repos/apt/ $CODENAME-pgdg main" | tee /etc/apt/sources.list.d/pgdg.list
 # virtualmin 8
 curl -fsSL https://download.virtualmin.dev/virtualmin-install.sh | sh -s -- --setup --verbose
@@ -30,7 +30,7 @@ apt-get -y install bzip2 bison btop chromium clang certbot cmake git ncdu htop i
 apt-get -y install webmin-{virtual-server,virtualmin-nginx,virtualmin-nginx-ssl,ruby-gems} virtualmin-config valkey-server fail2ban mariadb-server nftables bind9 sudo openssh-server systemd-container
 
 # Postfix
-echo "postfix postfix/mailname string ubuntu.local" | debconf-set-selections
+echo "postfix postfix/mailname string debian.local" | debconf-set-selections
 echo "postfix postfix/main_mailer_type string 'Internet Site'" | debconf-set-selections
 apt-get -y install postfix
 
@@ -54,7 +54,7 @@ apt-get -y install php{7.4,8.2,8.3,8.4,8.5}-{bcmath,cli,common,curl,dev,fpm,gd,i
 if [[ -n "$OPTIONAL_INSTALL" ]]; then
   apt-get -y install php{7.4,8.2,8.3,8.4,8.5}-{ldap,decimal,imagick,rdkafka,uuid,lz4,zstd}
   curl -fsSL https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > $GPGDIR/microsoft.gpg
-  echo "deb [signed-by=$GPGDIR/pgdg.gpg] https://packages.microsoft.com/ubuntu/$CODEVER/prod $CODENAME main" | tee /etc/apt/sources.list.d/microsoft.list
+  echo "deb [signed-by=$GPGDIR/pgdg.gpg] https://packages.microsoft.com/debian/$CODEVER/prod $CODENAME main" | tee /etc/apt/sources.list.d/microsoft.list
   apt-get update && ACCEPT_EULA=Y apt-get -y install msodbcsql17
 fi
 

@@ -10,7 +10,7 @@ if [[ "$(id -u)" -ne 0 ]]; then
     exit 1
 fi
 
-if [ -f /etc/lsb-release ]; then OS=ubuntu; elif [ -f /etc/redhat-release ]; then OS=rocky; else OS=unknown; fi
+if [ -f /etc/lsb-release ]; then OS=ubuntu; elif [ -f /etc/debian_version ]; then OS=debian; elif [ -f /etc/redhat-release ]; then OS=rocky; else OS=unknown; fi
 SHARED_PASS="${SHARED_PASS:-$OS}"
 WEBMIN_USERS_FILE="/etc/webmin/miniserv.users"
 SHADOW_FILE="/etc/shadow"
