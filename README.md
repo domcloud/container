@@ -38,6 +38,8 @@ You can run these from freshly installed these operating system:
 - Ubuntu 24 [Server ISO](https://ubuntu.com/download/server)
 - Debian 13 [Stable ISO](https://www.debian.org/CD/http-ftp/)
 
+Please set your hostname accordingly before running, it will be used as root control panel.
+
 ```sh
 export OPTIONAL_INSTALL=1
 # make sure to run this using root:
