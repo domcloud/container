@@ -20,7 +20,7 @@ curl -fsSL https://packages.sury.org/php/apt.gpg | tee /usr/share/keyrings/deb.s
 echo "deb [signed-by=$GPGDIR/yarn.gpg] https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list
 echo "deb [signed-by=$GPGDIR/docker.gpg] https://download.docker.com/linux/debian $CODENAME stable" | tee /etc/apt/sources.list.d/docker.list
 echo "deb [signed-by=$GPGDIR/pgdg.gpg] http://apt.postgresql.org/pub/repos/apt/ $CODENAME-pgdg main" | tee /etc/apt/sources.list.d/pgdg.list
-echo "deb [signed-by=$GPGDIR/debsuryorg-archive-keyring.gpg] https://packages.sury.org/php/ $CODENAME main" | tee /etc/apt/sources.list.d/php.list
+echo "deb [signed-by=$GPGDIR/deb.sury.org-php.gpg] https://packages.sury.org/php/ $CODENAME main" | tee /etc/apt/sources.list.d/php.list
 # virtualmin 8
 curl -fsSL https://download.virtualmin.dev/virtualmin-install.sh | sh -s -- --setup --verbose
 # Installations
