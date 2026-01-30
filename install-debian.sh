@@ -53,7 +53,7 @@ fi
 # PHP
 apt-get -y install php{7.4,8.2,8.3,8.4,8.5}-{bcmath,cli,common,curl,dev,fpm,gd,imap,igbinary,intl,mbstring,mysql,memcached,pgsql,readline,redis,soap,xml,tidy,zip}
 # opcache no longer optional in 8.5, mongodb is not backported in 7.x
-apt-get -y install php{7.4,8.2,8.3,8.4}-opcache php{8.2,8.3,8.4,8.5}-mongdb
+apt-get -y install php{7.4,8.2,8.3,8.4}-opcache php{8.2,8.3,8.4,8.5}-mongodb
 if [[ -n "$OPTIONAL_INSTALL" ]]; then
   apt-get -y install php{7.4,8.2,8.3,8.4,8.5}-{ldap,decimal,imagick,rdkafka,uuid,lz4,zstd}
   curl -fsSL https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > $GPGDIR/microsoft.gpg
