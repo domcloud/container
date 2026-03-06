@@ -142,9 +142,12 @@ WantedBy=multi-user.target
 EOF
 
 cat <<'EOF' > /etc/security/limits.conf
-root             soft    nofile          65535
-*                hard    nproc           512
-*                hard    priority        5
+*         hard    nproc           20
+*         hard    as              1000000
+@nolimit  hard    nproc           512
+@nolimit  hard    as              unlimited
+root      hard    nproc           unlimited
+root      hard    as              unlimited
 EOF
 
 # Services config
@@ -233,6 +236,14 @@ if ! grep -qE '^\s*proc\s+/proc\s+' "$FSTAB"; then
   tail -c1 "$FSTAB" | read -r _ || echo >> "$FSTAB"
   echo "$PROC_ENTRY" >> "$FSTAB"
 fi
+
+# nolimit group
+NOLIMIT="nolimit"
+if ! getent group "$NOLIMIT" > /dev/null; then
+    groupadd "$NOLIMIT"
+    gpasswd -M "chrony,nginx,mysql,postfix,postgres,named,valkey,sshd" "$NOLIMIT"
+fi
+
 
 # DB
 if [[ "$OS" != "rocky" ]]; then
