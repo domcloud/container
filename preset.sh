@@ -1074,6 +1074,7 @@ EOF
 systemctl daemon-reload
 systemctl enable rdproxy nginx
 systemctl enable bridge --now
+gpasswd -a bridge nolimit
 
 while ! curl -sS http://localhost:2223/status/about; do
     sleep 1
