@@ -46,8 +46,7 @@ if ! command -v neovim &> /dev/null; then
 fi
 
 # needed by tree-sitter
-. "$HOME/.cargo/env"
-if ! command -v rustc &> /dev/null; then
+if ! . "$HOME/.cargo/env" &> /dev/null; then
   curl "https://sh.rustup.rs" -sSf | sh -s -- -y --default-toolchain stable --profile minimal
 fi
 
