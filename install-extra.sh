@@ -2,7 +2,7 @@
 set -ex
 cd /root
 
-# contains prebuilt/selfbuild software (not from apt/dnf) because of many reasons
+# contains prebuilt/source build software (not from apt/dnf) because of many reasons
 
 # NGINX with custom patches
 BUILDER_DIR=/usr/local/lib/nginx-builder; [ ! -d "$BUILDER_DIR" ] && \
@@ -39,12 +39,23 @@ if ! command -v pathman &> /dev/null; then
   tar -xf $PATHMAN.tar.gz && mv -f $PATHMAN /usr/local/bin/pathman && rm -f $PATHMAN.tar.gz
 fi
 
-# newer NVIM, self build because of glibc issues
-NVIM_V=0.11.5
+# source build because of glibc issues in prebuild
 if ! command -v neovim &> /dev/null; then
-  NVIM_F=nvim-linux-$( [ "$(uname -m)" = "aarch64" ] && echo "arm64" || echo "x86_64" )
-  curl -sSLO https://github.com/neovim/neovim/releases/download/v$NVIM_V/$NVIM_F.tar.gz
-  tar -xf $NVIM_F.tar.gz && chown -R root:root $NVIM_F && rsync -a $NVIM_F/ /usr/local/ && rm -rf $NVIM_F*
+  git clone https://github.com/neovim/neovim --branch release-0.11 --filter=tree:0
+  cd neovim; make CMAKE_BUILD_TYPE=RelWithDebInfo install; cd ..; rm -rf neovim
+fi
+
+# needed by tree-sitter
+. "$HOME/.cargo/env"
+if ! command -v rustc &> /dev/null; then
+  curl "https://sh.rustup.rs" -sSf | sh -s -- -y --default-toolchain stable --profile minimal
+fi
+
+# source build because of https://github.com/tree-sitter/tree-sitter/issues/282
+if ! command -v tree-sitter &> /dev/null; then
+  git clone https://github.com/tree-sitter/tree-sitter --branch release-0.26 --filter=tree:0
+  cargo install --path tree-sitter/crates/cli; rm -rf tree-sitter
+  mv /root/.cargo/bin/tree-sitter /usr/local/bin/
 fi
 
 # prebuilt Lazygit
