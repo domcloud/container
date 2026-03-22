@@ -19,7 +19,7 @@ curl -fsSL https://download.virtualmin.dev/virtualmin-install.sh | sh -s -- --se
 PG=18
 
 # Tools
-dnf -y install awscli bison btop bzip2 certbot clang cmake gcc-c++ git ncdu htop iftop jq lsof make nano ninja-build ncurses npm nodejs patch ripgrep ruby rsync screen socat strace tar time tmux vim wget whois xz yarn zstd \
+dnf -y install awscli bison btop bzip2 certbot clang cmake fd-find gcc-c++ git ncdu htop iftop jq lsof make nano ninja-build ncurses npm nodejs patch ripgrep ruby rsync screen socat strace tar time tmux vim wget whois xz yarn zstd \
   lib{curl,ffi,sqlite3x,tool-ltdl,md,yaml}-devel {brotli,bzip2,fuse,mesa-libGL,nettle,openldap,pcre2,perl,python,readline,ruby,xmlsec1,xmlsec1-openssl,valkey}-devel python3-pip rubygem-{json,rack,rake} \
   {langpacks,glibc-langpack}-en perl-{DBD-Pg,DBD-mysql,LWP-Protocol-https,macros,DateTime,IO-Tty,XML-Simple} sudo libpq5-$PG* fcgi chromium zsh --nobest
 dnf -y install wbm-virtual-server wbm-virtualmin-{nginx,nginx-ssl} virtualmin-config fail2ban-server nftables iptables-nft postfix mariadb-server valkey openssh-server systemd-container bind

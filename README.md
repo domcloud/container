@@ -161,7 +161,7 @@ The `vda` is the real disk provisioned by the system. To extend the `vda2`:
     + `lvresize -l +100%FREE /dev/rl_rocky9/root`
     + `xfs_growfs /`
 
-## Connect to DOM Cloud
+### Connect to DOM Cloud
 
 Goto `Servers` section in [DOM Cloud Portal Dashboard](https://my.domcloud.co) to connect to our cloud portal.
 
@@ -173,7 +173,7 @@ Why still connecting to our cloud portal?
 + You get some cloud features like backups, domcloud.dev domain, team collab, etc
 + Can be connected for free
 
-## More Post Installation Checklist
+### More Post Installation Checklist
 
 1. Check /home has been mounted properly
 2. Check SELinux disabled
@@ -198,4 +198,46 @@ EOF
 cat <<EOF | crontab -
 1 0 1 * * scp '$USER@$SHARED_DOMAIN_OWNER:$HOME/*' $HOME/
 EOF
+```
+
+## Orchestrating with PSSH
+
+If you've multiple servers, it's better to orchestrate them with PSSH. Assume your servers list is on `~/hosts`
+
+### Simple call
+
+```sh
+pssh -t 0 -ih ~/hosts 'whoami'
+```
+
+
+### Simple call to user
+
+```sh
+pssh -t 0 -iPh ~/hosts "su bridge -c 'cd ~/public_html; git pull'"
+```
+
+### Simple call without hang up
+
+```sh
+pssh -t 0 -iPh ~/hosts 'nohup yum update -y &'
+```
+
+### Multi-line call
+
+```sh
+pssh -t 0 -IiPh ~/hosts <<'EOC'
+whoami
+EOC
+```
+
+### Updating file
+
+```sh
+pssh -t 0 -IiPh ~/hosts <<'EOC'
+cat <<'EOF' > /output/to/file
+This is line 1
+This is line 2
+EOF
+EOC
 ```

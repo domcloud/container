@@ -2,16 +2,18 @@
 set -ex
 cd /root
 
-# NGINX
+# contains prebuilt/selfbuild software (not from apt/dnf) because of many reasons
+
+# NGINX with custom patches
 BUILDER_DIR=/usr/local/lib/nginx-builder; [ ! -d "$BUILDER_DIR" ] && \
 git clone https://github.com/domcloud/nginx-builder/ $BUILDER_DIR || git -C $BUILDER_DIR pull
 cd $BUILDER_DIR/ && make install DOWNLOAD_V=1.3.0 && make clean && cd /root
 ln -fs /usr/local/sbin/nginx /usr/sbin/nginx # nginx compatibility
 
-# Composer
+# Composer that's ree from apt deps
 curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
-# Scripts
+# User scripts
 curl -sSLo /usr/local/bin/restart https://raw.githubusercontent.com/domcloud/bridge/main/userkill.sh && chmod 755 /usr/local/bin/restart
 curl -sSLo /usr/local/bin/loadenv https://raw.githubusercontent.com/domcloud/bridge/main/userloadenv.sh && chmod 755 /usr/local/bin/loadenv
 
@@ -37,7 +39,7 @@ if ! command -v pathman &> /dev/null; then
   tar -xf $PATHMAN.tar.gz && mv -f $PATHMAN /usr/local/bin/pathman && rm -f $PATHMAN.tar.gz
 fi
 
-# NVIM for NvChad
+# newer NVIM, self build because of glibc issues
 NVIM_V=0.11.5
 if ! command -v neovim &> /dev/null; then
   NVIM_F=nvim-linux-$( [ "$(uname -m)" = "aarch64" ] && echo "arm64" || echo "x86_64" )
@@ -45,7 +47,7 @@ if ! command -v neovim &> /dev/null; then
   tar -xf $NVIM_F.tar.gz && chown -R root:root $NVIM_F && rsync -a $NVIM_F/ /usr/local/ && rm -rf $NVIM_F*
 fi
 
-# Lazygit for NVIM
+# prebuilt Lazygit
 LAZYGIT_V=0.58.0
 if ! command -v lazygit &> /dev/null; then
   LAZYGIT=lazygit_${LAZYGIT_V}_Linux_$( [ "$(uname -m)" = "aarch64" ] && echo "arm64" || echo "x86_64" )
@@ -53,7 +55,7 @@ if ! command -v lazygit &> /dev/null; then
   tar -xf $LAZYGIT.tar.gz && mv lazygit /usr/local/bin/ && rm -f $LAZYGIT.tar.gz
 fi
 
-# Lazydocker
+# prebuilt Lazydocker
 LAZYDOCK_V=0.24.3
 if ! command -v lazydocker &> /dev/null; then
   LAZYDOCK=lazydocker_${LAZYDOCK_V}_Linux_$( [ "$(uname -m)" = "aarch64" ] && echo "arm64" || echo "x86_64" )
@@ -61,7 +63,7 @@ if ! command -v lazydocker &> /dev/null; then
   tar -xf $LAZYDOCK.tar.gz && mv lazydocker /usr/local/bin/ && rm -f $LAZYDOCK.tar.gz
 fi
 
-# Neofetch (Forked)
+# Forked Neofetch
 curl -sSLo /usr/local/bin/neofetch https://github.com/hykilpikonna/hyfetch/raw/1.99.0/neofetch
 chmod +x /usr/local/bin/neofetch
 

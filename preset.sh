@@ -31,6 +31,8 @@ cat <<'EOF' > /etc/gitconfig
         defaultBranch = main
 [push]
         default = current
+[rebase]
+        autoStash = true
 EOF
 cat <<'EOF' > /etc/environment
 LC_ALL="en_US.UTF-8"
