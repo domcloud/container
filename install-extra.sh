@@ -40,7 +40,7 @@ if ! command -v pathman &> /dev/null; then
 fi
 
 # source build because of glibc issues in prebuild
-if ! command -v neovim &> /dev/null; then
+if ! command -v nvim &> /dev/null; then
   git clone https://github.com/neovim/neovim --branch release-0.11 --filter=tree:0
   cd neovim; make CMAKE_BUILD_TYPE=RelWithDebInfo install; cd ..; rm -rf neovim
 fi
@@ -48,6 +48,7 @@ fi
 # needed by tree-sitter
 if ! . "$HOME/.cargo/env" &> /dev/null; then
   curl "https://sh.rustup.rs" -sSf | sh -s -- -y --default-toolchain stable --profile minimal
+  . "$HOME/.cargo/env"
 fi
 
 # source build because of https://github.com/tree-sitter/tree-sitter/issues/282
