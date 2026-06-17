@@ -243,9 +243,12 @@ fi
 NOLIMIT="nolimit"
 if ! getent group "$NOLIMIT" > /dev/null; then
     groupadd "$NOLIMIT"
+if [[ "$OS" != "rocky" ]]; then
+    gpasswd -M "_chrony,nginx,mysql,postfix,postgres,bind,valkey,sshd" "$NOLIMIT"
+else
     gpasswd -M "chrony,nginx,mysql,postfix,postgres,named,valkey,sshd" "$NOLIMIT"
 fi
-
+fi
 
 # DB
 if [[ "$OS" != "rocky" ]]; then
