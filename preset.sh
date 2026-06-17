@@ -39,6 +39,9 @@ LC_ALL="en_US.UTF-8"
 LC_CTYPE="en_US.UTF-8"
 LANGUAGE="en_US.UTF-8"
 EOF
+cat <<'EOF' > /etc/profile.d/vscode.sh
+export NODE_OPTIONS="--disable-wasm-trap-handler"
+EOF
 
 # Earlyoom
 cat <<'EOF' > /etc/default/earlyoom
