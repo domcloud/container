@@ -794,6 +794,7 @@ cat <<'EOF' > /etc/fail2ban/filter.d/ratelimit.conf
 [Definition]
 failregex = ^.+limiting requests, excess: \d+.\d+ by zone "\w+", client: <ADDR>, .+$
             ^.+limiting connections by zone "\w+" while initializing session, client: <ADDR>, .+$
+            ^.*\[error\].*FastCGI sent in stderr: "Primary script unknown".*client: <HOST>,.*$
 
 ignoreregex =
 EOF
