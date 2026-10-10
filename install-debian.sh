@@ -51,11 +51,11 @@ if [[ -n "$OPTIONAL_INSTALL" ]]; then
 fi
 
 # PHP
-apt-get -y install php{7.4,8.2,8.3,8.4,8.5}-{bcmath,cli,common,curl,dev,fpm,gd,imap,igbinary,intl,mbstring,mysql,memcached,pgsql,readline,redis,soap,xml,tidy,zip}
+apt-get -y install php{7.4,8.3,8.4,8.5}-{bcmath,cli,common,curl,dev,fpm,gd,imap,igbinary,intl,mbstring,mysql,memcached,pgsql,readline,redis,soap,xml,tidy,zip}
 # opcache no longer optional in 8.5, mongodb is not backported in 7.x
-apt-get -y install php{7.4,8.2,8.3,8.4}-opcache php{8.2,8.3,8.4,8.5}-mongodb
+apt-get -y install php{7.4,8.3,8.4}-opcache php{8.3,8.4,8.5}-mongodb
 if [[ -n "$OPTIONAL_INSTALL" ]]; then
-  apt-get -y install php{7.4,8.2,8.3,8.4,8.5}-{ldap,decimal,imagick,rdkafka,uuid,lz4,zstd}
+  apt-get -y install php{7.4,8.3,8.4,8.5}-{ldap,decimal,imagick,rdkafka,uuid,lz4,zstd}
   curl -fsSL https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > $GPGDIR/microsoft.gpg
   curl -fsSL https://packages.microsoft.com/keys/microsoft-2025.asc | gpg --dearmor > $GPGDIR/microsoft-2025.gpg
   echo "deb [signed-by=$GPGDIR/microsoft-2025.gpg] https://packages.microsoft.com/debian/$CODEVER/prod $CODENAME main" | tee /etc/apt/sources.list.d/microsoft.list

@@ -27,10 +27,10 @@ ln -s /usr/bin/gcc /usr/bin/$(uname -m)-linux-gnu-gcc || true # fix pip install 
 ln -s /usr/bin/valkey-cli /usr/local/bin/redis-cli || true # redis compatibility
 
 # PHP
-dnf -y install php{74,82,83,84,85}-php-{bcmath,cli,common,devel,ffi,fpm,gd,imap,intl,mbstring,mysqlnd,opcache,pdo,pecl-memcached,pecl-mongodb,pecl-redis,pecl-zip,pgsql,process,sodium,soap,xml,tidy}
+dnf -y install php{74,83,84,85}-php-{bcmath,cli,common,devel,ffi,fpm,gd,imap,intl,mbstring,mysqlnd,opcache,pdo,pecl-memcached,pecl-mongodb,pecl-redis,pecl-zip,pgsql,process,sodium,soap,xml,tidy}
 if [[ -n "$OPTIONAL_INSTALL" ]]; then
   curl https://packages.microsoft.com/config/rhel/9/prod.repo | tee /etc/yum.repos.d/mssql-release.repo
-  dnf -y install php{74,82,83}-php-ioncube-loader php{74,82,83,84,85}-php-{brotli,ldap,pecl-decimal,pecl-imagick-im7,pecl-rdkafka,pecl-simdjson,pecl-uuid,sqlsrv,xz,zstd}
+  dnf -y install php{74,83}-php-ioncube-loader php{74,83,84,85}-php-{brotli,ldap,pecl-decimal,pecl-imagick-im7,pecl-rdkafka,pecl-simdjson,pecl-uuid,sqlsrv,xz,zstd}
   env ACCEPT_EULA=Y dnf -y install msodbcsql17 --skip-broken
 fi
 dnf -y remove php-* && ln -fs `which php85` /usr/bin/php || true
