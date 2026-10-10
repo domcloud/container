@@ -146,14 +146,70 @@ PrivateTmp=true
 WantedBy=multi-user.target
 EOF
 
-cat <<'EOF' > /etc/security/limits.conf
-*         hard    nproc           20
-*         hard    as              1000000
-@nolimit  hard    nproc           512
-@nolimit  hard    as              unlimited
-root      hard    nproc           unlimited
-root      hard    as              unlimited
+# Per user cgroup
+mkdir -p /etc/systemd/system/user-.slice.d
+cat <<'EOF' > /etc/systemd/system/user-.slice.d/10-default-limits.conf
+[Slice]
+TasksMax=60
+MemoryMax=1G
+MemorySwapMax=4G
 EOF
+
+# Per user systemd cgroup
+mkdir -p /etc/systemd/system/user@.service.d
+cat <<'EOF' > /etc/systemd/system/user@.service.d/10-default-limits.conf
+[Service]
+LimitNPROC=60
+LimitAS=2G
+EOF
+
+# Nolimit user cgroup
+cat <<'EOF' > /etc/systemd/system/nolimit-slice.conf
+[Slice]
+TasksMax=512
+MemoryMax=infinity
+EOF
+
+# Per user systemd cgroup
+cat <<'EOF' > /etc/systemd/system/nolimit-service.conf
+[Service]
+LimitNPROC=512
+LimitAS=infinity
+EOF
+
+# root user cgroup
+mkdir -p /etc/systemd/system/user-0.slice.d
+cat <<'EOF' > /etc/systemd/system/user-0.slice.d/99-nolimit.conf
+[Slice]
+TasksMax=infinity
+MemoryMax=infinity
+EOF
+
+# root systemd cgroup
+mkdir -p /etc/systemd/system/user@0.service.d
+cat <<'EOF' > /etc/systemd/system/user@0.service.d/99-nolimit.conf
+[Service]
+LimitNPROC=infinity
+LimitAS=infinity
+EOF
+
+NOLIMIT="nolimit"
+rm -f /etc/systemd/system/user-*.slice.d/99-nolimit.conf 2>/dev/null || true
+rm -f /etc/systemd/system/user@*.service.d/99-nolimit.conf 2>/dev/null || true
+
+for u in $(getent group "$NOLIMIT" | cut -d: -f4 | tr ',' ' '); do
+    uid=$(id -u "$u" 2>/dev/null || true)
+    if [ -n "$uid" ]; then
+        mkdir -p "/etc/systemd/system/user-${uid}.slice.d"
+        mkdir -p "/etc/systemd/system/user@${uid}.service.d"
+        
+        ln -sf /etc/systemd/system/nolimit-slice.conf "/etc/systemd/system/user-${uid}.slice.d/99-nolimit.conf"
+        ln -sf /etc/systemd/system/nolimit-service.conf "/etc/systemd/system/user@${uid}.service.d/99-nolimit.conf"
+    fi
+done
+
+# End of systemd settings
+systemctl daemon-reload
 
 # Services config
 PG=18
