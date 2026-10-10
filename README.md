@@ -241,3 +241,9 @@ This is line 2
 EOF
 EOC
 ```
+
+### Rotate root passwd
+
+```sh
+pssh -t 0 -ih ~/hosts 'PASS=$(tr -dc A-Za-z0-9 </dev/urandom | head -c 24); echo "root:$PASS" | chpasswd; echo "$(hostname): $PASS"'
+```
