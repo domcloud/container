@@ -19,6 +19,8 @@ dnf -y module reset nodejs
 dnf -y module enable nodejs:24
 dnf -y module reset mariadb
 dnf -y module enable mariadb:11.8
+dnf -y module reset valkey
+dnf -y module enable valkey:remi-9.2
 
 PG=18
 
