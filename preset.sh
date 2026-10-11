@@ -1162,6 +1162,8 @@ echo "FILESTASH_URL=https://filestash.mnz.domcloud.co" >> .env
 rm -rf ~/.cache ~/.npm ~/public_html/phpmyadmin/node_modules
 EOF
 
+mkdir -p /run/bridge
+chown bridge:bridge /run/bridge
 systemctl daemon-reload
 systemctl enable rdproxy nginx
 systemctl enable bridge --now
