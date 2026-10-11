@@ -15,6 +15,10 @@ dnf config-manager --disable pgdg{17,16,15,14}
 curl -fsSL https://download.virtualmin.dev/virtualmin-install.sh | sh -s -- --setup --verbose
 
 # Modules
+dnf -y module reset nodejs
+dnf -y module enable nodejs:24
+dnf -y module reset mariadb
+dnf -y module enable mariadb:11.8
 
 PG=18
 
