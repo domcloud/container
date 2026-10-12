@@ -151,7 +151,7 @@ mkdir -p /etc/systemd/system/user-.slice.d
 cat <<'EOF' > /etc/systemd/system/user-.slice.d/10-default-limits.conf
 [Slice]
 TasksMax=60
-MemoryMax=1G
+MemoryMax=1500M
 MemorySwapMax=4G
 EOF
 
@@ -159,8 +159,8 @@ EOF
 mkdir -p /etc/systemd/system/user@.service.d
 cat <<'EOF' > /etc/systemd/system/user@.service.d/10-default-limits.conf
 [Service]
-LimitNPROC=60
-LimitAS=2G
+LimitNPROC=50
+LimitAS=1G
 EOF
 
 # Nolimit user cgroup
@@ -168,6 +168,7 @@ cat <<'EOF' > /etc/systemd/system/nolimit-slice.conf
 [Slice]
 TasksMax=4096
 MemoryMax=infinity
+MemorySwapMax=infinity
 EOF
 
 # Per user systemd cgroup
