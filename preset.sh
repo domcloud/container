@@ -166,14 +166,14 @@ EOF
 # Nolimit user cgroup
 cat <<'EOF' > /etc/systemd/system/nolimit-slice.conf
 [Slice]
-TasksMax=512
+TasksMax=4096
 MemoryMax=infinity
 EOF
 
 # Per user systemd cgroup
 cat <<'EOF' > /etc/systemd/system/nolimit-service.conf
 [Service]
-LimitNPROC=512
+LimitNPROC=4000
 LimitAS=infinity
 EOF
 
